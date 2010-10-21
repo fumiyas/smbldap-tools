@@ -9,6 +9,8 @@
 	  - changed option: -M (now sets only mail attribute)
 	  - home directory is now chowned as $userUidNumber:$userGidNumber
 	    (bug #11721)
+	  - use gecos as displayName if givenName and userSN not provided
+	    (bug #14517)
 	* smbldap-passwd:
 	  - new option: -p (allow root to set password from 
 	    STDIN without verification, e.g. using a pipe) (bug #11964)

@@ -295,8 +295,9 @@ $givenName = ( utf8Encode( $characterSet, $Options{'N'} ) || $userName );
 $userSN    = ( utf8Encode( $characterSet, $Options{'S'} ) || $userName );
 if ( $Options{'N'} and $Options{'S'} ) {
     $displayName = $userCN = "$givenName" . " $userSN";
-}
-else {
+} elsif ( $Options{'c'} ) {
+    $displayName = $userCN = $config{userGecos};
+} else {
     $displayName = $userCN = $userName;
 }
 
