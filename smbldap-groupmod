@@ -144,7 +144,7 @@ if (defined($Options{'x'})) {
 	$config{groupsdn}=$group_entry->dn;
 	if (is_group_member("$config{groupsdn}",$member)) {
 	    my $delete=1;
-	    if (defined $group_entry->get_value('sambaSID')) {
+	    if (defined ($user_entry) && defined $group_entry->get_value('sambaSID')) {
 		if ($group_entry->get_value('sambaSID') eq $user_entry->get_value('sambaPrimaryGroupSID')) {
 		    $delete=0;
 		    print "Cannot delete user ($member) from his primary group ($groupName)\n";
