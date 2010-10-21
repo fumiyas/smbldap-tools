@@ -57,6 +57,7 @@ dist: .diststamp
 	@cp smbldap-populate $(DESTARCH)
 	@cp smbldap-groupadd $(DESTARCH)
 	@cp smbldap-groupshow $(DESTARCH)
+	@cp smbldap-grouplist $(DESTARCH)
 	@cp smbldap-groupmod $(DESTARCH)
 	@cp smbldap-groupdel $(DESTARCH)
 	@cp smbldap-useradd $(DESTARCH)

@@ -86,6 +86,7 @@ fi
 %defattr(-,root,root)
 %{prefix}/sbin/smbldap-groupadd
 %{prefix}/sbin/smbldap-groupdel
+%{prefix}/sbin/smbldap-grouplist
 %{prefix}/sbin/smbldap-groupmod
 %{prefix}/sbin/smbldap-groupshow
 %{prefix}/sbin/smbldap-populate

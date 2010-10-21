@@ -1,6 +1,7 @@
 # $Id$
 
 2010-10-21 <mm@FreeBSD.org>
+	* new tool: smbldap-grouplist (list LDAP groups)
 	* remove references to smbldap_conf.pm
 
 2008-04-22 <jtournier@gmail.com>

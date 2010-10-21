@@ -16,6 +16,8 @@ smbldap-groupadd    : add a new LDAP group entry
 			(objectclass: posixGroup)
 smbldap-groupdel    : delete a LDAP group entry
 			(objectclass: posixGroup)
+smbldap-grouplist   : list LDAP group entries
+			(objectclass: posixGroup)
 smbldap-groupmod    : modify a LDAP group entry (or its members)
 			(objectclass: posixGroup)
 smbldap-groupshow   : view a LDAP group entry

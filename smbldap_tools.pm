@@ -94,6 +94,7 @@ use vars qw(%config $ldap);
   get_user_dn2
   connect_ldap_master
   connect_ldap_slave
+  group_name_by_type
   group_type_by_name
   subst_configvar
   read_config
@@ -1099,6 +1100,16 @@ EOF
     close FILE;
     my $rc = $?;
     return $rc;
+}
+
+sub group_name_by_type {
+    my $groupmap = shift;
+    my %type_name  = (
+	2 => 'domain',
+	4 => 'local',
+	5 => 'builtin'
+    );
+    return $type_name{$groupmap};
 }
 
 sub group_type_by_name {
