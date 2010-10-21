@@ -3,7 +3,7 @@
 2010-10-21 <mm@FreeBSD.org>
 	* new tool: smbldap-grouplist (list LDAP groups)
 	* smbldap-useradd, smbldap-usershow, smbldap-usermod:
-	  - change default encoding of givenName and sn to UTF-8
+	  - change default encoding of givenName and sn to UTF-8 (bug #11717)
 	  - new option: -X (input/output encoding, defaults to UTF-8)
 	  - new option: -O (localMailAddress attribute)
 	  - changed option: -M (now sets only mail attribute)
