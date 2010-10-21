@@ -278,23 +278,26 @@ EOF
 if ( $update_unix_passwd ) {
     my $shadowLastChange=int(time()/86400);
     my $modify;
-    if (($< != 0) || (!defined $config{defaultMaxPasswordAge})) {
 	$modify = $ldap_master->modify ( "$dn",
 					    changes => [
 							replace => [userPassword => "$hash_password"],
-							replace => [shadowLastChange => "$shadowLastChange"]
 							]
 					    );
-    } else {
+	$modify->code && warn "Failed to modify UNIX password: ", $modify->error;
 	$modify = $ldap_master->modify ( "$dn",
 					    changes => [
-							replace => [userPassword => "$hash_password"],
 							replace => [shadowLastChange => "$shadowLastChange"],
+							]
+					    );
+	$modify->code && warn "Failed to modify shadowLastChange: ", $modify->error;
+    if (($< == 0) && (defined $config{defaultMaxPasswordAge})) {
+	$modify = $ldap_master->modify ( "$dn",
+					    changes => [
 							replace => [shadowMax => "$config{defaultMaxPasswordAge}"]
 							]
 					    );
+	$modify->code && warn "Failed to modify shadowMax: ", $modify->error;
     }
-    $modify->code && warn "Failed to modify UNIX password: ", $modify->error ;
 }
 
 # take down session
