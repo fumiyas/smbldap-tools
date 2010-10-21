@@ -1,22 +1,24 @@
-# $Id: $
-# $Source: $
+# $Id$
 #
-## Authors and actives contributors to SMBLDAP-TOOLS
+## Authors, developers and contributors of SMBLDAP-TOOLS
 
-Have contributed directly to this tools, or are always in charge of 
-some aspects of it developments:
- . JÈrÙme Tournier <jerome.tournier@IDEALX.com>
+The following developers have contributed directly to this project,
+or maintain parts of the code tree:
+ . J√©r√¥me Tournier <jerome.tournier@IDEALX.com>
  . Terry Davis <terry@terryd.net>
  . David Le Corfec <dlc@freesurf.fr>
  . Olivier Lemaire <olivier.lemaire@IDEALX.com>
+ . Martin Matu≈°ka <mm@FreeBSD.org>
 
-Many thanks to contributors for bug report and patches:
+Many thanks for bug reports and patches:
  . Bruce Benda
-	smbldap-passwd: regular users can change their passwords when TLS is forced
+	smbldap-passwd: regular users can change their passwords when
+	TLS is forced
  . Dmitry Grigorovich
 	options in smbldap-passwd
  . Marc Schoechlin <ms@LF.net>
-	load the perl-modules without setting environment-variables or making symlinks
+	load the perl-modules without setting environment-variables
+	or making symlinks
  . Alexander Bergolth <leo@strike.wu-wien.ac.at>
 	more Net::LDAP support
  . Gert-Jan Braas <braas@wyldebeast-wunderliebe.com>
@@ -35,4 +37,3 @@ Many thanks to contributors for bug report and patches:
 	bug report for smbldap-populate
  . Christophe DUBREUIL <christophe.dubreuil@laposte.net>
 	Net::LDAP support in smbldap_tools.pm
-# - The End
