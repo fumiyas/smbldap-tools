@@ -1,12 +1,11 @@
 #!/usr/bin/perl -w
 
-# $Id: $
-# $Source: $
+# $Id$
 
-# This script can help you setting up the smbldap_conf.pl file. It will get all the defaults value
-# that are defined in the smb.conf configuration file. You should then start with this configuration
-# file. You will also need the SID for your samba domain: set up the controler domain before using
-# this script.
+# This script can help you setting up the smbldap_conf.pl file. It will get all
+# the defaults value that are defined in the smb.conf configuration file. You 
+# should then start with this configuration file. You will also need the SID
+# for your samba domain: set up the controler domain before using this script.
 
 #  This code was developped by IDEALX (http://IDEALX.org/) and
 #  contributors (their names can be found in the CONTRIBUTORS file).
@@ -313,7 +312,7 @@ my $mailDomain=read_entry(". default domain name to append to mail adress", "","
 print "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
 my $template_smbldap="
 # \$Source: /opt/cvs/samba/smbldap-tools/configure.pl,v $
-# \$Id: configure.pl,v 1.17 2005/07/05 09:05:16 jtournier Exp $
+# \$Id$
 #
 # smbldap-tools.conf : Q & D configuration file for smbldap-tools
 

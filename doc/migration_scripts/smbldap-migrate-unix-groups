@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# $Id$
+
 # Created by P.Wieleba@iem.pw.edu.pl in 2004
 
 use strict;

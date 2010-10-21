@@ -1,4 +1,4 @@
-# $Source: $
+# $Id$
 #
 ## TODO list - First In, Last in the list...
 ## (BF: Bug Report / FR: Feature Request)
@@ -28,5 +28,3 @@ FR * add smbldap-backup/smbldap-restore to backup and restore
      a SAM (in LDAP) database. No sorcery, just LDIF, but usefull
      for non-LDAP gurus
 FR * adding migration tools from migration from W2K and NetWare to Samba-LDAP
-
-# - The End

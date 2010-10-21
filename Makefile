@@ -1,3 +1,5 @@
+# $Id$
+
 PACKAGE=smbldap-tools
 VERSION=0.9.5
 RELEASE=1

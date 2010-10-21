@@ -1,5 +1,4 @@
-# $Id: $
-# $Source: $
+# $Id$
 #
 ## How To Install SMBLDAP-TOOLS
 
@@ -126,8 +125,3 @@ UPGRADE TO RELEASE 0.8.4 :
   - /etc/smbldap-tools/smbldap_bind.conf for connection parameters
 . scripts does not have any more the .pl extension. The call of the
   scripts in the smb.conf file must then be updated.
-
-
-
-
-# - The End

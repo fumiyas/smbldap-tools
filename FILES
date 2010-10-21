@@ -1,5 +1,4 @@
-# $Id: $
-# $Source: $
+# $Id$
 #
 ## File listing for SMBLDAP-TOOLS
 
@@ -41,5 +40,3 @@ Migration:
 =-=-=-=-=-
 smbldap-migrate-accounts     : add NT sam entries from pwdump to ldap
 smbldap-migrate-groups       : add any LDAP posixGroups from the output of the 'net group' NT command
-
-# - The End

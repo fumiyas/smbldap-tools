@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# $Id$
+
 #  This code was developped by Jerome Tournier (jtournier@gmail.com) and
 #  contributors (their names can be found in the CONTRIBUTORS file).
 

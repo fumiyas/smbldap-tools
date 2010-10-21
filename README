@@ -1,6 +1,4 @@
-# $Id: $
-# $Source: $
-#
+# $Id$
 
 Latest version may be found at https://gna.org/projects/smbldap-tools/
 
@@ -95,5 +93,3 @@ them with some functions you want them to support.
 
 Sincerly,
 	LEM
-
-# - The End

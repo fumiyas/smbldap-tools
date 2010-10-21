@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# $Id$
+
 #  This code was developped by Jerome Tournier (<jtournier@gmail.com>)
 #  This was first contributed by IDEALX (http://www.opentrust.com/)
 #  Originally developped by P.Wieleba@iem.pw.edu.pl

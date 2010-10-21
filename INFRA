@@ -1,5 +1,4 @@
-# $Id: $
-# $Source: $
+# $Id$
 #
 ## Some notes about the architecture
 
@@ -90,5 +89,3 @@ LDAP connection. The uid == 0 check was to ensure that a normal user could
 not get write access to the LDAP backend. A more logical situation should be 
 done for 2.2.5 by checking if the user is a member of the domain admin group 
 (reported to Jerremy and Gerald 2002-05-28).
-
-# - The End
