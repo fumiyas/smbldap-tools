@@ -7,8 +7,10 @@
 	  - new option: -X (input/output encoding, defaults to UTF-8)
 	  - new option: -O (localMailAddress attribute)
 	  - changed option: -M (now sets only mail attribute)
-	* fix bug in smbldap-groupmod (allow deletion of users from groups
-	without a defined samba group SID)
+	* smbldap-useradd: new option: -p (allow root to set password from 
+	  STDIN without verification, e.g. using a pipe) (bug #11964)
+	* smbldap-groupmod: allow deletion of users from groups without 
+	  a defined samba group SID)
 	* remove references to smbldap_conf.pm
 
 2008-04-22 <jtournier@gmail.com>

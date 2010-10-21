@@ -53,6 +53,7 @@ my $arg;
 my $update_samba_passwd= 1;
 my $update_unix_passwd= 1;
 my $force_update_samba_passwd=0;
+my $use_dialog=1;
 
 foreach $arg (@ARGV) {
     if ( substr( $arg, 0, 1 ) eq '-' ) {
@@ -63,6 +64,7 @@ foreach $arg (@ARGV) {
 	    print "  -s             update only samba password\n";
 	    print "  -u             update only UNIX password\n";
 	    print "  -B             must change Samba password at logon\n";
+	    print "  -p             read password from STDIN without verification (root only)\n";
 	    exit (6);
 	} elsif ($arg eq '-s') {
 	    $update_samba_passwd= 1; $update_unix_passwd= 0;
@@ -70,6 +72,8 @@ foreach $arg (@ARGV) {
 	    $update_samba_passwd= 0; $update_unix_passwd= 1;
 	} elsif ($arg eq '-B') {
             $force_update_samba_passwd= 1;
+	} elsif ($arg eq '-p') {
+            $use_dialog= 0;
         }
     } else {
 	if ( $< != 0 ) {
@@ -142,23 +146,29 @@ if ( $samba and $update_samba_passwd ) {
 # prompt for new password
 
 my $pass;
-my $pass2;
 
-print "New password: ";
-system "/bin/stty -echo" if (-t STDIN);
-chomp($pass=<STDIN>);
-system "/bin/stty echo" if (-t STDIN);
-print "\n";
+if (($< != 0) || $use_dialog) {
+	my $pass2;
 
-print "Retype new password: ";
-system "/bin/stty -echo" if (-t STDIN);
-chomp($pass2=<STDIN>);
-system "/bin/stty echo" if (-t STDIN);
-print "\n";
+	print "New password: ";
+	system "/bin/stty -echo" if (-t STDIN);
+	chomp($pass=<STDIN>);
+	system "/bin/stty echo" if (-t STDIN);
+	print "\n";
 
-if ($pass ne $pass2) {
-    print "New passwords don't match!\n";
-    exit (10);
+	print "Retype new password: ";
+	system "/bin/stty -echo" if (-t STDIN);
+	chomp($pass2=<STDIN>);
+	system "/bin/stty echo" if (-t STDIN);
+	print "\n";
+
+	if ($pass ne $pass2) {
+	    print "New passwords don't match!\n";
+	    exit (10);
+	}
+} else {
+	system "/bin/stty -echo" if (-t STDIN);
+	chomp($pass=<STDIN>);
 }
 
 # Prepare '$hash_password' for 'userPassword'
