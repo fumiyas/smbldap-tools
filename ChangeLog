@@ -7,6 +7,8 @@
 	  - new option: -X (input/output encoding, defaults to UTF-8)
 	  - new option: -O (localMailAddress attribute)
 	  - changed option: -M (now sets only mail attribute)
+	  - home directory is now chowned as $userUidNumber:$userGidNumber
+	    (bug #11721)
 	* smbldap-passwd:
 	  - new option: -p (allow root to set password from 
 	    STDIN without verification, e.g. using a pipe) (bug #11964)
