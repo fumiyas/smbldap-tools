@@ -29,7 +29,7 @@ INSTALLATION from the tar.gz archive
   > my $smbldap_conf="/etc/smbldap-tools/smbldap.conf";
   > my $smbldap_bind_conf="/etc/smbldap-tools/smbldap_bind.conf";
 . if upgrading, add these lines in smbldap.conf configuration file:
-  > # Allows not tu use slappasswd (if with_slappasswd == 0 in smbldap_conf.pm)
+  > # Allows not tu use slappasswd (if with_slappasswd="0" in smbldap.conf)
   > # but prefer Crypt:: libraries
   > with_slappasswd="0"
   > slappasswd="/usr/sbin/slappasswd"

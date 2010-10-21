@@ -75,10 +75,6 @@ if [ -f /usr/lib/perl5/site_perl/smbldap_tools.pm ];
 then
 	rm -f /usr/lib/perl5/site_perl/smbldap_tools.pm
 fi
-if [ -f /usr/lib/perl5/site_perl/smbldap_conf.pm ];
-then
-	rm -f /usr/lib/perl5/site_perl/smbldap_conf.pm
-fi
 
 if [ ! -n `grep with_slappasswd %{_sysconfdir}/smbldap-tools/smbldap.conf | grep -v "^#"` ];
 then

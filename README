@@ -55,7 +55,7 @@ Constraints :
 The current release uses the "mkntpwd" program, in mkntpwd.tar.gz
 in the current directory. It comes from
 http://www.demog.berkeley.edu/~aperrin/tips/src/mkntpwd.tar.gz
-It allows to not use smbpasswd (if $with_smbpasswd == 0 in smbldap_conf.pm)
+It allows to not use smbpasswd (if $with_smbpasswd="0" in smbldap.conf)
 
 What do SMBLDAP-TOOLS deliver?
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

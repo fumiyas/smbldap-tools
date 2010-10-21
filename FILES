@@ -12,31 +12,34 @@ configure.pl		: script to configure the smbldap_conf.pl
 
 Core:
 =-=-=
-smbldap-groupadd    : to add a new group
-			 (objectclass: posixGroup)
-smbldap-groupdel    : to delete a group
-			 (objectclass: posixGroup)
-smbldap-groupmod    : to modify a group (mostly used to add user to a group)
-			 (objectclass: posixGroup)
-smbldap-groupshow   : to view a group
-			 (objectclass: posixGroup)
-smbldap_conf.pm     : global configuration datas
+smbldap-groupadd    : add a new LDAP group entry
+			(objectclass: posixGroup)
+smbldap-groupdel    : delete a LDAP group entry
+			(objectclass: posixGroup)
+smbldap-groupmod    : modify a LDAP group entry (or its members)
+			(objectclass: posixGroup)
+smbldap-groupshow   : view a LDAP group entry
+			(objectclass: posixGroup)
+smbldap.conf        : global configuration data
+smbldap_bind.conf   : LDAP binding configuration
 smbldap_tools.pm    : functions
-smbldap-useradd     : to add a new user
-			 (objectclass: posixAccount and/or sambaAccount)
-smbldap-userdel     : to delete a user
-			 (objectclass: posixAccount and/or sambaAccount)
-smbldap-usermod     : to modify a user datas
-			 (objectclass: posixAccount and/or sambaAccount)
-smbldap-usershow    : to view an user datas
-			 (objectclass: posixAccount and/or sambaAccount)
-smbldap-passwd      : to sync passwd (Unix and Samba)
-			 (a replacement for the system passwd utility)
-smbldap-populate    : to add a builtin ldif to initialize your LDAP master for
-                         smbldap use, or to add a specified ldif
+smbldap-useradd     : add a new LDAP user
+			(objectclass: posixAccount and/or sambaAccount)
+smbldap-userdel     : delete a LDAP user
+			(objectclass: posixAccount and/or sambaAccount)
+smbldap-userlist    : list LDAP users
+smbldap-usermod     : modify a LDAP user entry
+			(objectclass: posixAccount and/or sambaAccount)
+smbldap-usershow    : view a LDAP user entry
+			(objectclass: posixAccount and/or sambaAccount)
+smbldap-passwd      : set and sync LDAP passwdords (Unix and Samba)
+			(replacement for the system passwd utility)
+smbldap-populate    : add a builtin ldif to initialize your LDAP master for
+			smbldap use, or to add a specified ldif
 smbldap-tools.spec  : SPEC file for RedHat RPM package format
 
 Migration:
 =-=-=-=-=-
 smbldap-migrate-accounts     : add NT sam entries from pwdump to ldap
-smbldap-migrate-groups       : add any LDAP posixGroups from the output of the 'net group' NT command
+smbldap-migrate-groups       : add any LDAP posixGroups from the output of the 
+				'net group' NT command

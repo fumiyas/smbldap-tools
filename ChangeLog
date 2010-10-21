@@ -1,5 +1,8 @@
 # $Id$
 
+2010-10-21 <mm@FreeBSD.org>
+	* remove references to smbldap_conf.pm
+
 2008-04-22 <jtournier@gmail.com>
 	* new tag 0.9.5
 
