@@ -828,9 +828,9 @@ sub read_user {
         $lines .= "dn: " . $entry->dn . "\n";
         foreach my $attr ( $entry->attributes ) {
             my @vals = $entry->get_value($attr);
-            foreach my $val (@vals) {
-                $val = "**UNPRINTABLE**" if ( $val =~ /[^[:print:]]/ );
-            }
+#            foreach my $val (@vals) {
+#                $val = "**UNPRINTABLE**" if ( $val =~ /[^[:print:]]/ );
+#            }
             $lines .= $attr . ": " . join( ',', @vals ) . "\n";
         }
     }
@@ -1222,22 +1222,33 @@ sub get_next_id($$) {
 }
 
 sub utf8Encode {
-    my $arg = shift;
+    my $charset = shift;
+    my $string = shift;
 
-    return to_utf8(
-        -string  => $arg,
-        -charset => 'ISO-8859-1',
-    );
+    if ($charset eq "UTF-8") {
+	return $string;
+    }
+    else {
+	return to_utf8(
+	    -string  => $string,
+	    -charset => $charset,
+	);
+    }
 }
 
 sub utf8Decode {
-    my $arg = shift;
+    my $charset = shift;
+    my $string = shift;
 
-    return from_utf8(
-        -string  => $arg,
-        -charset => 'ISO-8859-1',
-    );
+    if ($charset eq "UTF-8") {
+	return $string;
+    }
+    else {
+	return from_utf8(
+	    -string  => $string,
+	    -charset => $charset,
+	);
+    }
 }
 
 1;
-
