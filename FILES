@@ -20,7 +20,7 @@ smbldap-groupmod    : modify a LDAP group entry (or its members)
 			(objectclass: posixGroup)
 smbldap-groupshow   : view a LDAP group entry
 			(objectclass: posixGroup)
-smbldap.conf        : global configuration data
+smbldap.conf        : global configuration
 smbldap_bind.conf   : LDAP binding configuration
 smbldap_tools.pm    : functions
 smbldap-useradd     : add a new LDAP user
@@ -28,6 +28,7 @@ smbldap-useradd     : add a new LDAP user
 smbldap-userdel     : delete a LDAP user
 			(objectclass: posixAccount and/or sambaAccount)
 smbldap-userlist    : list LDAP users
+			(objectclass: posixAccount and/or sambaAccount)
 smbldap-usermod     : modify a LDAP user entry
 			(objectclass: posixAccount and/or sambaAccount)
 smbldap-usershow    : view a LDAP user entry
