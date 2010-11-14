@@ -2,7 +2,7 @@
 
 # $Id$
 
-#  This code was developped by Jerome Tournier (jtournier@gmail.com) and
+#  This code was developed by Jerome Tournier (jtournier@gmail.com) and
 #  contributors (their names can be found in the CONTRIBUTORS file).
 
 #  This was first contributed by IDEALX (http://www.opentrust.com/)
@@ -37,11 +37,11 @@ use Getopt::Std;
 my %Options;
 
 my $ok =
-  getopts( 'o:abnmwWiPG:u:g:d:s:c:k:t:A:B:C:D:E:F:H:L:M:N:O:S:T:X:Z?', \%Options );
+  getopts( 'abc:d:g:ik:mno:s:t:u:wA:B:C:D:E:F:G:H:M:N:O:PS:T:WX:Z:?', \%Options );
 
 if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'?'} ) ) {
     print_banner;
-    print "Usage: $0 [-awmugdsckABCDEFGHMNPST?] username\n";
+    print "Usage: $0 [-abcdgikmnostuwABCDEFGHMNOPSTWXZ?] username\n";
     print "  -a	is a Windows User (otherwise, Posix stuff only)\n";
     print "  -b	is a AIX User\n";
     print "  -c	gecos\n";
@@ -53,10 +53,10 @@ if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'?'} ) ) {
     print "  -n	do not create a group\n";
     print
 "  -o	add the user in the organizational unit (relative to the user suffix. Ex: 'ou=admin,ou=all')\n";
-    print "  -u	uid\n";
     print "  -s	shell\n";
     print
 "  -t	time. Wait 'time' seconds before exiting (when adding Windows Workstation)\n";
+    print "  -u	uid\n";
     print "  -w	is a Windows Workstation (otherwise, Posix stuff only)\n";
     print
 "  -W	is a Windows Workstation, with Samba atributes (otherwise, Posix stuff only)\n";
@@ -71,12 +71,12 @@ if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'?'} ) ) {
     print "  -G	supplementary comma-separated groups\n";
     print
       "  -H	sambaAcctFlags (samba account control bits like '[NDHTUMWSLKI]')\n";
-    print "  -M	e-mail address (comma seperated)\n";
+    print "  -M	e-mail address (comma separated)\n";
     print "  -N	given name \n";
     print "  -O	localMailAddress (comma separated)\n";
     print "  -P	ends by invoking smbldap-passwd\n";
     print "  -S	surname (Family name)\n";
-    print "  -T	mailToAddress (forward address) (comma seperated)\n";
+    print "  -T	mailToAddress (forward address) (comma separated)\n";
     print "  -X	input encoding for givenname and surname (default UTF-8)\n";
     print "  -Z	set custom LDAP attributes, name=value pairs comma separated\n";
     print "  -?	show this help message\n";
@@ -280,10 +280,10 @@ if ( !defined( $userHomeDirectory = $Options{'d'} ) ) {
 # sn: family name (option S)             # RFC 2256: family name of a person.
 # givenName: prenom (option N)           # RFC 2256: part of a person's name which is not their surname nor middle name.
 # cn: person's full name                 # RFC 2256: person's full name.
-# displayName: perferably displayed name # RFC 2798: preferred name of a person to be used when displaying entries.
+# displayName: preferably displayed name # RFC 2798: preferred name of a person to be used when displaying entries.
 
-#givenname is the forename of a person (not famiy name) => http://en.wikipedia.org/wiki/Given_name
-#surname (or sn) is the familiy name => http://en.wikipedia.org/wiki/Surname
+#givenname is the forename of a person (not family name) => http://en.wikipedia.org/wiki/Given_name
+#surname (or sn) is the family name => http://en.wikipedia.org/wiki/Surname
 # my surname (or sn): Tournier
 # my givenname: Jerome
 
@@ -313,7 +313,7 @@ if (   defined( $Options{'w'} )
     or defined( $Options{'W'} ) )
 {
 
-    # if Options{'i'} and username does not end with $ caracter => we add it
+    # if Options{'i'} and username does not end with $ character => we add it
     if ( $Options{'i'} and !( $userName =~ m/\$$/ ) ) {
         $userName .= "\$";
     }
@@ -409,7 +409,7 @@ if (   defined( $Options{'w'} )
 # add posix account first
 my $add;
 
-# if AIX account, inetOrgPerson obectclass can't be used
+# if AIX account, inetOrgPerson objectclass can't be used
 if ( defined( $Options{'b'} ) ) {
     $add = $ldap_master->add(
         "uid=$userName,$config{usersdn}",
@@ -498,7 +498,7 @@ if ( defined( $tmp = $Options{'m'} ) ) {
     }
 }
 
-# we start to defined mail adresses if option M, O or T are given
+# we start to define mail addresses if option M, O or T are given
 my @adds;
 if ( @userMailLocal || @userMailTo ) {
     push( @adds, 'objectClass' => 'inetLocalMailRecipient' );
@@ -556,7 +556,7 @@ if ( defined( $Options{'a'} ) ) {
                 $valpwdmustchange = "0";
 
                 # To force a user to change his password:
-                # . the attribut sambaAcctFlags must not match the 'X' flag
+                # . the attribute sambaAcctFlags must not match the 'X' flag
                 $valacctflags = "[U]";
             }
             else {
@@ -678,100 +678,111 @@ smbldap-useradd - Create a new user
 
 =head1 SYNOPSIS
 
-smbldap-useradd [-o user_ou] [-c comment] [-d home_dir] [-g initial_group] [-G group[,...]] [-m [-k skeleton_dir]] [-s shell] [-u uid [ -o]] [-P] [-A canchange] [-B mustchange] [-C smbhome] [-D homedrive] [-E scriptpath] [-F profilepath] [-H acctflags] login
+smbldap-useradd [-abinwPW] [-c comment] [-d home_dir] [-g initial_group] [-m [-k skeleton_dir]] [-o user_ou] [-s shell] [-t time] [-u uid] [-A canchange] [-B mustchange] [-C smbhome] [-D homedrive] [-E scriptpath] [-F profilepath] [-G group[,...]] [-H acctflags] [-M mailaddr[,...]] [-N givenname] [-O mailaddr[,...]] [-S surname] [-T mailaddr[,...]] [-X encoding] [-Z name=value[,...]] login
 
 =head1 DESCRIPTION
 
 Creating New Users
-The smbldap-useradd command creates a new user account using  the values specified on the  command  line  and  the default  values from the system and from the configuration files (in  /etc/smbldap-tools directory).
+The smbldap-useradd command creates a new user account using the values specified on the command line and the default values from the system and from the configuration files (in the /etc/smbldap-tools directory).
 
-For Samba users, rid is '2*uidNumber+1000', and sambaPrimaryGroupSID  is '$SID-2*gidNumber+1001', where $SID is the domain SID.  Thus you may want to use :
-$ smbldap-useradd -a -g "Domain Admins" -u 500 Administrator
-to create an domain administrator account (admin rid is 0x1F4 = 500 and grouprid is 0x200 = 512).
+For Samba users, rid is '2*uidNumber+1000', and sambaPrimaryGroupSID is '$SID-2*gidNumber+1001', where $SID is the domain SID. Thus you may want to use:
 
-Without any option, the account created will be an Unix (Posix)  account. The following options may be used to add information:
+ $ smbldap-useradd -a -g "Domain Admins" -u 500 Administrator
 
--o node
-   The user's account will be created in the specified organazional unit. It is relative to the user suffix dn ($usersdn) defined in the configuration file.
-Ex: 'ou=admin,ou=all'
+to create a domain administrator account (admin rid is 0x1F4 = 500 and grouprid is 0x200 = 512).
+
+Without any option, the account created will be a Unix (Posix) account. The following options may be used to add information:
 
 -a
    The user will have a Samba account (and Unix).
 
+-A
+   Can change password? 0 if no, 1 if yes.
+
 -b
-   The usrer is an AIX acount
+   The user is an AIX account.
 
--w
-   Creates an account for a Samba machine (Workstation), so that it can join a sambaDomainName.
-
--i
-   Creates an interdomain trust account (machine Workstation). A password will be asked for the trust account.
+-B
+   Must change password? 0 if no, 1 if yes.
 
 -c "comment"
    The new user's comment field (gecos). This option is for gecos only! To set as user's full name use the -N and -S options.
 
--d home_dir
-   The new user will be created using home_dir as the value for the user's login directory.  The default is to append the login name      to userHomePrefix (defined in the configuration file) and use that      as the login directory name.
-
--g initial_group
-   The group name or number of the user's initial login group. The  group  name must exist.  A group number must refer to an already  existing group.  The default group number is defined in the  configuration file (defaultUserGid="513").
-
--G group,[...]
-   A list of supplementary groups which the user is also  a  member of. Each  group is separated to the next by a comma, with no intervening whitespace.  The groups  are  subject  to  the  same restrictions as the group given with the -g option.  The default is for the user to belong only to the initial group.
-
--m
-   The user's home directory will be created if it does not  exist. The  files  contained in skeletonDir will be copied to the home directory if the -k option is used,  otherwise  the  files  contained  in /etc/skel will be used instead.  Any directories contained in skeletonDir or  /etc/skel  will  be  created  in  the user's  home  directory as well.  The -k option is only valid in conjunction with the -m option.  The default is  to  not  create the directory and to not copy any files.
-
--s shell
-   The name of the user's login shell.  The  default  is  to  leave this  field blank, which causes the system to select the default login shell.
-
--t time
-   Wait <time> seconds before exiting script when adding computer's account. This is useful when Master/PDC and Slaves/BDCs are connected through the internet (replication is not real time)
-
--u uid
-   The numerical value of  the  user's  ID.   This  value  must  be unique,  unless  the  -o option is used.  The value must be nonnegative.  The default is to use the smallest ID  value  greater than 1000 and greater than every other user.
-
--P
-   ends by invoking smbldap-passwd
-
--A
-   can change password ? 0 if no, 1 if yes
-
--B
-   must change password ? 0 if no, 1 if yes
-
 -C sambaHomePath
-   SMB home share, like '\\\\PDC-SRV\\homes'
+   SMB home share, like '\\\\PDC-SRV\\homes'.
+
+-d home_dir
+   The new user will be created using home_dir for the user's login directory. The default is to append the login name to userHomePrefix (defined in the configuration file) and use that as the login directory name.
 
 -D sambaHomeDrive
-   letter associated with home share, like 'H:'
+   Letter associated with home share, like 'H:'.
 
 -E sambaLogonScript
-   relative to the [netlogon] share (DOS script to execute on login, like 'foo.bat'
+   Relative to the [netlogon] share (DOS script to execute on login, like 'foo.bat'.
 
 -F sambaProfilePath
-   profile directory, like '\\\\PDC-SRV\\profiles\\foo'
+   Profile directory, like '\\\\PDC-SRV\\profiles\\foo'.
+
+-g initial_group
+   The group name or number of the user's initial login group. The group name must exist. A group number must refer to an already existing group. The default group number is defined in the configuration file (defaultUserGid="513").
+
+-G group,[...]
+   A list of supplementary groups that the user is also a member of. Each group is separated from the next by a comma, with no intervening whitespace. The groups are subject to the same restrictions as the group given with the -g option. The default is for the user to belong only to the initial group.
 
 -H sambaAcctFlags
-   spaces and trailing bracket are ignored (samba account control bits like '[NDHTUMWSLKI]'
+   Spaces and trailing bracket are ignored (samba account control bits like '[NDHTUMWSLKI]').
+
+-i
+   Creates an interdomain trust account (machine Workstation). A password will be asked for the trust account.
+
+-k skeletonDir
+   When creating the user's home directory, copy files and directories from skeletonDir rather than /etc/skel. The -k option is only valid in conjunction with the -m option. The default is not to create the directory and not to copy any files.
+
+-m
+   The user's home directory will be created if it does not exist. The files contained in skeletonDir will be copied to the home directory if the -k option is used, otherwise the files contained in /etc/skel will be used instead.  Any directories contained in skeletonDir or /etc/skel will be created in the user's home directory as well.
 
 -M mail
-   e-mail adresses (multiple addresses are seperated by commas)
-
--N givenname
-   family name. Defaults to username
-
--O localMailAddress
-   localMailAddresses (multiple addresses are seperated by commas)
-
--S surname
-   defaults to username
-
--T mailToAddress
-   Forward address (multiple addresses are seperated by commas)
+   E-mail addresses (multiple addresses are separated by commas).
 
 -n
-   do not print banner message
+   Do not print banner message.
+
+-N givenname
+   Family name. Defaults to username.
+
+-o node
+   The user's account will be created in the specified organizational unit. It is relative to the user suffix dn ($usersdn) defined in the configuration file.
+Ex: 'ou=admin,ou=all'
+
+-O localMailAddress
+   localMailAddresses (multiple addresses are separated by commas).
+
+-P
+   Ends by invoking smbldap-passwd.
+
+-s shell
+   The name of the user's login shell. The default is to leave this field blank, which causes the system to select the default login shell.
+
+-S surname
+   Defaults to username.
+
+-t time
+   Wait <time> seconds before exiting script when adding computer's account. This is useful when Master/PDC and Slaves/BDCs are connected through the Internet (replication is not real time).
+
+-T mailToAddress
+   Forward address (multiple addresses are separated by commas).
+
+-u uid
+   The numerical value of the user's ID. This value must be unique, unless the -o option is used. The value must be non-negative. The default is to use the smallest ID value greater than 1000 and greater than every other user.
+
+-w/-W
+   Creates an account for a Samba machine (Workstation), so that it can join a sambaDomainName. Normally -w is used for adding machines through Samba but -W can be used for manual addition of samba attributes.
+
+-X encoding
+   Specify input encoding for givenname and surname (default UTF-8).
+
+-Z name=value
+   Specify custom LDAP attributes, using comma-separated name=value pairs.
 
 =head1 SEE ALSO
 
