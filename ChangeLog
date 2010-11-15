@@ -1,18 +1,15 @@
 # $Id$
 
 2010-11-15 <mm@FreeBSD.org>
-	* new tag 0.9.6
-
-2010-11-15 <mm@FreeBSD.org>
 	* smbldap-useradd:
 	  - fix Z option in getopt (custom LDAP attribute)
 	  - drop unused L option from getopt
 	  - alphabetically reorganize getopt options
 	  - fix several mis-spellings and typos
 	(thx to Paul Howarth <paul@city-fan.org>)
-
 	* other utilities:
 	  - alphabetically reorganize getopt and help
+	* new tag 0.9.6
 
 2010-10-21 <mm@FreeBSD.org>
 	* new tool: smbldap-grouplist (list LDAP groups)
