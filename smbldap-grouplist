@@ -39,8 +39,7 @@ my %Options;
 
 my $ok = getopts('dtS?', \%Options);
 if ( (!$ok) || ($Options{'?'}) || $Options{'h'} ) {
-    print "Usage: $0 [options] [user template]\n\n";
-    print "Available UNIX options are:\n";
+    print "Usage: $0 [dtS?] [user template]\n\n";
     print "-d     Show displayName\n";
     print "-t     Show samba group type\n";
     print "-S     Show samba SID\n";

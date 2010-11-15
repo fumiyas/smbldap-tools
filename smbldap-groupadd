@@ -33,18 +33,18 @@ use smbldap_tools;
 use Getopt::Std;
 my %Options;
 
-my $ok = getopts('abg:or:s:t:p?', \%Options);
+my $ok = getopts('abg:opr:s:t:?', \%Options);
 if ( (!$ok) || (@ARGV < 1) || ($Options{'?'}) ) {
     print_banner;
-    print "Usage: $0 [-agorst?] groupname\n";
+    print "Usage: $0 [-abgoprst?] groupname\n";
     print "  -a   add automatic group mapping entry\n";
     print "  -b   create a AIX group\n";
     print "  -g   gid\n";
     print "  -o   gid is not unique\n";
+    print "  -p   print the gidNumber to stdout\n";
     print "  -r   group-rid\n";
     print "  -s   group-sid\n";
     print "  -t   group-type\n";
-    print "  -p   print the gidNumber to stdout\n";
     print "  -?   show this help message\n";
     exit (1);
 }

@@ -37,18 +37,18 @@ sub exist_in_tab;
 
 my %Options;
 
-my $ok = getopts('adelmugh?', \%Options);
+my $ok = getopts('adeghlmu?', \%Options);
 if ( (!$ok) || ($Options{'?'}) || $Options{'h'} ) {
-    print "Usage: $0 [options] [user template]\n\n";
+    print "Usage: $0 [adeghlmu?] [user template]\n\n";
     print "Available UNIX options are:\n";
     print "-a     Show gecos, password last change, expiration date and account status\n";
-    print "-g     Show gecos entry\n";
     print "-d     Show last modification password date.\n";
     print "-e     Show the expiration date\n";
+    print "-g     Show gecos entry\n";
     print "-l     Show account status (locl/unlock)\n";
     print "-m     Only list machines.\n";
     print "-u     Only list users\n";
-    print "-?     show the help message\n";
+    print "-?|-h  show the help message\n";
     exit (1);
 }
 

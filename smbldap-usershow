@@ -33,11 +33,11 @@ use smbldap_tools;
 use Getopt::Std;
 my %Options;
 
-my $ok = getopts('?hX:',\%Options);
+my $ok = getopts('hX:?',\%Options);
 
 if ( (!$ok) || (@ARGV < 1) || ($Options{'?'}) ) {
     print_banner;
-    print "Usage: $0 [-h?] username\n";
+    print "Usage: $0 [-hX?] username\n";
     print "  -h	print Samba dates in human-readable form\n";
     print "  -X	output character set (default UTF-8)\n";
     print "  -?	show this help message\n";

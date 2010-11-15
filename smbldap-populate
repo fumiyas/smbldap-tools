@@ -46,20 +46,20 @@ use vars qw(%oc);
 
 my %Options;
 
-my $ok = getopts('a:b:e:i:k:l:m:u:g:r:?', \%Options);
+my $ok = getopts('a:b:e:g:i:k:l:m:r:u:?', \%Options);
 if ( (!$ok) || ($Options{'?'}) ) {
     print_banner;
-    print "Usage: $0 [-abeiklug?] [ldif]\n";
-    print "  -u uidNumber	first uidNumber to allocate (default: 1000)\n";
-    print "  -g gidNumber	first uidNumber to allocate (default: 1000)\n";
-    print "  -r ridNumber	first sambaNextRid to allocate (default: 1000)\n";
+    print "Usage: $0 [-abegiklmru?] [ldif]\n";
     print "  -a user	administrator login name (default: root)\n";
     print "  -b user	guest login name (default: nobody)\n";
+    print "  -e file	export ldif file\n";
+    print "  -g gidNumber	first uidNumber to allocate (default: 1000)\n";
+    print "  -i file	import ldif file\n";
     print "  -k uidNumber	administrator's uidNumber (default: 0)\n";
     print "  -l uidNumber	guest's uidNumber (default: 999)\n";
     print "  -m gidNumber	administrator's gidNumber (default: 0)\n";
-    print "  -e file	export ldif file\n";
-    print "  -i file	import ldif file\n";
+    print "  -r ridNumber	first sambaNextRid to allocate (default: 1000)\n";
+    print "  -u uidNumber	first uidNumber to allocate (default: 1000)\n";
     print "  -?		show this help message\n";
 
     exit (1);

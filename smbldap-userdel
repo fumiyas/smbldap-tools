@@ -40,9 +40,10 @@ my $ok = getopts('rR?', \%Options);
 
 if ( (!$ok) || (@ARGV < 1) || ($Options{'?'}) ) {
     print_banner;
-    print "Usage: $0 [-r?] username\n";
+    print "Usage: $0 [-rR?] username\n";
     print "  -r	remove home directory\n";
     print "  -R	remove home directory interactively\n";
+    print "  -? show this help message\n";
     exit (1);
 }
 

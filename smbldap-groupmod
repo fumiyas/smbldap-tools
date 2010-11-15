@@ -39,12 +39,12 @@ my %Options;
 my $ok = getopts('ag:n:m:or:s:t:x:?', \%Options);
 if ( (!$ok) || (@ARGV < 1) || ($Options{'?'}) ) {
     print_banner;
-    print "Usage: $0 [-a] [-g gid [-o]] [-n name] [-m members(,)] [-x members (,)] [-r rid] [-s sid] [-t type] groupname\n";
+    print "Usage: $0 [-a] [-g gid] [-n name] [-m members(,)] [-o] [-r rid] [-s sid] [-t type] [-x members (,)] groupname\n";
     print "  -a   add automatic group mapping entry\n";
     print "  -g   new gid\n";
-    print "  -o   gid is not unique\n";
     print "  -n   new group name\n";
     print "  -m   add members (comma delimited)\n";
+    print "  -o   gid is not unique\n";
     print "  -r   group-rid\n";
     print "  -s   group-sid\n";
     print "  -t   group-type\n"; 

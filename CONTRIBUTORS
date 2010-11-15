@@ -37,3 +37,5 @@ Many thanks for bug reports and patches:
 	bug report for smbldap-populate
  . Christophe DUBREUIL <christophe.dubreuil@laposte.net>
 	Net::LDAP support in smbldap_tools.pm
+ . Paul Horwath <paul@city-fan.org>
+	various style, spelling and other bugfixes

@@ -33,18 +33,18 @@ sub exist_in_tab;
 
 my %Options;
 
-my $ok = getopts('f:r:w:h:o:s:l?v', \%Options);
+my $ok = getopts('f:h:lo:r:s:vw:?', \%Options);
 if ( (!$ok) || ($Options{'?'}) ) {
-    print "Usage: $0 [-frwhosh?] username\n";
-    print "  -?|-h show this help message\n";
+    print "Usage: $0 [-fhlorsvw?] username\n";
     print "  -f full_name\n";
-    print "  -r room_no\n";
-    print "  -w work_ph\n";
     print "  -h home_ph\n";
+    print "  -l only list user information\n";
     print "  -o other\n";
+    print "  -r room_no\n";
     print "  -s shell\n";
     print "  -v show modified user record\n";
-    print "  -l only list user information\n";
+    print "  -w work_ph\n";
+    print "  -? show this help message\n";
     exit (1);
 }
 

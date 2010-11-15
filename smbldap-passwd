@@ -59,12 +59,12 @@ foreach $arg (@ARGV) {
     if ( substr( $arg, 0, 1 ) eq '-' ) {
 	if ( $arg eq '-h' || $arg eq '-?' || $arg eq '--help' ) {
 	    print_banner;
-	    print "Usage: $0 [options] [username]\n";
+	    print "Usage: $0 [hpsuB?] [username]\n";
 	    print "  -h, -?, --help show this help message\n";
+	    print "  -p             read password from STDIN without verification (root only)\n";
 	    print "  -s             update only samba password\n";
 	    print "  -u             update only UNIX password\n";
 	    print "  -B             must change Samba password at logon\n";
-	    print "  -p             read password from STDIN without verification (root only)\n";
 	    exit (6);
 	} elsif ($arg eq '-s') {
 	    $update_samba_passwd= 1; $update_unix_passwd= 0;
