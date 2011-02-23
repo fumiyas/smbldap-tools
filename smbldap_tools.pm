@@ -25,6 +25,7 @@
 use strict;
 
 package smbldap_tools;
+use Encode;
 use Net::LDAP;
 use Crypt::SmbHash;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8);
@@ -828,9 +829,10 @@ sub read_user {
         $lines .= "dn: " . $entry->dn . "\n";
         foreach my $attr ( $entry->attributes ) {
             my @vals = $entry->get_value($attr);
-#            foreach my $val (@vals) {
-#                $val = "**UNPRINTABLE**" if ( $val =~ /[^[:print:]]/ );
-#            }
+#	    my $val_utf8 = eval {
+#		Encode::decode_utf8($val, Encode::FB_CROAK);
+#	    };
+#	    $val = "**UNPRINTABLE**" if ($@ || $val_utf8 =~ /\P{IsPrint}/);
             $lines .= $attr . ": " . join( ',', @vals ) . "\n";
         }
     }
@@ -857,7 +859,10 @@ sub read_user_human_readable {
         foreach my $attr ( $entry->attributes ) {
             my @vals = $entry->get_value($attr);
             foreach my $val (@vals) {
-                $val = "**UNPRINTABLE**" if ( $val =~ /[^[:print:]]/ );
+		my $val_utf8 = eval {
+		    Encode::decode_utf8($val, Encode::FB_CROAK);
+		};
+		$val = "**UNPRINTABLE**" if ($@ || $val_utf8 =~ /\P{IsPrint}/);
             }
             if (   $attr eq "sambaPwdLastSet"
                 or $attr eq "sambaPwdCanChange"
