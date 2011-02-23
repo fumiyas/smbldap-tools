@@ -121,16 +121,16 @@ sub print_banner {
 sub read_parameter {
     my $line = shift;
     ## check for a param = value
-    if ( $_ =~ /=/ ) {
+    if ( $line =~ /=/ ) {
         my ( $param, $val );
-        if ( $_ =~ /\s*.*?\s*=\s*".*"/ ) {
-            ( $param, $val ) = /\s*(.*?)\s*=\s*"(.*)"/;
+        if ( $line =~ /\s*(.*?)\s*=\s*"(.*)"/ ) {
+            ( $param, $val ) = ($1, $2);
         }
-        elsif ( $_ =~ /\s*.*?\s*=\s*'.*'/ ) {
-            ( $param, $val ) = /\s*(.*?)\s*=\s*'(.*)'/;
+        elsif ( $line =~ /\s*(.*?)\s*=\s*'(.*)'/ ) {
+            ( $param, $val ) = ($1, $2);
         }
         else {
-            ( $param, $val ) = /\s*(.*?)\s*=\s*(.*)/;
+            ( $param, $val ) = $line =~ /\s*(.*?)\s*=\s*(.*)/;
         }
         return ( $param, $val );
     }
