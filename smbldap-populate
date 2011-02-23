@@ -339,7 +339,7 @@ gidNumber: 544
 cn: Administrators
 description: Netbios Domain Members can fully administer the computer/sambaDomainName
 sambaSID: S-1-5-32-544
-sambaGroupType: 5
+sambaGroupType: 4
 displayName: Administrators
 
 #dn: cn=Users,$config{groupsdn}
@@ -350,7 +350,7 @@ displayName: Administrators
 #cn: Users
 #description: Netbios Domain Ordinary users
 #sambaSID: S-1-5-32-545
-#sambaGroupType: 5
+#sambaGroupType: 4
 #displayName: users
 
 #dn: cn=Guests,$config{groupsdn}
@@ -362,7 +362,7 @@ displayName: Administrators
 #memberUid: $guestName
 #description: Netbios Domain Users granted guest access to the computer/sambaDomainName
 #sambaSID: S-1-5-32-546
-#sambaGroupType: 5
+#sambaGroupType: 4
 #displayName: Guests
 
 #dn: cn=Power Users,$config{groupsdn}
@@ -373,7 +373,7 @@ displayName: Administrators
 #cn: Power Users
 #description: Netbios Domain Members can share directories and printers
 #sambaSID: S-1-5-32-547
-#sambaGroupType: 5
+#sambaGroupType: 4
 #displayName: Power Users
 
 dn: cn=Account Operators,$config{groupsdn}
@@ -384,7 +384,7 @@ gidNumber: 548
 cn: Account Operators
 description: Netbios Domain Users to manipulate users accounts
 sambaSID: S-1-5-32-548
-sambaGroupType: 5
+sambaGroupType: 4
 displayName: Account Operators
 
 #dn: cn=System Operators,$config{groupsdn}
@@ -395,7 +395,7 @@ displayName: Account Operators
 #cn: System Operators
 #description: Netbios Domain System Operators
 #sambaSID: S-1-5-32-549
-#sambaGroupType: 5
+#sambaGroupType: 4
 #displayName: System Operators
 
 dn: cn=Print Operators,$config{groupsdn}
@@ -406,7 +406,7 @@ gidNumber: 550
 cn: Print Operators
 description: Netbios Domain Print Operators
 sambaSID: S-1-5-32-550
-sambaGroupType: 5
+sambaGroupType: 4
 displayName: Print Operators
 
 dn: cn=Backup Operators,$config{groupsdn}
@@ -417,7 +417,7 @@ gidNumber: 551
 cn: Backup Operators
 description: Netbios Domain Members can bypass file security to back up files
 sambaSID: S-1-5-32-551
-sambaGroupType: 5
+sambaGroupType: 4
 displayName: Backup Operators
 
 dn: cn=Replicators,$config{groupsdn}
@@ -428,7 +428,7 @@ gidNumber: 552
 cn: Replicators
 description: Netbios Domain Supports file replication in a sambaDomainName
 sambaSID: S-1-5-32-552
-sambaGroupType: 5
+sambaGroupType: 4
 displayName: Replicators
 
 ";
