@@ -632,12 +632,9 @@ if ( defined( $tmp = $Options{'A'} ) ) {
     }
 }
 
-my $_sambaPwdMustChange;
 if ( defined( $tmp = $Options{'B'} ) ) {
     if ( $samba == 1 ) {
         if ( $tmp != 0 ) {
-            $_sambaPwdMustChange = 0;
-
             # To force a user to change his password:
             # . the attribut sambaAcctFlags must not match the 'X' flag
             my $_sambaAcctFlags;
@@ -651,12 +648,13 @@ if ( defined( $tmp = $Options{'B'} ) ) {
                 $_sambaAcctFlags = "\[$letters\]";
                 push( @mods, 'sambaAcctFlags' => $_sambaAcctFlags );
             }
-            push( @mods, 'sambaPwdLastSet' => '0' );
+	    push(@mods, 'sambaPwdLastSet' => 0);
+	    push(@mods, 'sambaPwdMustChange' => 0);
         }
         else {
-            $_sambaPwdMustChange = $winmagic;
+	    push(@mods, 'sambaPwdLastSet' => time);
+	    push(@mods, 'sambaPwdMustChange' => $winmagic);
         }
-        push( @mods, 'sambaPwdMustChange' => $_sambaPwdMustChange );
     }
     else {
         print "User $user is not a samba user\n";

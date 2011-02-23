@@ -8,11 +8,12 @@
 	  - read_user_human_readable: Use UTF-8 flaged string and
 	    \P{IsPrint} to check if an LDAP attribute has non-printable
 	    characters or not
-
 	* smbldap-populate: Fix wrong sambaGroupType values for local groups
 	* Replace bare "smbpasswd" with "$config{smbpasswd}"
 	* smbldap-useradd: Add -h (--no-dereference) option to the
 	  chown(1) command-line
+	* smbldap-usermod: Set sambaPwdLastSet to the current time
+	  if "-B 0" is used (for Samba 3.0.25 and later)
 
 2010-11-15 <mm@FreeBSD.org>
 	* smbldap-useradd:
