@@ -482,7 +482,7 @@ if ( defined( $tmp = $Options{'m'} ) ) {
                 system "mkdir $userHomeDirectory 2>/dev/null";
             }
             system
-"chown -R $userUidNumber:$userGidNumber $userHomeDirectory 2>/dev/null";
+"chown -hR $userUidNumber:$userGidNumber $userHomeDirectory 2>/dev/null";
             if ( defined $config{userHomeDirectoryMode} ) {
                 system
 "chmod $config{userHomeDirectoryMode} $userHomeDirectory 2>/dev/null";
