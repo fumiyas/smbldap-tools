@@ -1,5 +1,8 @@
 # $Id$
 
+2011-02-23 <fumiyas at OSS Technology, Inc. Japan>
+	* smbldap_tools.pm: get_next_id(): Use getgrgid() for GID number
+
 2010-11-15 <mm@FreeBSD.org>
 	* smbldap-useradd:
 	  - fix Z option in getopt (custom LDAP attribute)

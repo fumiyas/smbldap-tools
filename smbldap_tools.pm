@@ -1209,7 +1209,8 @@ sub get_next_id($$) {
         if ( $check_uid_mesg->count == 0 ) {
 
    # now, look if the id or gid is not already used in /etc/passwd or /etc/group
-            if ( !getpwuid($nextuid) ) {
+            if ($attribute =~ /^uid/i && !getpwuid($nextuid) ||
+	        $attribute =~ /^gid/i && !getgrgid($nextuid) ) {
                 $found = 1;
                 return $nextuid;
             }
