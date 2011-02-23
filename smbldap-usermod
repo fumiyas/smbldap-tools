@@ -32,7 +32,6 @@ use smbldap_tools;
 use Time::Local;
 #####################
 
-use Getopt::Std;
 use Getopt::Long;
 my %Options;
 my $nscd_status;
@@ -53,19 +52,19 @@ my $ok = GetOptions(
     "M|mail=s"               => \$Options{M},
     "N|givenName=s"          => \$Options{N},
     "O|mailLocalAddress=s"   => \$Options{O},
-    "P=s"                    => \$Options{P},
+    "P"                      => \$Options{P},
     "U|shadowUnlock"         => \$Options{U},
     "S|surname=s"            => \$Options{S},
     "T|mailToAddress=s"      => \$Options{T},
     "X|inputEncoding=s"      => \$Options{X},
-    "Z|attr=s"               => \$Options{Z},
+    "Z|attr=s@"              => \$Options{Z},
     "a|addsambaSAMAccount"   => \$Options{a},
     "c|gecos=s"              => \$Options{c},
     "d|homedir=s"            => \$Options{d},
     "e|expire=s"             => \$Options{e},
     "sambaExpire=s"          => \$Options{sambaExpire},
     "g|gid=s"                => \$Options{g},
-    "h|help"                 => \$Options{h},
+    "h|?|help"               => \$Options{h},
     "o|canBeNotUnique"       => \$Options{o},
     "r|rename=s"             => \$Options{r},
     "s|shell=s"              => \$Options{s},
@@ -76,8 +75,6 @@ my $ok = GetOptions(
     "shadowWarning=s"        => \$Options{shadowWarning},
     "u|uid=s"                => \$Options{u}
 );
-
-#my $ok = getopts('A:B:C:D:E:F:H:IJM:N:O:S:PT:X:Z:ame:f:u:g:G:d:l:r:s:c:ok:?h', \%Options);
 
 if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'h'} ) ) {
     print_banner;
@@ -774,15 +771,31 @@ elsif ( !$samba == 1
 }
 
 if ( defined( $tmp = $Options{'Z'} ) ) {
-    my @namval = split /,/, $tmp;
-    if (@namval) {
-        foreach my $pair (@namval) {
-            my ( $name, $value ) = split /=/, $pair;
-            next if ( !$name or !$value );
-            push( @mods, $name => $value );
-        }
+    my %mods;
+    for my $pair ( map { split /,/ } @{$Options{'Z'}} ) {
+	my ( $name, $value ) = split( /[=:]/, $pair, 2 );
+	$name = lc( $name );
+	if ( defined($value) ) {
+	    if ( $name =~ s/^([\+\-])// ) {
+		my $action = $1;
+		my @value_old = $mods{$name}
+		    ? @{$mods{$name}}
+		    : $user_entry->get_value($name);
+		my @value = ($action eq '+')
+		    ? list_union( \@value_old, [$value] )
+		    : list_minus( \@value_old, [$value] );
+		$mods{$name} = \@value;
+	    } else {
+		push( @{$mods{$name}}, $value );
+	    }
+	} elsif ( $name =~ s/^-// ) {
+	    $mods{$name} = [];
+	}
     }
 
+    while ( my ($name, $value) = each( %mods ) ) {
+	push( @mods, $name => $value );
+    }
 }
 
 # apply changes

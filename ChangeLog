@@ -12,8 +12,15 @@
 	* Replace bare "smbpasswd" with "$config{smbpasswd}"
 	* smbldap-useradd: Add -h (--no-dereference) option to the
 	  chown(1) command-line
+	* smbldap-useradd: Extend -Z (--attr) option to take multiple
+	  -Z options
 	* smbldap-usermod: Set sambaPwdLastSet to the current time
 	  if "-B 0" is used (for Samba 3.0.25 and later)
+	* smbldap-usermod: Extend -Z (--attr) option:
+	  - Take multiple -Z options
+	  - Append a value to a multi-value attribute by -Z +name=value
+	  - Remove a value from a multi-value attribute by -Z -name=value
+	  - Remove a attribte by -Z -name
 
 2010-11-15 <mm@FreeBSD.org>
 	* smbldap-useradd:

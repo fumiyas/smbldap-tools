@@ -33,13 +33,47 @@ use smbldap_tools;
 use Crypt::SmbHash;
 #####################
 
-use Getopt::Std;
+use Getopt::Long;
 my %Options;
 
-my $ok =
-  getopts( 'abc:d:g:ik:mno:s:t:u:wA:B:C:D:E:F:G:H:M:N:O:PS:T:WX:Z:?', \%Options );
+Getopt::Long::Configure('bundling');
+my $ok = GetOptions(
+    "A|sambaPwdCanChange=s"  => \$Options{A},
+    "B|sambaPwdMustChange=s" => \$Options{B},
+    "C|sambaHomePath=s"      => \$Options{C},
+    "D|sambaHomeDrive=s"     => \$Options{D},
+    "E|sambaLogonScript=s"   => \$Options{E},
+    "F|sambaProfilePath=s"   => \$Options{F},
+    "G|group=s"              => \$Options{G},
+    "H|sambaAcctFlags=s"     => \$Options{H},
+    "M|mailAddresses=s"      => \$Options{M},
+    "N|givenName=s"          => \$Options{N},
+    "O|mailLocalAddress=s"   => \$Options{O},
+    "P"                      => \$Options{P},
+    "S|surname=s"            => \$Options{S},
+    "T|mailToAddress=s"      => \$Options{T},
+    "W"                      => \$Options{W},
+    "X|inputEncoding=s"      => \$Options{X},
+    "Z|attr=s@"              => \$Options{Z},
+    "a|addsambaSAMAccount"   => \$Options{a},
+    "b|aix"                  => \$Options{b},
+    "c|gecos=s"              => \$Options{c},
+    "d|homedir=s"            => \$Options{d},
+    "g|gid=s"                => \$Options{g},
+    "h|?|help"               => \$Options{h},
+    "i"                      => \$Options{i},
+    "k=s"                    => \$Options{k},
+    "m"                      => \$Options{m},
+    "n"                      => \$Options{n},
+    "o|ou=s"                 => \$Options{o},
+    "p=s"                    => \$Options{p},
+    "s|shell=s"              => \$Options{s},
+    "t=s"                    => \$Options{t},
+    "u|uid=s"                => \$Options{u},
+    "w"                      => \$Options{w},
+);
 
-if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'?'} ) ) {
+if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'h'} ) ) {
     print_banner;
     print "Usage: $0 [-abcdgikmnostuwABCDEFGHMNOPSTWXZ?] username\n";
     print "  -a	is a Windows User (otherwise, Posix stuff only)\n";
@@ -79,7 +113,7 @@ if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'?'} ) ) {
     print "  -T	mailToAddress (forward address) (comma separated)\n";
     print "  -X	input encoding for givenname and surname (default UTF-8)\n";
     print "  -Z	set custom LDAP attributes, name=value pairs comma separated\n";
-    print "  -?	show this help message\n";
+    print "  -h	show this help message\n";
     exit(1);
 }
 
@@ -521,15 +555,24 @@ if (@userMailTo) {
 }
 
 # Custom modification - MPK
-if ( $Options{'Z'} ) {
-    my @namval = split /,/, $Options{'Z'};
-    if (@namval) {
-        foreach my $pair (@namval) {
-            my ( $name, $value ) = split /=/, $pair;
-            next if ( !$name or !$value );
-            push( @adds, $name => $value );
-        }
+if ( defined( $tmp = $Options{'Z'} ) ) {
+    my %adds;
+    for my $pair ( map { split /,/ } @{$Options{'Z'}} ) {
+	my ( $name, $value ) = split( /[=:]/, $pair, 2 );
+	$name = lc( $name );
+	push( @{$adds{$name}}, $value );
     }
+
+    while ( my ($name, $value) = each( %adds ) ) {
+	push( @adds, $name => $value );
+    }
+}
+
+if (@adds) {
+    my $modify =
+      $ldap_master->modify( "uid=$userName,$config{usersdn}", add => {@adds} );
+
+    $modify->code && die "failed to add entry: ", $modify->error;
 }
 
 # Add Samba user infos
@@ -615,6 +658,8 @@ EOF
 
     $tmp = defined( $Options{'F'} ) ? $Options{'F'} : $config{userProfile};
     my $valprofilepath = &subst_user( $tmp, $userName );
+
+    my @adds = ();
 
     if ($valhomedrive) {
         push( @adds, 'sambaHomeDrive' => $valhomedrive );
