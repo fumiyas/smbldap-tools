@@ -588,7 +588,7 @@ if ( defined( $Options{'a'} ) ) {
 
     }
     else {
-        my $FILE = "|smbpasswd -s -a $userName >/dev/null";
+        my $FILE = "|$config{smbpasswd} -s -a $userName >/dev/null";
         open( FILE, $FILE ) || die "$!\n";
         print FILE <<EOF;
 x

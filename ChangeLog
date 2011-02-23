@@ -3,6 +3,7 @@
 2011-02-23 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap_tools.pm: get_next_id(): Use getgrgid() for GID number
 	* smbldap-populate: Fix wrong sambaGroupType values for local groups
+	* Replace bare "smbpasswd" with "$config{smbpasswd}"
 
 2010-11-15 <mm@FreeBSD.org>
 	* smbldap-useradd:

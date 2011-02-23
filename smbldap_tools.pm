@@ -624,7 +624,7 @@ sub add_posix_machine {
 # success = add_samba_machine_smbpasswd($computername)
 sub add_samba_machine_smbpasswd {
     my $user = shift;
-    system "smbpasswd -a -m $user";
+    system "$config{smbpasswd} -a -m $user";
     return 1;
 }
 
