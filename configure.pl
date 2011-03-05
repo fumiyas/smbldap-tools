@@ -2,12 +2,12 @@
 
 # $Id$
 
-# This script can help you setting up the smbldap_conf.pl file. It will get all
-# the defaults value that are defined in the smb.conf configuration file. You 
+# This script can help you setting up the smbldap_conf.pl file. It will set all
+# the default values that are defined in the smb.conf configuration file. You 
 # should then start with this configuration file. You will also need the SID
-# for your samba domain: set up the controler domain before using this script.
+# for your samba domain: set up the domain controller before using this script.
 
-#  This code was developped by IDEALX (http://IDEALX.org/) and
+#  This code was developed by IDEALX (http://IDEALX.org/) and
 #  contributors (their names can be found in the CONTRIBUTORS file).
 #
 #                 Copyright (C) 2002 IDEALX
@@ -43,14 +43,14 @@ Before starting, check
  . if your samba controller is up and running.
  . if the domain SID is defined (you can get it with the 'net getlocalsid')
 
- . you can leave the configuration using the Crtl-c key combination
+ . you can leave the configuration using the Ctrl-c key combination
  . empty value can be set with the \".\" character\n";
 print "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n";
 
 # we first check if Samba is up and running
 my $test_smb=`pidof smbd`;
 chomp($test_smb);
-die "\nSamba need to be started first !\n" if ($test_smb eq "" || not defined $test_smb);
+die "\nSamba needs to be started first !\n" if ($test_smb eq "" || not defined $test_smb);
 
 print "Looking for configuration files...\n\n";
 my $smb_conf="";
@@ -67,11 +67,11 @@ if ($config_smb ne "") {
 
 my $conf_dir;
 if (-d "/etc/opt/IDEALX/smbldap-tools") {
-	$conf_dir="/etc/opt/IDEALX/smbldap-tools/";
+	$conf_dir="/etc/opt/IDEALX/smbldap-tools";
 } elsif (-d "/etc/smbldap-tools") {
-	$conf_dir="/etc/smbldap-tools/";
+	$conf_dir="/etc/smbldap-tools";
 } else {
-	$conf_dir="/etc/opt/IDEALX/smbldap-tools/";
+	$conf_dir="/etc/opt/IDEALX/smbldap-tools";
 }
 
 print "\nThe default directory in which the smbldap configuration files are stored is shown.\n";
@@ -83,13 +83,13 @@ if ($conf_dir_tmp ne "") {
   $conf_dir=$conf_dir_tmp;
 }
 
-$conf_dir=~s/(\w)$/$1\//;
+$conf_dir=~s/\/*$//;
 if (! -d $conf_dir) {
 	mkdir "$conf_dir";
 }
 
-my $smbldap_conf="$conf_dir"."smbldap.conf";
-my $smbldap_bind_conf="$conf_dir"."smbldap_bind.conf";
+my $smbldap_conf="$conf_dir"."/smbldap.conf";
+my $smbldap_bind_conf="$conf_dir"."/smbldap_bind.conf";
 
 
 
@@ -141,8 +141,8 @@ print "Let's start configuring the smbldap-tools scripts ...\n\n";
 #   }
 # . if no value is found in smb.conf for the keys, this value is proposed
 # . the 'insist' variable: if set to 1, then the script will always call for a value
-#   for the parameter. In other words, there's not default value, and it can't be set
-#   to a null caracter string.
+#   for the parameter. In other words, there's no default value, and it can't be set
+#   to an empty string.
 
 sub read_entry
   {
@@ -193,10 +193,10 @@ sub read_entry
     return $value;
   }
 
-print ". workgroup name: name of the domain Samba act as a PDC\n";
+print ". workgroup name: name of the domain Samba acts as a PDC for\n";
 my $workgroup=read_entry("  workgroup name","workgroup","",0);
 
-print ". netbios name: netbios name of the samba controler\n";
+print ". netbios name: netbios name of the samba controller\n";
 my $netbios_name=read_entry("  netbios name","netbiosname","",0);
 
 print ". logon drive: local path to which the home directory will be connected (for NT Workstations). Ex: 'H:'\n";
@@ -207,7 +207,7 @@ my $logonhome=read_entry("  logon home (press the \".\" character if you don't w
 #$logonhome=~s/\\/\\\\/g;
 
 print ". logon path: directory where roaming profiles are stored. Ex:'\\\\$netbios_name\\profiles\\\%U'\n";
-my $logonpath=read_entry("  logon path (press the \".\" character if you don't want roaming profile)","logonpath","\\\\$netbios_name\\profiles\\\%U",0);
+my $logonpath=read_entry("  logon path (press the \".\" character if you don't want roaming profiles)","logonpath","\\\\$netbios_name\\profiles\\\%U",0);
 #$logonpath=~s/\\/\\\\/g;
 
 my $userHome=read_entry(". home directory prefix (use %U as username)","","/home/\%U",0);
@@ -237,12 +237,11 @@ my $sambaUnixIdPooldn=read_entry("  sambaUnixIdPooldn object (relative to \${suf
 my ($trash1,$server);
 if (defined $config{passdbbackend}) {
   ($trash1,$server)=($config{passdbbackend}=~m/(.*)ldap:\/\/(.*)/);
-} else {
-  $server="127.0.0.1";
 }
+$server="127.0.0.1" unless defined($server);
 $server=~s/\///;
 my $ldapmasterserver;
-print ". ldap master server: IP adress or DNS name of the master (writable) ldap server\n";
+print ". ldap master server: IP address or DNS name of the master (writable) ldap server\n";
 $ldapmasterserver=read_entry("  ldap master server","",$server,0);
 my $ldapmasterport;
 if (defined $config{ldapport}) {
@@ -257,7 +256,7 @@ print "\n";
 system "stty echo";
 
 # parameters for the slave ldap server
-print ". ldap slave server: IP adress or DNS name of the slave ldap server: can also be the master one\n";
+print ". ldap slave server: IP address or DNS name of the slave ldap server: can also be the master one\n";
 my $ldap_slave_server=read_entry("  ldap slave server","","$server",0);
 my $ldap_slave_port;
 if (defined $config{ldapport}) {
@@ -307,16 +306,13 @@ my $userLoginShell=read_entry(". default login shell","","/bin/bash",0);
 
 my $skeletonDir=read_entry(". default skeleton directory","","/etc/skel",0);
 
-my $mailDomain=read_entry(". default domain name to append to mail adress", "","",0);
+my $mailDomain=read_entry(". default domain name to append to mail address", "","",0);
 
 print "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
 my $template_smbldap="
-# \$Source: /opt/cvs/samba/smbldap-tools/configure.pl,v $
-# \$Id$
-#
 # smbldap-tools.conf : Q & D configuration file for smbldap-tools
 
-#  This code was developped by IDEALX (http://IDEALX.org/) and
+#  This code was developed by IDEALX (http://IDEALX.org/) and
 #  contributors (their names can be found in the CONTRIBUTORS file).
 #
 #                 Copyright (C) 2001-2002 IDEALX
@@ -524,12 +520,12 @@ mailDomain=\"$mailDomain\"
 #
 ##############################################################################
 
-# Allows not to use smbpasswd (if with_smbpasswd="0" in smbldap.conf) but
+# Allows not to use smbpasswd (if with_smbpasswd=\"0\" in smbldap.conf) but
 # prefer Crypt::SmbHash library
 with_smbpasswd=\"0\"
 smbpasswd=\"/usr/bin/smbpasswd\"
 
-# Allows not to use slappasswd (if with_slappasswd="0" in smbldap.conf)
+# Allows not to use slappasswd (if with_slappasswd=\"0\" in smbldap.conf)
 # but prefer Crypt:: libraries
 with_slappasswd=\"0\"
 slappasswd=\"/usr/sbin/slappasswd\"
@@ -542,7 +538,7 @@ my $template_smbldap_bind="
 ############################
 # Credential Configuration #
 ############################
-# Notes: you can specify two differents configuration if you use a
+# Note: you can specify two different configurations if you use a
 # master ldap for writing access and a slave ldap server for reading access
 # By default, we will use the same DN (so it will work for standard Samba
 # release)
