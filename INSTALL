@@ -14,7 +14,7 @@ gpgkey=http://dag.wieers.com/packages/RPM-GPG-KEY.dag.txt
 gpgcheck=1
 enabled=0
 EOF
-. yum --enablerepo=dag install perl-Crypt-SmbHash perl-Unicode-MapUTF8
+. yum --enablerepo=dag install perl-Crypt-SmbHash
 
 INSTALLATION from the tar.gz archive
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

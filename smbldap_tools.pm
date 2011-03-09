@@ -28,7 +28,6 @@ package smbldap_tools;
 use Encode;
 use Net::LDAP;
 use Crypt::SmbHash;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8);
 
 my $smbldap_conf;
 if ( -e "/etc/smbldap-tools/smbldap.conf" ) {
@@ -1228,33 +1227,29 @@ sub get_next_id($$) {
 }
 
 sub utf8Encode {
-    my $charset = shift;
+    my $encoding = shift;
     my $string = shift;
 
-    if ($charset eq "UTF-8") {
+    if ($encoding eq "UTF-8") {
 	return $string;
     }
-    else {
-	return to_utf8(
-	    -string  => $string,
-	    -charset => $charset,
-	);
-    }
+
+    Encode::from_to($string, $encoding, "UTF-8");
+
+    return $string;
 }
 
 sub utf8Decode {
-    my $charset = shift;
+    my $encoding = shift;
     my $string = shift;
 
-    if ($charset eq "UTF-8") {
+    if ($encoding eq "UTF-8") {
 	return $string;
     }
-    else {
-	return from_utf8(
-	    -string  => $string,
-	    -charset => $charset,
-	);
-    }
+
+    Encode::from_to($string, "UTF-8", $encoding);
+
+    return $string;
 }
 
 1;
