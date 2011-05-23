@@ -1,5 +1,9 @@
 # $Id$
 
+2011-05-24 <fumiyas at OSS Technology, Inc. Japan>
+	* smbldap-populate, smbldap_tools.pm: Use /nonexistent instead
+	  of /dev/null for guest's and computer's homeDirectory
+
 2011-03-09 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap_tools.pm: Use Encode instead of Unicode::MapUTF8
 

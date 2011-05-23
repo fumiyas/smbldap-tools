@@ -216,7 +216,7 @@ uidNumber: $adminUidNumber\n";
 	$userHome=~s/\%U/$adminName/;
 	$entries.="homeDirectory: $userHome\n";
     } else {
-	$entries.="homeDirectory: /dev/null\n";
+	$entries.="homeDirectory: /nonexistent\n";
     }
     $entries.="sambaPwdLastSet: 0
 sambaLogonTime: 0
@@ -258,7 +258,7 @@ objectClass: shadowAccount
 gidNumber: 514
 uid: $guestName
 uidNumber: $guestUidNumber
-homeDirectory: /dev/null
+homeDirectory: /nonexistent
 sambaPwdLastSet: 0
 sambaLogonTime: 0
 sambaLogoffTime: 2147483647

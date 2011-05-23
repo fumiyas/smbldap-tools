@@ -609,7 +609,7 @@ sub add_posix_machine {
             'uid'           => "$user",
             'uidNumber'     => "$uid",
             'gidNumber'     => "$gid",
-            'homeDirectory' => '/dev/null',
+            'homeDirectory' => '/nonexistent',
             'loginShell'    => '/bin/false',
             'description'   => 'Computer',
             'gecos'         => 'Computer',
