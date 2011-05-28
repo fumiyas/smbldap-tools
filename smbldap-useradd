@@ -365,21 +365,8 @@ if (   defined( $Options{'w'} )
 
         # For machine trust account
         # Objectclass sambaSAMAccount must be added now !
-        my $pass;
-        my $pass2;
-
-        system "stty -echo";
-        print "New password : ";
-        chomp( $pass = <STDIN> );
-        print "\n";
-        system "stty echo";
-
-        system "stty -echo";
-        print "Retype new password : ";
-        chomp( $pass2 = <STDIN> );
-        print "\n";
-        system "stty echo";
-
+        my $pass = read_password("New password: ");
+        my $pass2 = read_password("Retype new password: ");
         if ( $pass ne $pass2 ) {
             print "New passwords don't match!\n";
             exit(10);

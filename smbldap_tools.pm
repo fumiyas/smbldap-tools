@@ -28,6 +28,11 @@ package smbldap_tools;
 use Encode;
 use Net::LDAP;
 use Crypt::SmbHash;
+use POSIX qw(:termios_h);
+use IO::File;
+
+use constant true => 1;
+use constant false => 0;
 
 my $smbldap_conf;
 if ( -e "/etc/smbldap-tools/smbldap.conf" ) {
@@ -109,6 +114,7 @@ use vars qw(%config $ldap);
   getLocalSID
   utf8Encode
   utf8Decode
+  read_password
   %config
 );
 
@@ -1250,6 +1256,61 @@ sub utf8Decode {
     Encode::from_to($string, "UTF-8", $encoding);
 
     return $string;
+}
+
+sub read_password
+{
+    my ($prompt, $timeout) = @_;
+
+    my $termios = POSIX::Termios->new;
+    my $term_flag = defined($termios->getattr(STDIN->fileno)) ?
+	$termios->getlflag : undef;
+
+    my $pass;
+    for (;;) {
+	my $sig_handlers_orig = {};
+	my $sig_sent = {};
+	my $sig_hander = sub { $sig_sent->{shift(@_)} = 1; die; };
+
+	for my $sig_name qw(ALRM INT HUP QUIT TERM TSTP TTIN TTOU) {
+	    $sig_handlers_orig->{$sig_name} = $SIG{$sig_name};
+	    $SIG{$sig_name} = $sig_hander;
+	}
+	$sig_handlers_orig->{'PIPE'} = $SIG{'PIPE'};
+	$SIG{'PIPE'} = 'IGNORE';
+
+	print $prompt if (defined($prompt));
+	$pass = eval {
+	    if ($term_flag && $term_flag & ECHO) {
+		$termios->setlflag($term_flag & ~ECHO);
+		$termios->setattr(STDIN->fileno, TCSANOW);
+	    }
+	    alarm($timeout) if ($timeout);
+	    STDIN->getline;
+	};
+	alarm(0) if ($timeout);
+
+	if ($term_flag && $term_flag & ECHO) {
+	    print "\n";
+	    $termios->setlflag($term_flag);
+	    $termios->setattr(STDIN->fileno, TCSANOW);
+	}
+
+	while (my ($sig_name, $sig_handler_orig) = each(%$sig_handlers_orig)) {
+	    $SIG{$sig_name} = $sig_handler_orig || 'DEFAULT';
+	}
+
+	my $restart = false;
+	for my $sig_name (keys %$sig_sent) {
+	    kill($sig_name, $$) unless ($sig_name eq 'ALRM' && $timeout);
+	    $restart = true if ($sig_name =~ /^T(STP|TIN|TOU)$/);
+	}
+	last unless ($restart);
+    }
+
+    chomp($pass) if (defined($pass));
+
+    return $pass;
 }
 
 1;

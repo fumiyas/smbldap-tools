@@ -26,11 +26,6 @@
 #       . ldap-unix passwd sync for SAMBA>2.2.2 + LDAP
 #       . may also replace /bin/passwd
 
-# untaint environment
-$ENV{'PATH'}= '/bin:/usr/bin';
-$ENV{'SHELL'}= '/bin/sh';
-delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
-
 use strict;
 use FindBin;
 use FindBin qw($RealBin);
@@ -99,11 +94,8 @@ if ($< != 0) {
     # non-root user
     if (!defined($oldpass)) {
 	# prompt for password
-	print "Identity validation...\nenter your UNIX password: ";
-	system "/bin/stty -echo" if (-t STDIN);
-	chomp($oldpass=<STDIN>); 
-	system "/bin/stty echo" if (-t STDIN);
-	print "\n";
+	print "Identity validation...\n");
+	$oldpass = read_password("enter your UNIX password: ");
 
 	$config{masterDN}="uid=$user,$config{usersdn}";
 	$config{masterPw}="$oldpass";
@@ -150,25 +142,15 @@ my $pass;
 if (($< != 0) || $use_dialog) {
 	my $pass2;
 
-	print "New password: ";
-	system "/bin/stty -echo" if (-t STDIN);
-	chomp($pass=<STDIN>);
-	system "/bin/stty echo" if (-t STDIN);
-	print "\n";
-
-	print "Retype new password: ";
-	system "/bin/stty -echo" if (-t STDIN);
-	chomp($pass2=<STDIN>);
-	system "/bin/stty echo" if (-t STDIN);
-	print "\n";
+	$pass = read_password("New password: ");
+	my $pass2 = read_password("Retype new password: ");
 
 	if ($pass ne $pass2) {
 	    print "New passwords don't match!\n";
 	    exit (10);
 	}
 } else {
-	system "/bin/stty -echo" if (-t STDIN);
-	chomp($pass=<STDIN>);
+	$pass = read_password();
 }
 
 # Prepare '$hash_password' for 'userPassword'

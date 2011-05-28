@@ -1,5 +1,8 @@
 # $Id$
 
+2011-05-28 <fumiyas at OSS Technology, Inc. Japan>
+	* smbldap_tools.pm: Add read_password() to avoid `stty -echo` hacks
+
 2011-05-24 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap-populate, smbldap_tools.pm: Use /nonexistent instead
 	  of /dev/null for guest's and computer's homeDirectory

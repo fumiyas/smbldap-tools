@@ -71,12 +71,7 @@ my ($dn,$ldap_master);
 if ($< != 0) {
     # non-root user
     if (!defined($pass)) {
-    # prompt for password
-    print "UNIX password: ";
-system "stty -echo" if (-t STDIN);
-chomp($pass=<STDIN>);
-system "stty echo" if (-t STDIN);
-print "\n";
+	$pass = read_password("UNIX password: ");
 
 # JTO: search real basedn: may be different in case ou=bla1,ou=bla2 !
 # JTO: faire afficher egalement lock, expire et lastChange
