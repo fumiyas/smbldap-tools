@@ -2,6 +2,7 @@
 
 2011-05-28 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap_tools.pm: Add read_password() to avoid `stty -echo` hacks
+	* Use /usr/sbin/nscd -i instead of /etc/init.d/nscd
 
 2011-05-24 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap-populate, smbldap_tools.pm: Use /nonexistent instead

@@ -56,11 +56,7 @@ my $dn = get_dn_from_line($dn_line);
 
 group_del($dn);
 
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
+nsc_invalidate("group");
 
 #if (defined($dn_line = get_group_dn($_groupName))) {
 #    print "$0: failed to delete group\n";

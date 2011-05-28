@@ -121,11 +121,7 @@ my $ldap_master = connect_ldap_master();
 
 # cause problems when dealing with getpwuid because of the
 # negative ttl and ldap modification
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ( $nscd_status == 0 ) {
-    system "/etc/init.d/nscd stop > /dev/null 2>&1";
-}
+nsc_invalidate("passwd");
 
 # Read only first @ARGV
 my $userName = $ARGV[0];
@@ -219,10 +215,6 @@ if ( !defined($userUidNumber) ) {
 }
 elsif ( getpwuid($userUidNumber) ) {
     die "Uid already exists.\n";
-}
-
-if ( $nscd_status == 0 ) {
-    system "/etc/init.d/nscd start > /dev/null 2>&1";
 }
 
 my $createGroup   = 0;
@@ -690,6 +682,8 @@ if ( defined( $Options{'b'} ) ) {
 }
 
 $ldap_master->unbind;    # take down session
+
+nsc_invalidate("passwd");
 
 if ( defined( $Options{'P'} ) ) {
     if ( defined( $tmp = $Options{'B'} ) and $tmp != 0 ) {

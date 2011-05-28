@@ -102,7 +102,7 @@ use vars qw(%config $ldap);
   group_name_by_type
   group_type_by_name
   subst_configvar
-  read_config
+  read_conf
   read_parameter
   subst_user
   split_arg_comma
@@ -115,6 +115,7 @@ use vars qw(%config $ldap);
   utf8Encode
   utf8Decode
   read_password
+  nsc_invalidate
   %config
 );
 
@@ -313,6 +314,9 @@ if ( !defined $config{ldapSSL} ) {
 if ( $config{ldapSSL} == 1 and $config{ldapTLS} == 1 ) {
     print "Both options ldapSSL and ldapTLS could not be activated\n";
     exit;
+}
+if ( !defined $config{nscd} ) {
+    $config{nscd} = "/usr/sbin/nscd";
 }
 
 sub connect_ldap_master {
@@ -751,16 +755,10 @@ sub delete_user {
 # $gid = group_add($groupname, $group_gid, $force_using_existing_gid)
 sub group_add {
     my ( $gname, $gid, $force ) = @_;
-    my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-    if ( $nscd_status == 0 ) {
-        system "/etc/init.d/nscd stop > /dev/null 2>&1";
-    }
-    if ( !defined($gid) ) {
 
-        #while (defined(getgrgid($config{GID_START}))) {
-        #	$config{GID_START}++;
-        #}
-        #$gid = $config{GID_START};
+    nsc_invalidate("group");
+
+    if ( !defined($gid) ) {
         $gid = get_next_id( $config{groupsdn}, "gidNumber" );
     }
     else {
@@ -769,9 +767,6 @@ sub group_add {
                 return undef;
             }
         }
-    }
-    if ( $nscd_status == 0 ) {
-        system "/etc/init.d/nscd start > /dev/null 2>&1";
     }
     my $modify = $ldap->add(
         "cn=$gname,$config{groupsdn}",
@@ -1311,6 +1306,15 @@ sub read_password
     chomp($pass) if (defined($pass));
 
     return $pass;
+}
+
+sub nsc_invalidate
+{
+    my ($dbname) = @_;
+
+    return unless (defined($config{nscd}) && length($config{nscd}));
+
+    system("\Q$config{nscd}\E -i \Q$dbname\E 2>/dev/null");
 }
 
 1;

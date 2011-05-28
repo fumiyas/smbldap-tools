@@ -34,7 +34,6 @@ use Time::Local;
 
 use Getopt::Long;
 my %Options;
-my $nscd_status;
 
 Getopt::Long::Configure('bundling');
 my $ok = GetOptions(
@@ -250,21 +249,10 @@ my $_userRid;
 
 if ( defined( $tmp = $Options{'u'} ) ) {
     if ( !defined( $Options{'o'} ) ) {
-        $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-        if ( $nscd_status == 0 ) {
-            system "/etc/init.d/nscd stop > /dev/null 2>&1";
-        }
-
+	nsc_invalidate("passwd");
         if ( getpwuid($tmp) ) {
-            if ( $nscd_status == 0 ) {
-                system "/etc/init.d/nscd start > /dev/null 2>&1";
-            }
-
             print "$0: uid number $tmp exists\n";
             exit(6);
-        }
-        if ( $nscd_status == 0 ) {
-            system "/etc/init.d/nscd start > /dev/null 2>&1";
         }
     }
 
@@ -914,11 +902,7 @@ if ( defined( my $new_user = $Options{'r'} ) and $Options{'r'} ne $user ) {
     $ldap_master->unbind;
 }
 
-$nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ( $nscd_status == 0 ) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
+nsc_invalidate("passwd");
 
 if ( defined( $Options{'P'} ) ) {
     exec "$RealBin/smbldap-passwd $user";

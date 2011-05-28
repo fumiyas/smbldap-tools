@@ -55,11 +55,6 @@ if ( defined( $Options{'X'} ) ) {
 	$characterSet = "UTF-8";
 }
 
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
-
 my $ldap_slave=connect_ldap_slave();
 
 my $lines;

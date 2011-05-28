@@ -65,11 +65,7 @@ if (! ($group_entry = read_group_entry($groupName))) {
 
 my $newname = $Options{'n'};
 
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
+nsc_invalidate("group");
 
 my $gid=$group_entry->get_value('gidNumber');
 
@@ -222,11 +218,7 @@ if ($group_sid) {
     $modify->code && warn "failed to delete entry: ", $modify->error ;
 }
 
-$nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
+nsc_invalidate("group");
 
 # take down session
 $ldap_master->unbind;

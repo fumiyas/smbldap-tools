@@ -49,14 +49,9 @@ if ( (!$ok) || (@ARGV < 1) || ($Options{'?'}) ) {
     exit (1);
 }
 
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd stop > /dev/null 2>&1";
-}
-
-
 my $_groupName = $ARGV[0];
+
+nsc_invalidate("group");
 
 my $ldap_master=connect_ldap_master();
 
@@ -147,9 +142,7 @@ if ($Options{'b'}) {
 # take down session
 $ldap_master->unbind;
 
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd start > /dev/null 2>&1";
-}
+nsc_invalidate("group");
 
 if ($Options{'p'}) {
     print STDOUT "$_groupGidNumber";

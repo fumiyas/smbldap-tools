@@ -96,11 +96,7 @@ if ($homedir) {
     system('rm', @rmargs, $homedir);
 }
 
-my $nscd_status = system "/etc/init.d/nscd status >/dev/null 2>&1";
-
-if ($nscd_status == 0) {
-    system "/etc/init.d/nscd restart > /dev/null 2>&1";
-}
+nsc_invalidate("passwd");
 
 $ldap_master->unbind;		# take down session
 
