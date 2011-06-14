@@ -1,5 +1,9 @@
 # $Id$
 
+2011-06-14 <fumiyas at OSS Technology, Inc. Japan>
+	* smbldap-passwd: Do not use permuted -s option for the smbpasswd(1)
+	  command-line because the plain-old getopt(3) does not support it
+
 2011-05-28 <fumiyas at OSS Technology, Inc. Japan>
 	* smbldap_tools.pm: Add read_password() to avoid `stty -echo` hacks
 	* Use /usr/sbin/nscd -i instead of /etc/init.d/nscd
