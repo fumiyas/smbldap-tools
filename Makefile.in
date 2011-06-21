@@ -1,26 +1,37 @@
 # $Id$
 
-PACKAGE=smbldap-tools
-VERSION=0.9.5
-RELEASE=1
-DESTARCH=smbldap-tools-$(VERSION)
-#RELEASE=$(shell date +%s)
+VERSION=		@PACKAGE_VERSION@
+RELEASE=		1
+DESTARCH=		smbldap-tools-$(VERSION)
+#RELEASE=		$(shell date +%s)
 
 # where to build the rpm
-TOPDIR=/home/$(USER)/redhat
-GPG_PATH=/home/$(USER)/.gnupg
-#BUILD_CMD=rpmbuild -ba
-BUILD_CMD=rpmbuild -ba --sign
+TOPDIR=			$$HOME/redhat
+GPG_PATH=		$$HOME/.gnupg
+#BUILD_CMD=		rpmbuild -ba
+BUILD_CMD=		rpmbuild -ba --sign
 
-prefix=/usr
-sbindir=$(prefix)/sbin
-sysconfdir=/etc/
-make=/usr/bin/make
-install=/usr/bin/install
-rm=/bin/rm
-sed=/bin/sed
+prefix=			@prefix@
+exec_prefix=		@exec_prefix@
+sbindir=		@sbindir@
+sysconfdir=		@sysconfdir@
+install=		/usr/bin/install
+RM=			/bin/rm
+PERL=			@PERL_EXE@
 
-prep:
+SAMBA_BINDIR=		@SAMBA_BINDIR@
+SAMBA_SYSCONFDIR=	@SAMBA_SYSCONFDIR@
+SAMBA_SMB_CONF=		$(SAMBA_SYSCONFDIR)/smb.conf
+
+BUILD_TARGETS=		smb.conf
+
+## ======================================================================
+
+default: build
+
+build: $(BUILD_TARGETS)
+
+smb.conf:
 	$(sed) -e 's|@SBINDIR@|$(sbindir)|g' smb.conf.in > smb.conf
 
 all:	prep distclean rpm
@@ -33,10 +44,10 @@ install:
 	$(install) -m0600 smbldap_bind.conf $(sysconfdir)/smbldap-tools/
 
 clean:
-	$(rm) -f *~
+	$(RM) -f *~
 
 distclean:
-	$(rm) -f *~
+	$(RM) -f *~
 
 dist: .diststamp
 	@if [ -d $(DESTARCH) ];then echo "About to remove ./$(DESTARCH)/ in 5 seconds ..."; sleep 5; fi
