@@ -42,12 +42,12 @@ AC_SUBST(PERL_VERSION)
 AC_ARG_WITH(
     perl,
     [AC_HELP_STRING(--with-perl=PATH,Use specific perl command)],
-    [echo "using $with_perl for perl"; PERL_EXE=$with_perl],
-    [AC_PATH_PROG(PERL_EXE, perl, not found)]
+    [echo "using $with_perl for perl"; PERL_CMD=$with_perl],
+    [AC_PATH_PROG(PERL_CMD, perl, not found)]
 )
 
 AC_MSG_CHECKING(for perl version)
-if test x"$PERL_EXE" != x"not found" && "$PERL_EXE" -e "use $PERL_VERSION;"; then
+if test x"$PERL_CMD" != x"not found" && "$PERL_CMD" -e "use $PERL_VERSION;"; then
     AC_MSG_RESULT($PERL_VERSION or later)
 else
     AC_MSG_ERROR(Perl $PERL_VERSION or later required.)
@@ -61,7 +61,7 @@ AC_SUBST(SAMBA_SYSCONFDIR)
 AC_ARG_WITH(
     samba_sysconfdir,
     [AC_HELP_STRING([--with-samba-sysconfdir=PATH],
-	[Path for smb.conf file [/etc/samba]])],
+	[Path for Samba sysconf directory [/etc/samba]])],
     [echo "using $with_smb_conf for Samba sysconfdir";
 	SAMBA_SYSCONFDIR=$with_samba_sysconfdir],
     [:]
@@ -72,7 +72,7 @@ AC_SUBST(SAMBA_BINDIR)
 AC_ARG_WITH(
     samba_bindir,
     [AC_HELP_STRING([--with-samba-bindir=PATH],
-	[Path for smb.conf file [/usr/bin]])],
+	[Path for Samba bin directory [/usr/bin]])],
     [echo "using $with_smb_conf for Samba bindir";
 	SAMBA_BINDIR=$with_samba_bindir],
     [:]
@@ -83,6 +83,9 @@ AC_ARG_WITH(
 
 AC_CONFIG_FILES(
     Makefile
+    build/Makefile
+    build/Makefile.package
+    build/subst.pl
 )
 
 AC_OUTPUT

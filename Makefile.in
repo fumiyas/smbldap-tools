@@ -1,53 +1,52 @@
 # $Id$
 
-VERSION=		@PACKAGE_VERSION@
+BUILD_TOP=		.
+BUILD_COMMON=		${BUILD_TOP}/build
+
+## ======================================================================
+
 RELEASE=		1
-DESTARCH=		smbldap-tools-$(VERSION)
-#RELEASE=		$(shell date +%s)
+DESTARCH=		smbldap-tools-$(PACKAGE_VERSION)
 
 # where to build the rpm
 TOPDIR=			$$HOME/redhat
 GPG_PATH=		$$HOME/.gnupg
-#BUILD_CMD=		rpmbuild -ba
-BUILD_CMD=		rpmbuild -ba --sign
+#RPMBUILD_CMD=		rpmbuild -ba
+RPMBUILD_CMD=		rpmbuild -ba --sign
 
-prefix=			@prefix@
-exec_prefix=		@exec_prefix@
-sbindir=		@sbindir@
-sysconfdir=		@sysconfdir@
-install=		/usr/bin/install
-RM=			/bin/rm
-PERL=			@PERL_EXE@
+BUILD_TARGETS= \
+	$(BUILD_TARGETS_TOP) \
+	$(INSTALL_FILES) \
+	$(INSTALL_CMDS) \
+	smb.smbldap.conf.example \
 
-SAMBA_BINDIR=		@SAMBA_BINDIR@
-SAMBA_SYSCONFDIR=	@SAMBA_SYSCONFDIR@
-SAMBA_SMB_CONF=		$(SAMBA_SYSCONFDIR)/smb.conf
-
-BUILD_TARGETS=		smb.conf
+INSTALL_DIR=		$(sbindir)
+INSTALL_FILES=		smbldap_tools.pm
+INSTALL_CMD_DIR=	$(sbindir)
+INSTALL_CMDS= \
+	smbldap-groupadd.cmd \
+	smbldap-groupdel.cmd \
+	smbldap-grouplist.cmd \
+	smbldap-groupmod.cmd \
+	smbldap-groupshow.cmd \
+	smbldap-passwd.cmd \
+	smbldap-populate.cmd \
+	smbldap-useradd.cmd \
+	smbldap-userdel.cmd \
+	smbldap-userinfo.cmd \
+	smbldap-userlist.cmd \
+	smbldap-usermod.cmd \
+	smbldap-usershow.cmd
 
 ## ======================================================================
 
-default: build
+include ${BUILD_COMMON}/Makefile
 
-build: $(BUILD_TARGETS)
+## ======================================================================
 
-smb.conf:
-	$(sed) -e 's|@SBINDIR@|$(sbindir)|g' smb.conf.in > smb.conf
+build::
 
-all:	prep distclean rpm
-
-install:
-	@mkdir -p $(sbindir)
-	@mkdir -p $(sysconfdir)/smbldap-tools/
-	$(install) -m0755 smbldap-* smbldap_tools.pm $(sbindir)
-	$(install) -m0644 smbldap.conf $(sysconfdir)/smbldap-tools/
-	$(install) -m0600 smbldap_bind.conf $(sysconfdir)/smbldap-tools/
-
-clean:
-	$(RM) -f *~
-
-distclean:
-	$(RM) -f *~
+install:: install-files install-cmds
 
 dist: .diststamp
 	@if [ -d $(DESTARCH) ];then echo "About to remove ./$(DESTARCH)/ in 5 seconds ..."; sleep 5; fi
@@ -109,7 +108,7 @@ rpm: dist build_dir
 	@perl -i -pe's@^\%define version(.*)@\%define version $(VERSION)@' $(TOPDIR)/SPECS/smbldap-tools.spec
 	@perl -i -pe's@^\%define release(.*)@\%define release $(RELEASE)@' $(TOPDIR)/SPECS/smbldap-tools.spec
 	@perl -i -pe's@^Source0(.*)@Source0: smbldap-tools-$(VERSION).tgz@' $(TOPDIR)/SPECS/smbldap-tools.spec
-	@cd $(TOPDIR)/SPECS/ && $(BUILD_CMD) smbldap-tools.spec
+	@cd $(TOPDIR)/SPECS/ && $(RPMBUILD_CMD) smbldap-tools.spec
 	@echo "Signing packages smbldap-tools-$(VERSION)-$(RELEASE).noarch.rpm"
 	@cd $(TOPDIR)/RPMS/noarch &&  gpg --detach smbldap-tools-$(VERSION)-$(RELEASE).noarch.rpm
 	@echo "Signing packages smbldap-tools-$(VERSION)-$(RELEASE).src.rpm"

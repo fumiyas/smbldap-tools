@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!@PERL_CMD@ -w
 
 # $Id$
 
@@ -34,28 +34,16 @@ use IO::File;
 use constant true => 1;
 use constant false => 0;
 
-my $smbldap_conf;
-if ( -e "/etc/smbldap-tools/smbldap.conf" ) {
-    $smbldap_conf = "/etc/smbldap-tools/smbldap.conf";
-}
-else {
-    $smbldap_conf = "/etc/opt/IDEALX/smbldap-tools/smbldap.conf";
-}
-
-my $smbldap_bind_conf;
-if ( -e "/etc/smbldap-tools/smbldap_bind.conf" ) {
-    $smbldap_bind_conf = "/etc/smbldap-tools/smbldap_bind.conf";
-}
-else {
-    $smbldap_bind_conf = "/etc/opt/IDEALX/smbldap-tools/smbldap_bind.conf";
-}
-my $samba_conf;
-if ( -e "/etc/samba/smb.conf" ) {
-    $samba_conf = "/etc/samba/smb.conf";
-}
-else {
-    $samba_conf = "/usr/local/samba/lib/smb.conf";
-}
+my $smbldap_conf =
+    $ENV{'SMBLDAP_CONF'} ||
+    '@sysconfdir@/smbldap.conf';
+my $smbldap_bind_conf =
+    $ENV{'SMBLDAP_BIND_CONF'} ||
+    '@sysconfdir@/smbldap_bind.conf';
+my $samba_conf =
+    $ENV{'SMBLDAP_SMB_CONF'} ||
+    $ENV{'SMB_CONF_PATH'} ||
+    '@SAMBA_SYSCONFDIR@/smb.conf';
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Exporter;

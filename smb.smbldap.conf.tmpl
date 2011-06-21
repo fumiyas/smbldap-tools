@@ -1,0 +1,13 @@
+## Put 'include = @SAMBA_SYSCONFDIR@/smb.smbldap.conf' into
+## your @SAMBA_SYSCONFDIR@/smb.conf file to enable smbldap-tools
+[global]
+add user script = @sbindir@/smbldap-useradd -m '%u' -t 1
+rename user script = @sbindir@/smbldap-usermod -r '%unew' '%uold'
+delete user script = @sbindir@/smbldap-userdel '%u'
+set primary group script = @sbindir@/smbldap-usermod -g '%g' '%u'
+add group script = @sbindir@/smbldap-groupadd -p '%g'
+delete group script = @sbindir@/smbldap-groupdel '%g'
+add user to group script = @sbindir@/smbldap-groupmod -m '%u' '%g'
+delete user from group script = @sbindir@/smbldap-groupmod -x '%u' '%g'
+add machine script = @sbindir@/smbldap-useradd -w '%u' -t 1
+
