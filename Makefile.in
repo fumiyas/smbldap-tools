@@ -15,27 +15,40 @@ GPG_PATH=		$$HOME/.gnupg
 RPMBUILD_CMD=		rpmbuild -ba --sign
 
 BUILD_TARGETS= \
-	$(INSTALL_FILES) \
-	$(INSTALL_CMDS) \
+	$(BUILD_PERL_MOD_TARGETS) \
+	$(BUILD_PERL_CMD_TARGETS) \
+	$(BUILD_PERL_MAN_TARGETS) \
 	smb.smbldap.conf.example \
 
 INSTALL_DIR=		$(PERL_LIBDIR)
-INSTALL_FILES=		smbldap_tools.pm
+INSTALL_FILES=		$(BUILD_PERL_MOD_TARGETS)
 INSTALL_CMD_DIR=	$(sbindir)
-INSTALL_CMDS= \
-	smbldap-groupadd.cmd \
-	smbldap-groupdel.cmd \
-	smbldap-grouplist.cmd \
-	smbldap-groupmod.cmd \
-	smbldap-groupshow.cmd \
-	smbldap-passwd.cmd \
-	smbldap-populate.cmd \
-	smbldap-useradd.cmd \
-	smbldap-userdel.cmd \
-	smbldap-userinfo.cmd \
-	smbldap-userlist.cmd \
-	smbldap-usermod.cmd \
-	smbldap-usershow.cmd
+INSTALL_CMDS=		$(BUILD_PERL_CMD_TARGETS)
+
+PERL_MOD_SOURCES= smbldap_tools.pl
+
+PERL_CMD_SOURCES= \
+	smbldap-groupadd.pl \
+	smbldap-groupdel.pl \
+	smbldap-grouplist.pl \
+	smbldap-groupmod.pl \
+	smbldap-groupshow.pl \
+	smbldap-passwd.pl \
+	smbldap-populate.pl \
+	smbldap-useradd.pl \
+	smbldap-userdel.pl \
+	smbldap-userinfo.pl \
+	smbldap-userlist.pl \
+	smbldap-usermod.pl \
+	smbldap-usershow.pl
+
+PERL_MAN_SECTION=	8
+
+BUILD_PERL_MOD_TARGETS= $(PERL_MOD_SOURCES:.pl=.pm)
+BUILD_PERL_CMD_TARGETS= $(PERL_CMD_SOURCES:.pl=.cmd)
+BUILD_PERL_MAN_TARGETS= $(BUILD_PERL_CMD_TARGETS:.cmd=.$(PERL_MAN_SECTION))
+
+POD2MAN_TARGETS= $(INSTALL_CMDS:.cmd \
 
 ## ======================================================================
 
@@ -44,9 +57,20 @@ include ${BUILD_COMMON}/Makefile.top
 
 ## ======================================================================
 
+.SUFFIXES: .cmd .$(PERL_MAN_SECTION)
+
+.cmd.$(PERL_MAN_SECTION):
+	@echo "Building $@ from $< ..."
+	@$(POD2MAN_CMD) --section=$(PERL_MAN_SECTION) $< >$@.tmp
+	@mv $@.tmp $@
+
+## ======================================================================
+
 build::
 
 install:: install-files install-cmds
+
+## ======================================================================
 
 dist: .diststamp
 	@if [ -d $(DESTARCH) ];then echo "About to remove ./$(DESTARCH)/ in 5 seconds ..."; sleep 5; fi

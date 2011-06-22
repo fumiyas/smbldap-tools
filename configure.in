@@ -51,11 +51,11 @@ case "$PERL_CMD" in
 /*)
     ;;
 *)
-    AC_PATH_PROG(PERL_CMD, perl, not found)
+    AC_PATH_PROG(PERL_CMD, perl)
     ;;
 esac
 
-AC_MSG_RESULT([using $PERL_CMD for perl])
+AC_MSG_RESULT([using $PERL_CMD for perl command])
 
 ## ----------------------------------------------------------------------
 
@@ -89,6 +89,26 @@ sitelib)
 esac
 
 AC_MSG_RESULT([using $PERL_LIBDIR for *.pm install directory])
+
+## ----------------------------------------------------------------------
+
+AC_SUBST(POD2MAN_CMD)
+
+AC_ARG_WITH(
+    pod2man,
+    [AC_HELP_STRING(--with-pod2man=PATH, [Use specific pod2man command])],
+    [POD2MAN_CMD="$withval"],
+)
+
+case "$POD2MAN_CMD" in
+/*)
+    ;;
+*)
+    AC_PATH_PROG(POD2MAN_CMD, pod2man)
+    ;;
+esac
+
+AC_MSG_RESULT([using $POD2MAN_CMD for pod2man command])
 
 ## Samba
 ## ======================================================================
