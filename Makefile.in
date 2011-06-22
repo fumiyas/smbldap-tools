@@ -19,7 +19,7 @@ BUILD_TARGETS= \
 	$(INSTALL_CMDS) \
 	smb.smbldap.conf.example \
 
-INSTALL_DIR=		$(sbindir)
+INSTALL_DIR=		$(PERL_LIBDIR)
 INSTALL_FILES=		smbldap_tools.pm
 INSTALL_CMD_DIR=	$(sbindir)
 INSTALL_CMDS= \
