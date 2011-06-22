@@ -17,7 +17,7 @@ http://www.islandlinux.org/HOWTO/openldap_samba.html (see bug in nss_ldap)
 What those tools are for?
 =-=-=-=-=-=-=-=-=-=-=-=-=
 
-A collection of scripts, «over» user{add,del,mod} and group{add,del,mod}
+A collection of scripts, Â«overÂ» user{add,del,mod} and group{add,del,mod}
 system tools to manipulate users and groups stored in LDAP directory,
 for DEN system like SAMBA-LDAP and pam/nss_ldap systems.
 
