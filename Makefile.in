@@ -70,50 +70,10 @@ build::
 
 install:: install-files install-cmds
 
-## ======================================================================
+dist: distclean
+	$(MAKE) -f Makefile.maintainer dist
 
-dist: .diststamp
-	@if [ -d $(DESTARCH) ];then echo "About to remove ./$(DESTARCH)/ in 5 seconds ..."; sleep 5; fi
-	@rm -rf ./$(DESTARCH)/
-	@mkdir -p $(DESTARCH)/doc
-	@cp smbldap-tools.spec $(DESTARCH)
-	@perl -i -pe's@^\%define version(.*)@\%define version $(VERSION)@' $(DESTARCH)/smbldap-tools.spec
-	@perl -i -pe's@^\%define release(.*)@\%define release $(RELEASE)@' $(DESTARCH)/smbldap-tools.spec
-	@cp Makefile $(DESTARCH)
-	@cp CONTRIBUTORS $(DESTARCH)
-	@cp COPYING $(DESTARCH)
-	@cp ChangeLog $(DESTARCH)
-	@cp FILES $(DESTARCH)
-	@cp INSTALL $(DESTARCH)
-	@cp README $(DESTARCH)
-	@cp TODO $(DESTARCH)
-	@cp INFRA $(DESTARCH)
-	@cp smbldap-populate $(DESTARCH)
-	@cp smbldap-groupadd $(DESTARCH)
-	@cp smbldap-groupshow $(DESTARCH)
-	@cp smbldap-grouplist $(DESTARCH)
-	@cp smbldap-groupmod $(DESTARCH)
-	@cp smbldap-groupdel $(DESTARCH)
-	@cp smbldap-useradd $(DESTARCH)
-	@cp smbldap-usershow $(DESTARCH)
-	@cp smbldap-usermod $(DESTARCH)
-	@cp smbldap-userinfo $(DESTARCH)
-	@cp smbldap-userlist $(DESTARCH)
-	@cp smbldap-userdel $(DESTARCH)
-	@cp smbldap-passwd $(DESTARCH)
-	@cp smbldap_bind.conf $(DESTARCH)
-	@cp smbldap_tools.pm $(DESTARCH)
-	@cp smbldap.conf $(DESTARCH)
-	@cp configure.pl $(DESTARCH)
-	@cp -r migration_scripts $(DESTARCH)/doc/
-	@cp doc/smbldap-tools/*.pdf doc/smbldap-tools/*.html $(DESTARCH)/doc/
-	@cp slapd.conf $(DESTARCH)/doc/
-	@cp smb.conf $(DESTARCH)/doc/
-	@rm -rf $(DESTARCH)/doc/{html,migration_scripts}/.svn
-	@echo "Creating tarball $(DESTARCH).tgz ...";
-	@tar czf $(DESTARCH).tgz $(DESTARCH)
-	@rm -r $(DESTARCH)
-	@touch .diststamp
+## ======================================================================
 
 build_dir:
 	@echo '%_topdir $(TOPDIR)' > $(HOME)/.rpmmacros
