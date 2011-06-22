@@ -1,0 +1,13 @@
+configure
+autom4te.cache
+config.log
+config.cache
+config.status
+Makefile
+*.cmd
+*.example
+smbldap_tools.pm
+build/Makefile
+build/Makefile.package
+build/subst
+build/subst.pl
