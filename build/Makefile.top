@@ -1,0 +1,9 @@
+clean::
+	$(RM) $(BUILD_COMMON)/subst
+
+distclean::
+	$(RM) Makefile config.log config.status config.cache autom4te.cache
+	$(RM) $(BUILD_COMMON)/subst.??
+	$(RM) $(BUILD_COMMON)/Makefile $(BUILD_COMMON)/Makefile.package
+	cp -p Makefile.maintainer Makefile
+

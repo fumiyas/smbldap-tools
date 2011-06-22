@@ -15,7 +15,6 @@ GPG_PATH=		$$HOME/.gnupg
 RPMBUILD_CMD=		rpmbuild -ba --sign
 
 BUILD_TARGETS= \
-	$(BUILD_TARGETS_TOP) \
 	$(INSTALL_FILES) \
 	$(INSTALL_CMDS) \
 	smb.smbldap.conf.example \
@@ -41,6 +40,7 @@ INSTALL_CMDS= \
 ## ======================================================================
 
 include ${BUILD_COMMON}/Makefile
+include ${BUILD_COMMON}/Makefile.top
 
 ## ======================================================================
 

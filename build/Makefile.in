@@ -82,6 +82,8 @@ default:: build
 
 build:: ${BUILD_TARGETS}
 
+${BUILD_TARGETS}:: $(BUILD_COMMON)/subst
+
 install:: ${INSTALL_TARGETS}
 
 install-dir:
