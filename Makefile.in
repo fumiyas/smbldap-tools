@@ -1,7 +1,7 @@
 # $Id$
 
 BUILD_TOP=		.
-BUILD_COMMON=		${BUILD_TOP}/build
+BUILD_COMMON=		$(BUILD_TOP)/build
 
 ## ======================================================================
 
@@ -52,8 +52,8 @@ POD2MAN_TARGETS= $(INSTALL_CMDS:.cmd \
 
 ## ======================================================================
 
-include ${BUILD_COMMON}/Makefile
-include ${BUILD_COMMON}/Makefile.top
+include $(BUILD_COMMON)/Makefile
+include $(BUILD_COMMON)/Makefile.top
 
 ## ======================================================================
 
@@ -74,6 +74,7 @@ dist: distclean
 	$(MAKE) -f Makefile.maintainer dist
 
 ## ======================================================================
+
 
 build_dir:
 	@echo '%_topdir $(TOPDIR)' > $(HOME)/.rpmmacros
