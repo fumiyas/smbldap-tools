@@ -90,8 +90,8 @@ if ($< != 0) {
     # non-root user
     if (!defined($oldpass)) {
 	# prompt for password
-	print "Identity validation...\n");
-	$oldpass = read_password("enter your UNIX password: ");
+	print "Identity validation...\n";
+	$oldpass = read_password("Enter your UNIX password: ");
 
 	$config{masterDN}="uid=$user,$config{usersdn}";
 	$config{masterPw}="$oldpass";
@@ -136,8 +136,6 @@ if ( $samba and $update_samba_passwd ) {
 my $pass;
 
 if (($< != 0) || $use_dialog) {
-	my $pass2;
-
 	$pass = read_password("New password: ");
 	my $pass2 = read_password("Retype new password: ");
 
@@ -254,27 +252,29 @@ EOF
 
 # Update 'userPassword' field
 if ( $update_unix_passwd ) {
-    my $shadowLastChange=int(time()/86400);
-    my $modify;
-	$modify = $ldap_master->modify ( "$dn",
-					    changes => [
-							replace => [userPassword => "$hash_password"],
-							]
-					    );
-	$modify->code && warn "Failed to modify UNIX password: ", $modify->error;
-	$modify = $ldap_master->modify ( "$dn",
-					    changes => [
-							replace => [shadowLastChange => "$shadowLastChange"],
-							]
-					    );
+    my $modify = $ldap_master->modify ($dn,
+	changes => [
+	    replace => [userPassword => $hash_password],
+	]
+    );
+    $modify->code && warn "Failed to modify UNIX password: ", $modify->error;
+
+    if ($config{shadowAccount}) {
+	my $shadowLastChange=int(time()/86400);
+	$modify = $ldap_master->modify ($dn,
+	    changes => [
+		replace => [shadowLastChange => $shadowLastChange],
+	    ]
+	);
 	$modify->code && warn "Failed to modify shadowLastChange: ", $modify->error;
-    if (($< == 0) && (defined $config{defaultMaxPasswordAge})) {
-	$modify = $ldap_master->modify ( "$dn",
-					    changes => [
-							replace => [shadowMax => "$config{defaultMaxPasswordAge}"]
-							]
-					    );
-	$modify->code && warn "Failed to modify shadowMax: ", $modify->error;
+	if (($< == 0) && (defined $config{defaultMaxPasswordAge})) {
+	    $modify = $ldap_master->modify ($dn,
+		changes => [
+		    replace => [shadowMax => "$config{defaultMaxPasswordAge}"]
+		]
+	    );
+	    $modify->code && warn "Failed to modify shadowMax: ", $modify->error;
+	}
     }
 }
 

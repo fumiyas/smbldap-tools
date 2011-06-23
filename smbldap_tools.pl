@@ -25,10 +25,10 @@ use warnings;
 
 package smbldap_tools;
 use Encode;
-use Net::LDAP;
-use Crypt::SmbHash;
 use POSIX qw(:termios_h);
 use IO::File;
+use Net::LDAP;
+use Crypt::SmbHash;
 
 use constant true => 1;
 use constant false => 0;
@@ -228,7 +228,17 @@ sub getLocalSID {
 }
 
 # let's read the configurations file...
-%config = read_conf();
+%config = (
+    masterLDAP =>	"127.0.0.1",
+    masterPort =>	389,
+    slaveLDAP =>	"127.0.0.1",
+    slavePort =>	389,
+    ldapTLS =>		false,
+    ldapSSL =>		false,
+    shadowAccount =>	true,
+    nscd =>		"/usr/sbin/nscd",
+    read_conf(),
+);
 
 sub get_parameter {
 
@@ -280,30 +290,8 @@ if ( !defined $config{sambaUnixIdPooldn} ) {
     $config{sambaUnixIdPooldn} =
       "sambaDomainName=$config{sambaDomain},$config{suffix}";
 }
-if ( !defined $config{masterLDAP} ) {
-    $config{masterLDAP} = "127.0.0.1";
-}
-if ( !defined $config{masterPort} ) {
-    $config{masterPort} = "389";
-}
-if ( !defined $config{slaveLDAP} ) {
-    $config{slaveLDAP} = "127.0.0.1";
-}
-if ( !defined $config{slavePort} ) {
-    $config{slavePort} = "389";
-}
-if ( !defined $config{ldapTLS} ) {
-    $config{ldapTLS} = "0";
-}
-if ( !defined $config{ldapSSL} ) {
-    $config{ldapSSL} = "0";
-}
 if ( $config{ldapSSL} == 1 and $config{ldapTLS} == 1 ) {
-    print "Both options ldapSSL and ldapTLS could not be activated\n";
-    exit;
-}
-if ( !defined $config{nscd} ) {
-    $config{nscd} = "/usr/sbin/nscd";
+    die "Both options ldapSSL and ldapTLS could not be activated\n";
 }
 
 sub connect_ldap_master {

@@ -1,24 +1,28 @@
 # $Id$
 
-2011-06-22 <fumiyas at OSS Technology, Inc, Japan>
+2011-06-23 <fumiyas at OSS Technology, Inc., Japan>
+	* Add shadowAccount parameter in smbldap.conf to control whether
+	  to treat shadowAccount objectclass and attributes or not
+
+2011-06-22 <fumiyas at OSS Technology, Inc., Japan>
 	* Introduce autoconf (configure.in, Makefile.in and so on)
 
-2011-06-14 <fumiyas at OSS Technology, Inc, Japan>
+2011-06-14 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-passwd: Do not use permuted -s option for the smbpasswd(1)
 	  command-line because the plain-old getopt(3) does not support it
 
-2011-05-28 <fumiyas at OSS Technology, Inc, Japan>
+2011-05-28 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap_tools.pm: Add read_password() to avoid `stty -echo` hacks
 	* Use /usr/sbin/nscd -i instead of /etc/init.d/nscd
 
-2011-05-24 <fumiyas at OSS Technology, Inc, Japan>
+2011-05-24 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-populate, smbldap_tools.pm: Use /nonexistent instead
 	  of /dev/null for guest's and computer's homeDirectory
 
-2011-03-09 <fumiyas at OSS Technology, Inc, Japan>
+2011-03-09 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap_tools.pm: Use Encode instead of Unicode::MapUTF8
 
-2011-02-23 <fumiyas at OSS Technology, Inc, Japan>
+2011-02-23 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap_tools.pm:
 	  - get_next_id: Use getgrgid() for GID number
 	  - read_parameter: Use lexically-scoped variable $line

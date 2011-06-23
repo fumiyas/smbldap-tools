@@ -417,52 +417,29 @@ if (   defined( $Options{'w'} )
 
 # USER ACCOUNT
 # add posix account first
-my $add;
+my @objectclass = qw(top person organizationalPerson posixAccount);
+my @attr = (
+    'objectclass' => \@objectclass,
+    'cn'            => $userCN,
+    'sn'            => $userSN,
+    'uid'           => $userName,
+    'uidNumber'     => $userUidNumber,
+    'gidNumber'     => $userGidNumber,
+    'homeDirectory' => $userHomeDirectory,
+    'loginShell'    => $config{userLoginShell},
+    'gecos'         => $config{userGecos},
+    'userPassword'  => "{crypt}x"
+);
+
+push(@objectclass, 'shadowAccount') if ($config{shadowAccount});
 
 # if AIX account, inetOrgPerson objectclass can't be used
-if ( defined( $Options{'b'} ) ) {
-    $add = $ldap_master->add(
-        "uid=$userName,$config{usersdn}",
-        attr => [
-            'objectclass' => [
-                'top',                  'person',
-                'organizationalPerson', 'posixAccount',
-                'shadowAccount'
-            ],
-            'cn'            => "$userCN",
-            'sn'            => "$userSN",
-            'uid'           => "$userName",
-            'uidNumber'     => "$userUidNumber",
-            'gidNumber'     => "$userGidNumber",
-            'homeDirectory' => "$userHomeDirectory",
-            'loginShell'    => "$config{userLoginShell}",
-            'gecos'         => "$config{userGecos}",
-            'userPassword'  => "{crypt}x"
-        ]
-    );
+unless ($Options{'b'}) {
+    push(@objectclass, 'inetOrgPerson');
+    $attr{'givenName'} = $givenName;
 }
-else {
-    $add = $ldap_master->add(
-        "uid=$userName,$config{usersdn}",
-        attr => [
-            'objectclass' => [
-                'top',                  'person',
-                'organizationalPerson', 'inetOrgPerson',
-                'posixAccount',         'shadowAccount'
-            ],
-            'cn'            => "$userCN",
-            'sn'            => "$userSN",
-            'givenName'     => "$givenName",
-            'uid'           => "$userName",
-            'uidNumber'     => "$userUidNumber",
-            'gidNumber'     => "$userGidNumber",
-            'homeDirectory' => "$userHomeDirectory",
-            'loginShell'    => "$config{userLoginShell}",
-            'gecos'         => "$config{userGecos}",
-            'userPassword'  => "{crypt}x"
-        ]
-    );
-}
+
+my $add = $ldap_master->add("uid=$userName,$config{usersdn}", attr => \@attr);
 $add->code && warn "failed to add entry: ", $add->error;
 
 #if ($createGroup) {

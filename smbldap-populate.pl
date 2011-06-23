@@ -204,10 +204,12 @@ objectClass: organizationalPerson
 objectClass: inetOrgPerson
 objectClass: sambaSAMAccount
 objectClass: posixAccount
-objectClass: shadowAccount
 gidNumber: $adminGidNumber
 uid: $adminName
 uidNumber: $adminUidNumber\n";
+    if ($config{shadowAccount}) {
+	$entries .= "objectClass: shadowAccount\n";
+    }
     if (defined $config{userHome} and $config{userHome} ne "") {
 	my $userHome=$config{userHome};
 	$userHome=~s/\%U/$adminName/;
@@ -251,7 +253,6 @@ objectClass: organizationalPerson
 objectClass: inetOrgPerson
 objectClass: sambaSAMAccount
 objectClass: posixAccount
-objectClass: shadowAccount
 gidNumber: 514
 uid: $guestName
 uidNumber: $guestUidNumber
@@ -262,6 +263,9 @@ sambaLogoffTime: 2147483647
 sambaKickoffTime: 2147483647
 sambaPwdCanChange: 0
 sambaPwdMustChange: 2147483647\n";
+    if ($config{shadowAccount}) {
+	$entries .= "objectClass: shadowAccount\n";
+    }
     if (defined $config{userSmbHome} and $config{userSmbHome} ne "") {
 	my $userSmbHome=$config{userSmbHome};
 	$userSmbHome=~s/\%U/$guestName/;
