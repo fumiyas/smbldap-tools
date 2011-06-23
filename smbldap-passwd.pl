@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -27,9 +27,7 @@
 #       . may also replace /bin/passwd
 
 use strict;
-use FindBin;
-use FindBin qw($RealBin);
-use lib "$RealBin/";
+use warnings;
 use smbldap_tools;
 
 use Crypt::SmbHash;

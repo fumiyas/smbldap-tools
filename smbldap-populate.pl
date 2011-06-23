@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -27,9 +27,8 @@
 #       . For lazy people, replace ldapadd (with only an ldif parameter)
 
 use strict;
-use FindBin;
+use warnings;
 use FindBin qw($RealBin);
-use lib "$RealBin/";
 use smbldap_tools;
 use Getopt::Std;
 use Net::LDAP::LDIF;

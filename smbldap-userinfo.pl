@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -22,10 +22,8 @@
 #  USA.
 
 use strict;
+use warnings;
 use Getopt::Std;
-use FindBin;
-use FindBin qw($RealBin);
-use lib "$RealBin/";
 use smbldap_tools;
 
 # function declaration

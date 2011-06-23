@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -26,9 +26,7 @@
 #
 
 use strict;
-use FindBin;
-use FindBin qw($RealBin);
-use lib "$RealBin/";
+use warnings;
 use smbldap_tools;
 use Getopt::Std;
 my %Options;

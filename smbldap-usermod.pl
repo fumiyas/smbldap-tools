@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -25,9 +25,8 @@
 # Purpose of smbldap-usermod : user (posix,shadow,samba) modification
 
 use strict;
-use FindBin;
+use warnings;
 use FindBin qw($RealBin);
-use lib "$RealBin/";
 use smbldap_tools;
 use Time::Local;
 #####################

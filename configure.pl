@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -29,6 +29,7 @@
 
 
 use strict;
+use warnings;
 use File::Basename;
 
 # we need to be root to configure the scripts

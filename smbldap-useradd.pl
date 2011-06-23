@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -25,10 +25,9 @@
 # Purpose of smbldap-useradd : user (posix,shadow,samba) add
 
 use strict;
+use warnings;
 
-use FindBin;
 use FindBin qw($RealBin);
-use lib "$RealBin/";
 use smbldap_tools;
 use Crypt::SmbHash;
 #####################

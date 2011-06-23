@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -25,9 +25,7 @@
 # Purpose of smbldap-groupdel : group (posix) deletion
 
 use strict;
-use FindBin;
-use FindBin qw($RealBin);
-use lib "$RealBin/";
+use warnings;
 use smbldap_tools;
 
 #####################

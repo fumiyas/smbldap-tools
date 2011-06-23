@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -25,12 +25,9 @@
 # Purpose of smbldap-grouplist : list groups
 
 use strict;
+use warnings;
 use Getopt::Std;
-use FindBin;
-use FindBin qw($RealBin);
-use lib "$RealBin/";
 use smbldap_tools;
-#use Date::Format; 
 
 # function declaration
 sub exist_in_tab;

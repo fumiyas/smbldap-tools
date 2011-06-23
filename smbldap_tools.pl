@@ -1,4 +1,4 @@
-#!@PERL_CMD@ -w
+#!@PERL_CMD@
 
 # $Id$
 
@@ -23,6 +23,7 @@
 #  USA.
 
 use strict;
+use warnings;
 
 package smbldap_tools;
 use Encode;
