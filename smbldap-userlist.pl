@@ -73,7 +73,7 @@ my ($dn,$ldap_master);
 if ($< != 0) {
     # non-root user
     if (!defined($pass)) {
-	$pass = read_password("UNIX password: ");
+	$pass = password_read("UNIX password: ");
 
 # JTO: search real basedn: may be different in case ou=bla1,ou=bla2 !
 # JTO: faire afficher egalement lock, expire et lastChange

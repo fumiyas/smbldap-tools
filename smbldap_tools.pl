@@ -28,7 +28,11 @@ use Encode;
 use POSIX qw(:termios_h);
 use IO::File;
 use Net::LDAP;
+use Net::LDAP::Extension::SetPassword;
 use Crypt::SmbHash;
+use Digest::MD5 qw(md5);
+use Digest::SHA1 qw(sha1);
+use MIME::Base64 qw(encode_base64);
 
 use constant true => 1;
 use constant false => 0;
@@ -101,7 +105,9 @@ use vars qw(%config $ldap);
   getLocalSID
   utf8Encode
   utf8Decode
-  read_password
+  password_read
+  password_set
+  shadow_update
   nsc_invalidate
   %config
 );
@@ -229,14 +235,16 @@ sub getLocalSID {
 
 # let's read the configurations file...
 %config = (
-    masterLDAP =>	"127.0.0.1",
-    masterPort =>	389,
-    slaveLDAP =>	"127.0.0.1",
-    slavePort =>	389,
-    ldapTLS =>		false,
-    ldapSSL =>		false,
-    shadowAccount =>	true,
-    nscd =>		"/usr/sbin/nscd",
+    masterLDAP =>		'127.0.0.1',
+    masterPort =>		389,
+    slaveLDAP =>		'127.0.0.1',
+    slavePort =>		389,
+    ldapTLS =>			false,
+    ldapSSL =>			false,
+    password_hash =>		'SSHA',
+    password_crypt_salt_format=>'%s',
+    shadowAccount =>		true,
+    nscd =>			"/usr/sbin/nscd",
     read_conf(),
 );
 
@@ -1228,7 +1236,7 @@ sub utf8Decode {
     return $string;
 }
 
-sub read_password
+sub password_read
 {
     my ($prompt, $timeout) = @_;
 
@@ -1281,6 +1289,172 @@ sub read_password
     chomp($pass) if (defined($pass));
 
     return $pass;
+}
+
+sub password_set
+{
+    my ($dn, $pass, $pass_old, $hash, $salt_format) = @_;
+    $hash ||= $config{password_hash};
+
+    if ($hash eq "exop") {
+	password_exop($dn, $pass, $pass_old);
+    } else {
+	password_modify($dn, $pass, $pass_old, $hash, $salt_format);
+    }
+
+    shadow_update($dn);
+}
+
+sub password_exop
+{
+    my ($dn, $pass, $pass_old) = @_;
+
+    my %values = (
+      user =>		$dn,
+      newpasswd =>	$pass,
+    );
+    $values{oldpasswd} = $pass_old if (defined($pass_old));
+
+    my $set = $ldap->set_password(%values);
+
+    $set->code && die "Failed to modify UNIX password: ", $set->error;
+}
+
+sub password_modify
+{
+    my ($dn, $pass, $pass_old, $hash, $salt_format) = @_;
+
+    my $pass_hashed = password_hash($pass, $hash, $salt_format);
+
+    my $modify = $ldap->modify ($dn,
+	changes => [
+	    replace => [userPassword => $pass_hashed],
+	]
+    );
+
+    $modify->code && die "Failed to modify UNIX password: ", $modify->error;
+}
+
+sub password_hash
+{
+    my ($pass, $hash, $salt_format) = @_;
+
+    return ($config{with_slappasswd}) ?
+	password_hash_by_slappasswd($pass, $hash, $salt_format) :
+	password_hash_internal($pass, $hash, $salt_format);
+}
+
+# Generates hash to be one of the following RFC 2307 schemes:
+# CRYPT, MD5, SMD5, SHA, SSHA and CLEARTEXT
+sub password_hash_internal
+{
+    my $pass = shift;
+    my $hash = shift || $config{password_hash};
+    my $crypt_salt_format = shift || $config{password_crypt_salt_format};
+
+    my $pass_hashed;
+    if ($hash eq "CLEARTEXT") {
+	return $pass;
+    } elsif ($hash eq "CRYPT") {
+	my $salt = sprintf($crypt_salt_format, password_salt());
+	$pass_hashed = crypt($pass, $salt);
+    } elsif ($hash eq "MD5") {
+	$pass_hashed = encode_base64( md5($pass),'' );
+    } elsif ($hash eq "SMD5") {
+	my $salt = password_salt(4);
+	$pass_hashed = encode_base64(md5($pass . $salt) . $salt, '');
+    } elsif ($hash eq "SHA") {
+	$pass_hashed = encode_base64(sha1($pass), '');
+    } elsif ($hash eq "SSHA") {
+	my $salt = password_salt(4);
+	$pass_hashed = encode_base64(sha1($pass . $salt) . $salt, '');
+    } else {
+	die "Unknown password hash scheme: $hash\n";
+    }
+
+    return "{$hash}$pass_hashed";
+}
+
+sub password_hash_by_slappasswd
+{
+    my $pass = shift;
+    my $hash = shift || $config{password_hash};
+    my $crypt_salt_format = shift || $config{password_crypt_salt_format};
+
+    # checking if password is tainted: nothing is changed!!!!
+    # essential for perl 5.8
+    ($pass =~ /^(.*)$/ and $pass=$1) or
+	die "$0: user password is tainted\n";
+
+    my $pass_hashed;
+
+    if ($hash eq "CLEARTEXT") {
+	return $pass;
+    } elsif ($hash eq "CRYPT") {
+	open BUF, "-|" or
+	    exec "$config{slappasswd}",
+	    "-h","{$hash}",
+	    "-c",$crypt_salt_format,
+	    "-s","$pass";
+	$pass_hashed = <BUF>;
+	close BUF;
+    } else {
+	open(BUF, "-|") or
+	    exec "$config{slappasswd}",
+	    "-h","{$hash}",
+	    "-s","$pass";
+	$pass_hashed = <BUF>;
+	close BUF;
+    }
+
+    defined($pass_hashed) or die "Failed to generate password hash!\n";
+    chomp($pass_hashed);
+    length($pass_hashed) or die "Failed to generate password hash!";
+
+    return $pass_hashed;
+}
+
+# Generates salt
+# Similar to Crypt::Salt module from CPAN
+sub password_salt
+{
+    my $length= shift || 32;
+
+    my @seeds = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
+    return join "", @seeds[map {rand scalar(@seeds)} (1..$length)];
+}
+
+sub shadow_update
+{
+    if (!$config{shadowAccount}) {
+	return;
+    }
+
+    shadow_update_internal(@_);
+}
+
+sub shadow_update_internal
+{
+    my $dn = shift;
+    my $time = shift || time;
+    my $pass_maxage = shift || $config{defaultMaxPasswordAge};
+
+    my $shadowLastChange = int($time / 86400);
+    my $modify = $ldap->modify ($dn,
+	changes => [
+	    replace => [shadowLastChange => $shadowLastChange],
+	]
+    );
+    $modify->code && die "Failed to modify shadowLastChange: ", $modify->error;
+
+    if (($< == 0) && ($pass_maxage)) {
+	my $modify = $ldap->modify ($dn,
+	    changes => [
+		replace => [shadowMax => $pass_maxage]
+	    ]
+	);
+	$modify->code && die "Failed to modify shadowMax: ", $modify->error;
+    }
 }
 
 sub nsc_invalidate

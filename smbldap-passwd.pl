@@ -29,16 +29,9 @@ use warnings;
 use smbldap_tools;
 
 use Crypt::SmbHash;
-use Digest::MD5 qw(md5);
-use Digest::SHA1 qw(sha1);
-use MIME::Base64 qw(encode_base64);
-
-# function declaration
-sub make_hash;
-sub make_salt;
 
 my $user= undef;
-my $oldpass= undef;
+my $pass_old = undef;
 
 my $arg;
 my $update_samba_passwd= 1;
@@ -88,16 +81,16 @@ my ($dn,$ldap_master);
 # First, connecting to the directory
 if ($< != 0) {
     # non-root user
-    if (!defined($oldpass)) {
+    if (!defined($pass_old)) {
 	# prompt for password
 	print "Identity validation...\n";
-	$oldpass = read_password("Enter your UNIX password: ");
+	$pass_old = password_read("Enter your UNIX password: ");
 
 	$config{masterDN}="uid=$user,$config{usersdn}";
-	$config{masterPw}="$oldpass";
+	$config{masterPw} = $pass_old;
 	$ldap_master=connect_ldap_master();
 	$dn=$config{masterDN};
-	if (!is_user_valid($user, $dn, $oldpass)) {
+	if (!is_user_valid($user, $dn, $pass_old)) {
 	    print "Authentication failure\n";
 	    exit (10);
 	}
@@ -136,58 +129,23 @@ if ( $samba and $update_samba_passwd ) {
 my $pass;
 
 if (($< != 0) || $use_dialog) {
-	$pass = read_password("New password: ");
-	my $pass2 = read_password("Retype new password: ");
+	$pass = password_read("New password: ");
+	my $pass2 = password_read("Retype new password: ");
 
 	if ($pass ne $pass2) {
 	    print "New passwords don't match!\n";
 	    exit (10);
 	}
 } else {
-	$pass = read_password();
+	$pass = password_read();
 }
-
-# Prepare '$hash_password' for 'userPassword'
-my $hash_password;
-# Generate password hash
-if ($config{with_slappasswd}) {
-    # checking if password is tainted: nothing is changed!!!!
-    # essential for perl 5.8
-    ($pass =~ /^(.*)$/ and $pass=$1) or
-	die "$0: user password is tainted\n";
-
-    # use slappasswd to generate hash
-    if ( $config{hash_encrypt} eq "CRYPT" && defined($config{crypt_salt_format}) ) {
-	open BUF, "-|" or
-	    exec "$config{slappasswd}",
-	    "-h","{$config{hash_encrypt}}",
-	    "-c","$config{crypt_salt_format}",
-	    "-s","$pass";
-	$hash_password = <BUF>;
-	close BUF;
-    } else {
-	open(BUF, "-|") or
-	    exec "$config{slappasswd}",
-	    "-h","{$config{hash_encrypt}}",
-	    "-s","$pass";
-	$hash_password = <BUF>;
-	close BUF;
-    }
-} else {
-    # use perl libraries to generate hash
-    $hash_password = make_hash($pass,$config{hash_encrypt},$config{crypt_salt_format});
-}
-# check if a hash was generated, otherwise die
-defined($hash_password) or
-    die "I cannot generate the proper hash!\n";
-chomp($hash_password);
 
 # First, connecting to the directory
 if ($< != 0) {
     # if we are not root, we close the connection to re-open it as a normal user
     $ldap_master->unbind;
     $config{masterDN}="uid=$user,$config{usersdn}";
-    $config{masterPw}="$oldpass";
+    $config{masterPw} = $pass_old;
     $ldap_master=connect_ldap_master();
 }
 
@@ -230,7 +188,7 @@ if ( $samba and $update_samba_passwd ) {
 	    my $FILE="|$config{smbpasswd} -s >/dev/null";
 	    open (FILE, $FILE) || die "$!\n";
 	    print FILE <<EOF;
-$oldpass
+$pass_old
 $pass
 $pass
 EOF
@@ -250,97 +208,14 @@ EOF
     }
 }
 
-# Update 'userPassword' field
 if ( $update_unix_passwd ) {
-    my $modify = $ldap_master->modify ($dn,
-	changes => [
-	    replace => [userPassword => $hash_password],
-	]
-    );
-    $modify->code && warn "Failed to modify UNIX password: ", $modify->error;
-
-    if ($config{shadowAccount}) {
-	my $shadowLastChange=int(time()/86400);
-	$modify = $ldap_master->modify ($dn,
-	    changes => [
-		replace => [shadowLastChange => $shadowLastChange],
-	    ]
-	);
-	$modify->code && warn "Failed to modify shadowLastChange: ", $modify->error;
-	if (($< == 0) && (defined $config{defaultMaxPasswordAge})) {
-	    $modify = $ldap_master->modify ($dn,
-		changes => [
-		    replace => [shadowMax => "$config{defaultMaxPasswordAge}"]
-		]
-	    );
-	    $modify->code && warn "Failed to modify shadowMax: ", $modify->error;
-	}
-    }
+    password_set($dn, $pass, $pass_old);
 }
 
 # take down session
 $ldap_master->unbind;
 
 exit 0;
-
-# Generates hash to be one of the following RFC 2307 schemes:
-# CRYPT,  MD5,  SMD5,  SHA, SSHA,  and  CLEARTEXT
-# SSHA is default
-# '%s' is a default crypt_salt_format
-# A substitute for slappasswd tool
-sub make_hash
-{
-    my $hash_encrypt;
-    my $crypt_salt_format;
-
-    my $clear_pass=$_[0] or return undef;
-    $hash_encrypt='{' . $_[1] . '}' or $hash_encrypt = "{SSHA}";
-    $crypt_salt_format=$_[2] or $crypt_salt_format = '%s';
-
-    my $hash_pass;
-    if ($hash_encrypt eq "{CRYPT}" && defined($crypt_salt_format)) {
-	# Generate CRYPT hash
-	# for unix md5crypt $crypt_salt_format = '$1$%.8s'
-	my $salt = sprintf($crypt_salt_format,make_salt());
-	$hash_pass = "{CRYPT}" . crypt($clear_pass,$salt);
-
-    } elsif ($hash_encrypt eq "{MD5}") {
-	# Generate MD5 hash
-	$hash_pass = "{MD5}" . encode_base64( md5($clear_pass),'' );
-
-    } elsif ($hash_encrypt eq "{SMD5}") {
-	# Generate SMD5 hash (MD5 with salt)
-	my $salt = make_salt(4);
-	$hash_pass = "{SMD5}" . encode_base64( md5($clear_pass . $salt) . $salt,'');
-
-    } elsif ($hash_encrypt eq "{SHA}") {
-	# Generate SHA1 hash
-	$hash_pass = "{SHA}" . encode_base64( sha1($clear_pass),'' );
-
-    } elsif ($hash_encrypt eq "{SSHA}") {
-	# Generate SSHA hash (SHA1 with salt)
-	my $salt = make_salt(4);
-	$hash_pass = "{SSHA}" . encode_base64( sha1($clear_pass . $salt) . $salt,'' );
-
-    } elsif ($hash_encrypt eq "{CLEARTEXT}") {
-	$hash_pass=$clear_pass;
-
-    } else {
-	$hash_pass=undef;
-    }
-    return $hash_pass;
-}
-
-# Generates salt
-# Similar to Crypt::Salt module from CPAN
-sub make_salt
-{
-    my $length=32;
-    $length = $_[0] if exists($_[0]);
-    
-    my @tab = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
-    return join "",@tab[map {rand 64} (1..$length)];
-}
 
 # - The End
 

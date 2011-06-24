@@ -81,7 +81,7 @@ $ldap_master->unbind();
 if ($Options{'l'}) {
     if (! $entry->get_value('userPassword')) {
         print "ACL on userPassword requires authentication... \n";
-	$pass = read_password("Please enter your UNIX password: ");
+	$pass = password_read("Please enter your UNIX password: ");
         # now bind again with user's parameters
         $config{masterDN}="$dn";
         $config{masterPw}="$pass";
@@ -157,7 +157,7 @@ if ($Options{'l'}) {
 if ($< != 0) {
     # non-root user
     if (!defined($pass)) {
-	$pass = read_password("UNIX password: ");
+	$pass = password_read("UNIX password: ");
 
 # now make a connection with the user's dn and password
 $config{masterDN}="$dn";

@@ -354,8 +354,8 @@ if (   defined( $Options{'w'} )
 
         # For machine trust account
         # Objectclass sambaSAMAccount must be added now !
-        my $pass = read_password("New password: ");
-        my $pass2 = read_password("Retype new password: ");
+        my $pass = password_read("New password: ");
+        my $pass2 = password_read("Retype new password: ");
         if ( $pass ne $pass2 ) {
             print "New passwords don't match!\n";
             exit(10);
