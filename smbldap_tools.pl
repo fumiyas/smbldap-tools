@@ -37,6 +37,11 @@ use MIME::Base64 qw(encode_base64);
 use constant true => 1;
 use constant false => 0;
 
+my %conf_renamed_by = (
+    password_hash =>			'hash_encrypt',
+    password_crypt_salt_format =>	'crypt_salt_format',
+);
+
 my $smbldap_conf =
     $ENV{'SMBLDAP_CONF'} ||
     '@sysconfdir@/smbldap.conf';
@@ -176,6 +181,12 @@ sub read_conf {
     else {
         $conf{slaveDN} = $conf{slavePw} = $conf{masterDN} = $conf{masterPw} =
           "";
+    }
+
+    while (my ($new, $old) = each(%conf_renamed_by)) {
+	if (exists($conf{$old})) {
+	    $conf{$new} = delete($conf{$old});
+	}
     }
 
     # automatically find SID
