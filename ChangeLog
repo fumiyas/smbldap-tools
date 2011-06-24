@@ -1,4 +1,9 @@
-# $Id$
+2011-06-24 <fumiyas at OSS Technology, Inc., Japan>
+	* Rename smbldap.conf parameters:
+	  - hash_encrypt -> password_hash
+	  - crypt_salt_format -> password_crypt_salt_format
+	* LDAPv3 Password Modify (RFC 3062) extended operation
+	  support when password_hash="exop" in smbldap.conf
 
 2011-06-23 <fumiyas at OSS Technology, Inc., Japan>
 	* Add shadowAccount parameter in smbldap.conf to control whether
