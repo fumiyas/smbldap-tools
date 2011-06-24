@@ -6,6 +6,7 @@ config.status
 Makefile
 *.cmd
 *.example
+*.8
 smbldap_tools.pm
 build/Makefile
 build/Makefile.package
