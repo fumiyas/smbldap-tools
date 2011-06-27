@@ -436,7 +436,7 @@ push(@objectclass, 'shadowAccount') if ($config{shadowAccount});
 # if AIX account, inetOrgPerson objectclass can't be used
 unless ($Options{'b'}) {
     push(@objectclass, 'inetOrgPerson');
-    $attr{'givenName'} = $givenName;
+    push(@attr, givenName => $givenName);
 }
 
 my $add = $ldap_master->add("uid=$userName,$config{usersdn}", attr => \@attr);
