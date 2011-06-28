@@ -102,7 +102,9 @@ use vars qw(%config $ldap);
   split_arg_comma
   list_union
   list_minus
-  get_next_id
+  idpool_next_id
+  user_next_uid
+  group_next_uid
   print_banner
   getDomainName
   getLocalSID
@@ -524,8 +526,6 @@ sub does_sid_exist {
         base   => $dn_group,
         scope  => $config{scope},
         filter => "(sambaSID=$sid)"
-
-#filter => "(&(objectClass=sambaSAMAccount|objectClass=sambaGroupMapping)(sambaSID=$sid))"
     );
     $mesg->code && die $mesg->error;
     return ($mesg);
@@ -751,7 +751,7 @@ sub group_add {
     nsc_invalidate("group");
 
     if ( !defined($gid) ) {
-        $gid = get_next_id( $config{groupsdn}, "gidNumber" );
+        $gid = group_next_gid();
     }
     else {
         if ( !defined($force) ) {
@@ -1150,61 +1150,86 @@ sub list_minus {
     return @res;
 }
 
-sub get_next_id($$) {
-    my $ldap_base_dn = shift;
-    my $attribute    = shift;
-    my $tries        = 0;
-    my $found        = 0;
-    my $next_uid_mesg;
-    my $nextuid;
-    if ( $ldap_base_dn =~ m/$config{usersdn}/i ) {
+sub idpool_next_id {
+    my ($attr) = @_;
 
-        # when adding a new user, we'll check if the uidNumber available is not
-        # already used for a computer's account
-        $ldap_base_dn = $config{suffix};
+    my $search = $ldap->search(
+	base   => $config{sambaUnixIdPooldn},
+	filter => "(objectClass=sambaUnixIdPool)",
+	scope  => "base",
+	attrs => [$attr],
+    );
+    if ($search->code) {
+	die "Failed to search $config{sambaUnixIdPooldn} to get next $attr: " .
+	    $search->error;
     }
-    do {
-        $next_uid_mesg = $ldap->search(
-            base   => $config{sambaUnixIdPooldn},
-            filter => "(objectClass=sambaUnixIdPool)",
-            scope  => "base"
+    if ($search->count != 1) {
+	die "Failed to find $config{sambaUnixIdPooldn} to get next $attr";
+    }
+
+    my $id = $search->entry(0)->get_value($attr);
+
+    my $modify = $ldap->modify($config{sambaUnixIdPooldn},
+	changes => [ replace => [ $attr=> $id + 1 ] ]
+    );
+    if ($modify->code) {
+	die "Failed to update $attr in $config{sambaUnixIdPooldn}: " .
+	    $modify->error;
+    }
+
+    return $id;
+}
+
+sub user_next_uid
+{
+    for (;;) {
+	my $uid = idpool_next_id("uidNumber");
+
+        my $search = $ldap->search(
+            base => $config{suffix},
+            filter => "(uidNumber=$uid)",
+	    scope => "sub",
+	    attrs => [],
         );
-        $next_uid_mesg->code
-          && die "Error looking for next uid in "
-          . $config{sambaUnixIdPooldn} . ":"
-          . $next_uid_mesg->error;
-        if ( $next_uid_mesg->count != 1 ) {
-            die "Could not find base dn, to get next $attribute";
-        }
-        my $entry = $next_uid_mesg->entry(0);
+        if ($search->code) {
+	    die "Failed to search entries to confirm next UID is free: " .
+		$search->error;
+	}
+	if ($search->count != 0) {
+	    redo;
+	}
+	if (getpwuid($uid)) {
+	    redo;
+	}
 
-        $nextuid = $entry->get_value($attribute);
-        my $modify =
-          $ldap->modify( "$config{sambaUnixIdPooldn}",
-            changes => [ replace => [ $attribute => $nextuid + 1 ] ] );
-        $modify->code && die "Error: ", $modify->error;
+	return $uid;
+    }
+}
 
-      # let's check if the id found is really free (in ou=Groups or ou=Users)...
-        my $check_uid_mesg = $ldap->search(
-            base   => $ldap_base_dn,
-            filter => "($attribute=$nextuid)",
+sub group_next_gid
+{
+    for (;;) {
+	my $gid = idpool_next_id("gidNumber");
+
+        my $search = $ldap->search(
+            base => $config{suffix},
+            filter => "(gidNumber=$gid)",
+	    scope => "sub",
+	    attrs => [],
         );
-        $check_uid_mesg->code
-          && die "Cannot confirm $attribute $nextuid is free";
-        if ( $check_uid_mesg->count == 0 ) {
+        if ($search->code) {
+	    die "Failed to search entries to confirm next GID is free: " .
+		$search->error;
+	}
+	if ($search->count != 0) {
+	    redo;
+	}
+	if (getgrgid($gid)) {
+	    redo;
+	}
 
-   # now, look if the id or gid is not already used in /etc/passwd or /etc/group
-            if ($attribute =~ /^uid/i && !getpwuid($nextuid) ||
-	        $attribute =~ /^gid/i && !getgrgid($nextuid) ) {
-                $found = 1;
-                return $nextuid;
-            }
-        }
-        $tries++;
-        print
-"Cannot confirm $attribute $nextuid is free: checking for the next one\n";
-    } while ( $found != 1 );
-    die "Could not allocate $attribute!";
+	return $gid;
+    }
 }
 
 sub utf8Encode {

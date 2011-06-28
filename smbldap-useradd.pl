@@ -208,7 +208,7 @@ if ( defined $user_ou ) {
 
 my $userUidNumber = $Options{'u'};
 if ( !defined($userUidNumber) ) {
-    $userUidNumber = get_next_id( $config{usersdn}, "uidNumber" );
+    $userUidNumber = user_next_uid();
 }
 elsif ( getpwuid($userUidNumber) ) {
     die "Uid already exists.\n";
