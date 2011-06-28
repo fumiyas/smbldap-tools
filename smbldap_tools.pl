@@ -90,8 +90,6 @@ use vars qw(%config $ldap);
   parse_group
   group_remove_member
   group_get_members
-  do_ldapadd
-  do_ldapmodify
   get_user_dn2
   connect_ldap_master
   connect_ldap_slave
@@ -1087,18 +1085,6 @@ sub group_get_members {
         }
     }
     return @resultat;
-}
-
-sub do_ldapmodify {
-    my $ldif = shift;
-    my $FILE = "|$config{ldapmodify} -r >/dev/null";
-    open( FILE, $FILE ) || die "$!\n";
-    print FILE <<EOF;
-$ldif
-EOF
-    close FILE;
-    my $rc = $?;
-    return $rc;
 }
 
 sub group_name_by_type {
