@@ -102,9 +102,11 @@ use vars qw(%config $ldap);
   split_arg_comma
   list_union
   list_minus
-  idpool_next_id
+  account_by_sid
   user_next_uid
+  user_next_rid
   group_next_uid
+  group_next_rid
   print_banner
   getDomainName
   getLocalSID
@@ -1150,86 +1152,218 @@ sub list_minus {
     return @res;
 }
 
-sub idpool_next_id {
-    my ($attr) = @_;
+sub account_next_id
+{
+    my $attr = shift;
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift;
+
+    my $base =  $config{sambaUnixIdPooldn};
+    my $oc = "sambaUnixIdPool";
+    my $filter = "(objectClass=sambaUnixIdPool)";
+    my $scope = "base";
+    my $id_bias = 0;
+    if ($attr =~ /rid$/i) {
+	$base = $config{suffix};
+	$oc = "sambaDomain";
+	$filter = "(&(objectClass=sambaDomain)(sambaDomainName=$domain))",
+	$scope = "sub";
+	## NOTE: sambaNextRid has "latest RID", not "next RID!
+	$id_bias = 1;
+    } else {
+    }
+
+    for (;;) {
+	my $search = $ldap->search(
+	    base   => $base,
+	    filter => $filter,
+	    scope  => $scope,
+	    attrs => [$attr],
+	);
+	if ($search->code) {
+	    die "Failed to search $oc to get next $attr: " .
+		$search->error;
+	}
+	if ($search->count != 1) {
+	    die "Failed to find $oc to get next $attr";
+	}
+
+	my $entry = $search->entry(0);
+	my $id = $entry->get_value($attr);
+
+	my $modify = $ldap->modify($entry->dn,
+	    changes => [ replace => [ $attr=> $id + 1 ] ]
+	);
+	if ($modify->code) {
+	    die "Failed to update $attr in $oc: " .
+		$modify->error;
+	}
+
+	$id += $id_bias;
+	unless ($checker && !$checker->($id)) {
+	    return $id;
+	}
+    }
+}
+
+sub account_next_rid
+{
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift || \&rid_is_free;
+
+    return account_next_id("sambaNextRid", $domain, $checker);
+}
+
+sub account_base_rid
+{
+    my $domain = shift || $config{sambaDomain};
 
     my $search = $ldap->search(
-	base   => $config{sambaUnixIdPooldn},
-	filter => "(objectClass=sambaUnixIdPool)",
-	scope  => "base",
-	attrs => [$attr],
+	base   => $config{suffix},
+	filter => "(&(objectClass=sambaDomain)(sambaDomainName=$domain))",
+	scope  => "sub",
+	attrs => ["sambaAlgorithmicRidBase", "sambaNextRid"],
     );
     if ($search->code) {
-	die "Failed to search $config{sambaUnixIdPooldn} to get next $attr: " .
+	die "Failed to search sambaDomain object to get sambaAlgorithmicRidBase: " .
 	    $search->error;
     }
     if ($search->count != 1) {
-	die "Failed to find $config{sambaUnixIdPooldn} to get next $attr";
+	die "Failed to find sambaDomain object to get sambaAlgorithmicRidBase";
     }
 
-    my $id = $search->entry(0)->get_value($attr);
+    my $entry = $search->entry(0);
+    my $rid_base = $entry->get_value("sambaAlgorithmicRidBase");
+    if (!defined($rid_base) && !defined($entry->get_value("sambaNextRid"))) {
+	return 1000;
+    }
 
-    my $modify = $ldap->modify($config{sambaUnixIdPooldn},
-	changes => [ replace => [ $attr=> $id + 1 ] ]
+    return $rid_base;
+}
+
+sub account_by_sid
+{
+    my $sid = shift;
+
+    my $search = $ldap->search(
+	base => $config{suffix},
+	filter => "(sambaSID=$sid)",
+	scope => "sub",
     );
-    if ($modify->code) {
-	die "Failed to update $attr in $config{sambaUnixIdPooldn}: " .
-	    $modify->error;
+    if ($search->code) {
+	die "Failed to search entries by SID: $sid: " .
+	    $search->error;
     }
 
-    return $id;
+    return ($search->entries)[0];
+}
+
+sub account_by_rid
+{
+    my $rid = shift;
+    my $domain_sid = shift || $config{SID};
+
+    return account_by_sid("$domain_sid-$rid");
+}
+
+sub rid_is_free
+{
+    my $rid = shift;
+    my $domain_sid = shift || $config{SID};
+
+    return !defined(account_by_rid($rid, $domain_sid));
+}
+
+sub user_by_uid
+{
+    my $uid = shift;
+
+    my $search = $ldap->search(
+	base => $config{suffix},
+	filter => "(&(objectClass=posixAccount)(uidNumber=$uid))",
+	scope => "sub",
+    );
+    if ($search->code) {
+	die "Failed to search entries by UID: $uid: " .
+	    $search->error;
+    }
+
+    return ($search->entries)[0];
+}
+
+sub uid_is_free
+{
+    my ($uid) = @_;
+
+    return !defined(user_by_uid($uid));
 }
 
 sub user_next_uid
 {
-    for (;;) {
-	my $uid = idpool_next_id("uidNumber");
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift || \&uid_is_free;
 
-        my $search = $ldap->search(
-            base => $config{suffix},
-            filter => "(uidNumber=$uid)",
-	    scope => "sub",
-	    attrs => [],
-        );
-        if ($search->code) {
-	    die "Failed to search entries to confirm next UID is free: " .
-		$search->error;
-	}
-	if ($search->count != 0) {
-	    redo;
-	}
-	if (getpwuid($uid)) {
-	    redo;
-	}
+    return account_next_id("uidNumber", $domain, $checker);
+}
 
-	return $uid;
+sub user_next_rid
+{
+    my $uid = shift;
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift || \&rid_is_free;
+
+    if (defined(my $rid_base = account_base_rid($domain))) {
+	## Use legacy algorithmic RID generator
+	return $uid * 2 + $rid_base;
     }
+
+    return account_next_rid($domain, $checker);
+}
+
+sub group_by_gid
+{
+    my $gid = shift;
+
+    my $search = $ldap->search(
+	base => $config{suffix},
+	filter => "(&(objectClass=posixGroup)(gidNumber=$gid))",
+	scope => "sub",
+    );
+    if ($search->code) {
+	die "Failed to search entries by GID: $gid: " .
+	    $search->error;
+    }
+
+    return ($search->entries)[0];
+}
+
+sub gid_is_free
+{
+    my ($gid) = @_;
+
+    return !defined(group_by_gid($gid));
 }
 
 sub group_next_gid
 {
-    for (;;) {
-	my $gid = idpool_next_id("gidNumber");
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift || \&gid_is_free;
 
-        my $search = $ldap->search(
-            base => $config{suffix},
-            filter => "(gidNumber=$gid)",
-	    scope => "sub",
-	    attrs => [],
-        );
-        if ($search->code) {
-	    die "Failed to search entries to confirm next GID is free: " .
-		$search->error;
-	}
-	if ($search->count != 0) {
-	    redo;
-	}
-	if (getgrgid($gid)) {
-	    redo;
-	}
+    return account_next_id("gidNumber", $domain, $checker);
+}
 
-	return $gid;
+sub group_next_rid
+{
+    my $gid = shift;
+    my $domain = shift || $config{sambaDomain};
+    my $checker = shift || \&rid_is_free;
+
+    if (defined(my $rid_base = account_base_rid($domain))) {
+	## Use legacy algorithmic RID generator
+	return $gid * 2 + $rid_base + 1;
     }
+
+    return account_next_rid($domain, $checker);
 }
 
 sub utf8Encode {

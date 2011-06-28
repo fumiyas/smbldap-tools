@@ -210,8 +210,8 @@ my $userUidNumber = $Options{'u'};
 if ( !defined($userUidNumber) ) {
     $userUidNumber = user_next_uid();
 }
-elsif ( getpwuid($userUidNumber) ) {
-    die "Uid already exists.\n";
+elsif (my $user = user_by_uid($userUidNumber)) {
+    die "UID already owned by " . $user->dn . "\n";
 }
 
 my $createGroup   = 0;
@@ -270,23 +270,8 @@ if (   defined $Options{'a'}
         exit(7);
     }
 
-    # as rid we use 2 * uid + 1000
-    $userRid = 2 * $userUidNumber + 1000;
-
-    # let's test if this SID already exist
+    $userRid = user_next_rid($userUidNumber);
     $user_sid = "$config{SID}-$userRid";
-    my $test_exist_sid = does_sid_exist( $user_sid, $config{usersdn} );
-    if ( $test_exist_sid->count == 1 ) {
-        print "User SID already owned by\n";
-
-        # there should not exist more than one entry, but ...
-        foreach my $entry ( $test_exist_sid->all_entries ) {
-            my $dn = $entry->dn;
-            chomp($dn);
-            print "$dn\n";
-        }
-        exit(7);
-    }
 }
 
 my $userHomeDirectory;

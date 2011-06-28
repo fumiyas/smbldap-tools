@@ -1,3 +1,8 @@
+2011-06-29 <fumiyas at OSS Technology, Inc., Japan>
+	* Use sambaNextRid attribute in sambaDomain entry for the next RID
+	  as same as Samba 3.0+ (only when sambaAlgorithmicRidBase attribute
+	  does NOT exists in sambaDomain entry for backward compatibility)
+
 2011-06-24 <fumiyas at OSS Technology, Inc., Japan>
 	* Rename smbldap.conf parameters:
 	  - hash_encrypt -> password_hash

@@ -82,22 +82,15 @@ if ($tmp= $Options{'s'}) {
 	}
     } else {
 	# algorithmic mapping
-	$group_rid = 2*$_groupGidNumber+1001;
+	$group_rid = group_next_rid($_groupGidNumber);
     }
     $group_sid = $config{SID}.'-'.$group_rid;
 }
 
 if ($Options{'r'} || $Options{'a'} || $Options{'s'}) {
     # let's test if this SID already exist
-    my $test_exist_sid=does_sid_exist($group_sid,$config{groupsdn});
-    if ($test_exist_sid->count == 1) {
-	warn "Group SID already owned by\n";
-	# there should not exist more than one entry, but ...
-	foreach my $entry ($test_exist_sid->all_entries) {
-	    my $dn= $entry->dn;
-	    chomp($dn);
-	    warn "$dn\n";
-	}
+    if (my $account = account_by_sid($group_sid)) {
+	warn "SID already owned by " . $account->dn. "\n";
 	exit(7);
     }
 }
