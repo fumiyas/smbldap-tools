@@ -21,7 +21,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #  Purpose :
-#       . Create an initial LDAP database suitable for Samba 2.2
+#       . Create an initial LDAP database suitable for Samba 3
 #       . For lazy people, replace ldapadd (with only an ldif parameter)
 
 use strict;
@@ -30,6 +30,7 @@ use FindBin qw($RealBin);
 use smbldap_tools;
 use Getopt::Std;
 use Net::LDAP::LDIF;
+use Net::LDAP::Entry;
 
 use vars qw(%oc);
 
@@ -39,7 +40,6 @@ use vars qw(%oc);
        "o" => "organization",
        "dc" => "dcObject",
        );
-
 
 my %Options;
 
@@ -92,11 +92,6 @@ if (!defined($firstridNumber)) {
 
 my $algorithmicRidBase = $Options{'R'};
 
-my $tmp_ldif_file=$Options{'e'};
-if (!defined($tmp_ldif_file)) {
-    $tmp_ldif_file="/tmp/$$.ldif";
-}
-
 my $adminName = $Options{'a'};
 if (!defined($adminName)) {
     $adminName = "root";
@@ -134,15 +129,19 @@ if (!defined($adminGidNumber)) {
     $adminGidNumber = "0";
 }
 
-my $_ldifName = $Options{'i'};
-
-my $exportFile = $Options{'e'};
-if (!defined($exportFile)) {
-    $exportFile = "base.ldif";
-}
-
 print "Populating LDAP directory for domain $domain ($config{SID})\n";
-if (!defined($_ldifName)) {
+
+my $entries_iter;
+
+if (my $file = $Options{'i'}) {
+    my $ldif = Net::LDAP::LDIF->new($file, "r", onerror => 'undef') or
+	die "Cannot open file: $file: $!";
+    $entries_iter = sub {
+	return $ldif->read_entry;
+    };
+} else {
+    my @entries;
+    my $entry;
     my $attr;
     my $val;
     my $objcl;
@@ -158,7 +157,7 @@ if (!defined($_ldifName)) {
     } else {
 	die "can't extract first attr and value from suffix $config{suffix}";
     }
-    #print "$attr=$val\n";
+
     my ($type,$ou_users,$ou_groups,$ou_computers,$ou_idmap,$cnsambaUnixIdPool);
     ($type,$ou_users)=($config{usersdn}=~/(.*)=(.*),$config{suffix}/);
     ($type,$ou_groups)=($config{groupsdn}=~/(.*)=(.*),$config{suffix}/);
@@ -167,7 +166,6 @@ if (!defined($_ldifName)) {
 	($type,$ou_idmap)=($config{idmapdn}=~/(.*)=(.*),$config{suffix}/);
     }
     ($type,$cnsambaUnixIdPool)=($config{sambaUnixIdPooldn}=~/(.*)=(.*),$config{suffix}/);
-    my $org;
     my ($organisation,$ext);
     if ($config{suffix} =~ m/dc=([^=]+),dc=(.*)$/) {
 	($organisation,$ext) = ($config{suffix} =~ m/dc=([^=]+),dc=(.*)$/);
@@ -175,363 +173,362 @@ if (!defined($_ldifName)) {
 	$organisation=$1;
     }
 
+    $entry = Net::LDAP::Entry->new($config{suffix},
+	objectClass => $objcl,
+	$attr => $val,
+    );
     if ($organisation ne '') {
-	$org = "\nobjectclass: organization\no: $organisation";
+	$entry->add(
+	    objectClass => "organization",
+	    o => $organisation,
+	);
     }
-    #my $FILE="|cat";
+    push(@entries, $entry);
 
-    my $entries="dn: $config{suffix}
-objectClass: $objcl$org
-$attr: $val
+    $entry = Net::LDAP::Entry->new($config{usersdn},
+	objectClass => [qw(top organizationalUnit)],
+	ou => $ou_users,
+    );
+    push(@entries, $entry);
 
-dn: $config{usersdn}
-objectClass: top
-objectClass: organizationalUnit
-ou: $ou_users
+    $entry = Net::LDAP::Entry->new($config{groupsdn},
+	objectClass => [qw(top organizationalUnit)],
+	ou => $ou_groups,
+    );
+    push(@entries, $entry);
 
-dn: $config{groupsdn}
-objectClass: top
-objectClass: organizationalUnit
-ou: $ou_groups
-
-dn: $config{computersdn}
-objectClass: top
-objectClass: organizationalUnit
-ou: $ou_computers\n";
+    $entry = Net::LDAP::Entry->new($config{computersdn},
+	objectClass => [qw(top organizationalUnit)],
+	ou => $ou_computers,
+    );
+    push(@entries, $entry);
 
     if (defined $config{idmapdn}) {
-	$entries.="\ndn: $config{idmapdn}
-objectClass: top
-objectClass: organizationalUnit
-ou: $ou_idmap\n";
+	$entry = Net::LDAP::Entry->new($config{idmapdn},
+	    objectClass => [qw(top organizationalUnit)],
+	    ou => $ou_idmap,
+	);
+	push(@entries, $entry);
     }
 
-    $entries.="\ndn: uid=$adminName,$config{usersdn}
-cn: $adminName
-sn: $adminName
-objectClass: top
-objectClass: person
-objectClass: organizationalPerson
-objectClass: inetOrgPerson
-objectClass: sambaSAMAccount
-objectClass: posixAccount
-gidNumber: $adminGidNumber
-uid: $adminName
-uidNumber: $adminUidNumber\n";
+    $entry = Net::LDAP::Entry->new("uid=$adminName,$config{usersdn}",
+	objectClass =>	[qw(top person organizationalPerson inetOrgPerson sambaSAMAccount posixAccount)],
+	uid =>		$adminName,
+	cn =>		$adminName,
+	sn =>		$adminName,
+	gidNumber =>	$adminGidNumber,
+	uidNumber =>	$adminUidNumber,
+    );
     if ($config{shadowAccount}) {
-	$entries .= "objectClass: shadowAccount\n";
+	$entry->add(objectClass => "shadowAccount");
     }
     if (defined $config{userHome} and $config{userHome} ne "") {
 	my $userHome=$config{userHome};
 	$userHome=~s/\%U/$adminName/;
-	$entries.="homeDirectory: $userHome\n";
+	$entry->add(homeDirectory => $userHome);
     } else {
-	$entries.="homeDirectory: /nonexistent\n";
+	$entry->add(homeDirectory => "/nonexistent");
     }
-    $entries.="sambaPwdLastSet: 0
-sambaLogonTime: 0
-sambaLogoffTime: 2147483647
-sambaKickoffTime: 2147483647
-sambaPwdCanChange: 0
-sambaPwdMustChange: 2147483647\n";
+    $entry->add(
+	sambaPwdLastSet =>	0,
+	sambaLogonTime =>	0,
+	sambaLogoffTime =>	2147483647,
+	sambaKickoffTime =>	2147483647,
+	sambaPwdCanChange =>	0,
+	sambaPwdMustChange =>	2147483647,
+    );
     if (defined $config{userSmbHome} and $config{userSmbHome} ne "") {
-	my $userSmbHome=$config{userSmbHome};
-	$userSmbHome=~s/\%U/$adminName/;
-	$entries.="sambaHomePath: $userSmbHome\n";
+	my $userSmbHome = $config{userSmbHome};
+	$userSmbHome =~ s/\%U/$adminName/;
+	$entry->add(sambaHomePath => $userSmbHome);
     }
     if (defined $config{userHomeDrive} and $config{userHomeDrive} ne "") {
-	$entries.="sambaHomeDrive: $config{userHomeDrive}\n";
+	$entry->add(sambaHomeDrive => $config{userHomeDrive});
     }
     if (defined $config{userProfile} and $config{userProfile} ne "") {
-	my $userProfile=$config{userProfile};
-	$userProfile=~s/\%U/$adminName/;
-	$entries.="sambaProfilePath: $userProfile\n";
+	my $userProfile = $config{userProfile};
+	$userProfile =~ s/\%U/$adminName/;
+	$entry->add(sambaProfilePath => $userProfile);
     }
-    $entries.="sambaPrimaryGroupSID: $config{SID}-512
-sambaLMPassword: XXX
-sambaNTPassword: XXX
-sambaAcctFlags: [U          ]
-sambaSID: $config{SID}-$adminRid
-loginShell: /bin/false
-gecos: Netbios Domain Administrator
+    $entry->add(
+	sambaPrimaryGroupSID =>	"$config{SID}-512",
+	sambaLMPassword =>	"XXX",
+	sambaNTPassword =>	"XXX",
+	sambaAcctFlags =>	"[U          ]",
+	sambaSID =>		"$config{SID}-$adminRid",
+	loginShell =>		"/bin/false",
+	gecos =>		"Netbios Domain Administrator",
+    );
+    push(@entries, $entry);
 
-dn: uid=$guestName,$config{usersdn}
-cn: $guestName
-sn: $guestName
-objectClass: top
-objectClass: person
-objectClass: organizationalPerson
-objectClass: inetOrgPerson
-objectClass: sambaSAMAccount
-objectClass: posixAccount
-gidNumber: 514
-uid: $guestName
-uidNumber: $guestUidNumber
-homeDirectory: /nonexistent
-sambaPwdLastSet: 0
-sambaLogonTime: 0
-sambaLogoffTime: 2147483647
-sambaKickoffTime: 2147483647
-sambaPwdCanChange: 0
-sambaPwdMustChange: 2147483647\n";
+    $entry = Net::LDAP::Entry->new("uid=$guestName,$config{usersdn}",
+	objectClass => [qw(top person organizationalPerson inetOrgPerson sambaSAMAccount posixAccount)],
+	cn =>			$guestName,
+	sn =>			$guestName,
+	gidNumber =>		514,
+	uid =>			$guestName,
+	uidNumber =>		$guestUidNumber,
+	homeDirectory =>	"/nonexistent",
+	sambaPwdLastSet =>	0,
+	sambaLogonTime =>	0,
+	sambaLogoffTime =>	2147483647,
+	sambaKickoffTime =>	2147483647,
+	sambaPwdCanChange =>	0,
+	sambaPwdMustChange =>	2147483647,
+    );
     if ($config{shadowAccount}) {
-	$entries .= "objectClass: shadowAccount\n";
+	$entry->add(objectClass => "shadowAccount");
     }
     if (defined $config{userSmbHome} and $config{userSmbHome} ne "") {
-	my $userSmbHome=$config{userSmbHome};
-	$userSmbHome=~s/\%U/$guestName/;
-	$entries.="sambaHomePath: $userSmbHome\n";
+	my $userSmbHome = $config{userSmbHome};
+	$userSmbHome =~ s/\%U/$guestName/;
+	$entry->add(sambaHomePath => $userSmbHome);
     }
     if (defined $config{userHomeDrive} and $config{userHomeDrive} ne "") {
-	$entries.="sambaHomeDrive: $config{userHomeDrive}\n";
+	$entry->add(sambaHomeDrive => $config{userHomeDrive});
     }
     if (defined $config{userProfile} and $config{userProfile} ne "") {
 	my $userProfile=$config{userProfile};
 	$userProfile=~s/\%U/$guestName/;
-	$entries.="sambaProfilePath: $userProfile\n";
+	$entry->add(sambaProfilePath => $userProfile);
     }
-    $entries.="sambaPrimaryGroupSID: $config{SID}-514
-sambaLMPassword: NO PASSWORDXXXXXXXXXXXXXXXXXXXXX
-sambaNTPassword: NO PASSWORDXXXXXXXXXXXXXXXXXXXXX
-# account disabled by default
-sambaAcctFlags: [NUD        ]
-sambaSID: $config{SID}-$guestRid
-loginShell: /bin/false
+    $entry->add(
+	sambaPrimaryGroupSID => "$config{SID}-514",
+	sambaLMPassword =>	"NO PASSWORDXXXXXXXXXXXXXXXXXXXXX",
+	sambaNTPassword =>	"NO PASSWORDXXXXXXXXXXXXXXXXXXXXX",
+	# account disabled by default
+	sambaAcctFlags =>	"[NUD        ]",
+	sambaSID =>		"$config{SID}-$guestRid",
+	loginShell =>		"/bin/false",
+    );
+    push(@entries, $entry);
 
-dn: cn=Domain Admins,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 512
-cn: Domain Admins
-memberUid: $adminName
-description: Netbios Domain Administrators
-sambaSID: $config{SID}-512
-sambaGroupType: 2
-displayName: Domain Admins
+    $entry = Net::LDAP::Entry->new("cn=Domain Admins,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Domain Admins",
+	gidNumber =>	512,
+	memberUid =>	$adminName,
+	description =>	"Netbios Domain Administrators",
+	sambaSID =>	"$config{SID}-512",
+	sambaGroupType =>2,
+	displayName =>	"Domain Admins",
+    );
+    push(@entries, $entry);
 
-dn: cn=Domain Users,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 513
-cn: Domain Users
-description: Netbios Domain Users
-sambaSID: $config{SID}-513
-sambaGroupType: 2
-displayName: Domain Users
+    $entry = Net::LDAP::Entry->new("cn=Domain Users,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Domain Users",
+	gidNumber =>	513,
+	description =>	"Netbios Domain Users",
+	sambaSID =>	"$config{SID}-513",
+	sambaGroupType =>2,
+	displayName =>	"Domain Users",
+    );
+    push(@entries, $entry);
 
-dn: cn=Domain Guests,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 514
-cn: Domain Guests
-description: Netbios Domain Guests Users
-sambaSID: $config{SID}-514
-sambaGroupType: 2
-displayName: Domain Guests
+    $entry = Net::LDAP::Entry->new("cn=Domain Guests,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Domain Guests",
+	gidNumber =>	514,
+	description =>	"Netbios Domain Guests Users",
+	sambaSID =>	"$config{SID}-514",
+	sambaGroupType =>2,
+	displayName =>	"Domain Guests",
+    );
+    push(@entries, $entry);
 
-dn: cn=Domain Computers,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 515
-cn: Domain Computers
-description: Netbios Domain Computers accounts
-sambaSID: $config{SID}-515
-sambaGroupType: 2
-displayName: Domain Computers
+    $entry = Net::LDAP::Entry->new("cn=Domain Computers,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Domain Computers",
+	gidNumber =>	515,
+	description =>	"Netbios Domain Computers accounts",
+	sambaSID =>	"$config{SID}-515",
+	sambaGroupType =>2,
+	displayName =>	"Domain Computers",
+    );
+    push(@entries, $entry);
 
-dn: cn=Administrators,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 544
-cn: Administrators
-description: Netbios Domain Members can fully administer the computer/sambaDomainName
-sambaSID: S-1-5-32-544
-sambaGroupType: 4
-displayName: Administrators
+    $entry = Net::LDAP::Entry->new("cn=Administrators,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Administrators",
+	gidNumber =>	544,
+	description =>	"Netbios Domain Members can fully administer the computer/sambaDomainName",
+	sambaSID =>	"S-1-5-32-544",
+	sambaGroupType => 4,
+	displayName =>	"Administrators",
+    );
+    push(@entries, $entry);
 
-#dn: cn=Users,$config{groupsdn}
-#objectClass: top
-#objectClass: posixGroup
-#objectClass: sambaGroupMapping
-#gidNumber: 545
-#cn: Users
-#description: Netbios Domain Ordinary users
-#sambaSID: S-1-5-32-545
-#sambaGroupType: 4
-#displayName: users
+#    $entry = Net::LDAP::Entry->new("cn=Users,$config{groupsdn}",
+#	objectClass => [qw(top posixGroup sambaGroupMapping)],
+#	gidNumber =>	545,
+#	cn =>		"Users",
+#	description =>	"Netbios Domain Ordinary users",
+#	sambaSID =>	"S-1-5-32-545",
+#	sambaGroupType =>	4,
+#	displayName =>	"users",
+#    );
+#    push(@entries, $entry);
 
-#dn: cn=Guests,$config{groupsdn}
-#objectClass: top
-#objectClass: posixGroup
-#objectClass: sambaGroupMapping
-#gidNumber: 546
-#cn: Guests
-#memberUid: $guestName
-#description: Netbios Domain Users granted guest access to the computer/sambaDomainName
-#sambaSID: S-1-5-32-546
-#sambaGroupType: 4
-#displayName: Guests
+#    $entry = Net::LDAP::Entry->new("cn=Guests,$config{groupsdn}",
+#	objectClass => [qw(top posixGroup sambaGroupMapping)],
+#	gidNumber =>	546,
+#	cn =>		"Guests",
+#	memberUid =>	$guestName,
+#	description =>	"Netbios Domain Users granted guest access to the computer/sambaDomainName",
+#	sambaSID =>	"S-1-5-32-546",
+#	sambaGroupType =>	4,
+#	displayName =>	"Guests",
+#    );
+#    push(@entries, $entry);
 
-#dn: cn=Power Users,$config{groupsdn}
-#objectClass: top
-#objectClass: posixGroup
-#objectClass: sambaGroupMapping
-#gidNumber: 547
-#cn: Power Users
-#description: Netbios Domain Members can share directories and printers
-#sambaSID: S-1-5-32-547
-#sambaGroupType: 4
-#displayName: Power Users
+#    $entry = Net::LDAP::Entry->new("cn=Power Users,$config{groupsdn}",
+#	objectClass => [qw(top posixGroup sambaGroupMapping)],
+#	gidNumber =>	547,
+#	cn =>		"Power Users",
+#	description =>	"Netbios Domain Members can share directories and printers",
+#	sambaSID =>	"S-1-5-32-547",
+#	sambaGroupType =>	4,
+#	displayName =>	"Power Users",
+#    );
+#    push(@entries, $entry);
 
-dn: cn=Account Operators,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 548
-cn: Account Operators
-description: Netbios Domain Users to manipulate users accounts
-sambaSID: S-1-5-32-548
-sambaGroupType: 4
-displayName: Account Operators
+    $entry = Net::LDAP::Entry->new("cn=Account Operators,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Account Operators",
+	gidNumber =>	548,
+	description =>	"Netbios Domain Users to manipulate users accounts",
+	sambaSID =>	"S-1-5-32-548",
+	sambaGroupType =>	4,
+	displayName =>	"Account Operators",
+    );
+    push(@entries, $entry);
 
-#dn: cn=System Operators,$config{groupsdn}
-#objectClass: top
-#objectClass: posixGroup
-#objectClass: sambaGroupMapping
-#gidNumber: 549
-#cn: System Operators
-#description: Netbios Domain System Operators
-#sambaSID: S-1-5-32-549
-#sambaGroupType: 4
-#displayName: System Operators
+#    $entry = Net::LDAP::Entry->new("cn=System Operators,$config{groupsdn}",
+#	objectClass => [qw(top posixGroup sambaGroupMapping)],
+#	gidNumber =>	549,
+#	cn =>		"System Operators",
+#	description =>	"Netbios Domain System Operators",
+#	sambaSID =>	"S-1-5-32-549",
+#	sambaGroupType =>	4,
+#	displayName =>	"System Operators",
+#    );
+#    push(@entries, $entry);
 
-dn: cn=Print Operators,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 550
-cn: Print Operators
-description: Netbios Domain Print Operators
-sambaSID: S-1-5-32-550
-sambaGroupType: 4
-displayName: Print Operators
+    $entry = Net::LDAP::Entry->new("cn=Print Operators,$config{groupsdn}",
+	objectClass =>	[qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Print Operators",
+	gidNumber =>	550,
+	description =>	"Netbios Domain Print Operators",
+	sambaSID =>	"S-1-5-32-550",
+	sambaGroupType =>	4,
+	displayName =>	"Print Operators",
+    );
+    push(@entries, $entry);
 
-dn: cn=Backup Operators,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 551
-cn: Backup Operators
-description: Netbios Domain Members can bypass file security to back up files
-sambaSID: S-1-5-32-551
-sambaGroupType: 4
-displayName: Backup Operators
+    $entry = Net::LDAP::Entry->new("cn=Backup Operators,$config{groupsdn}",
+	objectClass =>	[qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Backup Operators",
+	gidNumber =>	551,
+	description =>	"Netbios Domain Members can bypass file security to back up files",
+	sambaSID =>	"S-1-5-32-551",
+	sambaGroupType =>	4,
+	displayName =>	"Backup Operators",
+    );
+    push(@entries, $entry);
 
-dn: cn=Replicators,$config{groupsdn}
-objectClass: top
-objectClass: posixGroup
-objectClass: sambaGroupMapping
-gidNumber: 552
-cn: Replicators
-description: Netbios Domain Supports file replication in a sambaDomainName
-sambaSID: S-1-5-32-552
-sambaGroupType: 4
-displayName: Replicators
+    $entry = Net::LDAP::Entry->new("cn=Replicators,$config{groupsdn}",
+	objectClass => [qw(top posixGroup sambaGroupMapping)],
+	cn =>		"Replicators",
+	gidNumber =>	552,
+	description =>	"Netbios Domain Supports file replication in a sambaDomainName",
+	sambaSID =>	"S-1-5-32-552",
+	sambaGroupType =>	4,
+	displayName =>	"Replicators",
+    );
+    push(@entries, $entry);
 
-";
+    $entry = Net::LDAP::Entry->new("sambaDomainName=$domain,$config{suffix}",
+	objectClass =>	[qw(top sambaDomain)],
+	sambaDomainName =>	$domain,
+	sambaSID =>		$config{SID},
+    );
+    if (defined($algorithmicRidBase)) {
+	$entry->add(sambaAlgorithmicRidBase => $algorithmicRidBase);
+    } else {
+	$entry->add(sambaNextRid => $firstridNumber);
+    }
     if ("sambaDomainName=$domain,$config{suffix}" eq $config{sambaUnixIdPooldn}) {
-	$entries.="dn: sambaDomainName=$domain,$config{suffix}
-objectClass: top
-objectClass: sambaDomain
-objectClass: sambaUnixIdPool
-sambaDomainName: $domain
-sambaSID: $config{SID}
-uidNumber: $firstuidNumber
-gidNumber: $firstgidNumber
-";
-	if (defined($algorithmicRidBase)) {
-	    $entries .= "sambaAlgorithmicRidBase: $algorithmicRidBase";
+	$entry->add(
+	    objectClass =>	"sambaUnixIdPool",
+	    uidNumber =>	$firstuidNumber,
+	    gidNumber =>	$firstgidNumber,
+	);
+	push(@entries, $entry);
+    } else {
+	push(@entries, $entry);
+
+	$entry = Net::LDAP::Entry->new($config{sambaUnixIdPooldn},
+	    objectClass => [qw(inetOrgPerson sambaUnixIdPool)],
+	    cn => $cnsambaUnixIdPool,
+	    sn => $cnsambaUnixIdPool,
+	    uidNumber => $firstuidNumber,
+	    gidNumber => $firstgidNumber,
+	);
+	push(@entries, $entry);
+    }
+
+    $entries_iter = sub {
+	return shift(@entries);
+    };
+}
+
+if (my $file = $Options{'e'}) {
+    open my $file_fh, ">$file" or die "Cannot open file: $file: $!";
+    while (my $entry = $entries_iter->()) {
+	$file_fh->print($entry->ldif);
+    }
+    print "exported ldif file: $file\n";
+    exit(0);
+}
+
+my $ldap_master=connect_ldap_master();
+while (my $entry = $entries_iter->()) {
+    my $dn = $entry->dn;
+    # we first check if the entry exist
+    my $mesg = $ldap_master->search(
+	base => $dn,
+	scope => "base",
+	filter => "objectclass=*"
+    );
+    $mesg->code && die "failed to search entry: ", $mesg->error;
+    if ($mesg->count == 1) {
+	print "entry $dn already exist. ";
+	if ($dn eq $config{sambaUnixIdPooldn}) {
+	    print "Updating it...\n";
+	    my @mods;
+	    foreach my $attr_tmp ($entry->attributes) {
+		push(@mods,$attr_tmp=>[$entry->get_value("$attr_tmp")]);
+	    }
+	    my $modify = $ldap_master->modify($dn,
+		'replace' => { @mods },
+	    );
+	    $modify->code && warn "failed to modify entry: ", $modify->error ;
 	} else {
-	    $entries .= "sambaNextRid: $firstridNumber";
+	    print "\n";
 	}
     } else {
-	$entries.="dn: $config{sambaUnixIdPooldn}
-objectClass: inetOrgPerson
-objectClass: sambaUnixIdPool
-uidNumber: $firstuidNumber
-gidNumber: $firstgidNumber
-cn: $cnsambaUnixIdPool
-sn: $cnsambaUnixIdPool";
+	print "adding new entry: $dn\n";
+	my $result=$ldap_master->add($entry);
+	$result->code && warn "failed to add entry: ", $result->error ;
     }
-    open (FILE, ">$tmp_ldif_file") || die "Can't open file $tmp_ldif_file: $!\n";
-
-    print FILE <<EOF;
-$entries
-EOF
-	close FILE;
-} else {
-    $tmp_ldif_file=$_ldifName;
 }
+$ldap_master->unbind;
 
-if (!defined $Options{'e'}) {
-    my $ldap_master=connect_ldap_master();
-    my $ldif = Net::LDAP::LDIF->new($tmp_ldif_file, "r", onerror => 'undef' );
-    while ( not $ldif->eof() ) {
-	my $entry = $ldif->read_entry();
-	if ( $ldif->error() ) {
-	    print "Error msg: ",$ldif->error(),"\n";
-	    print "Error lines:\n",$ldif->error_lines(),"\n";
-	} else {
-	    my $dn = $entry->dn;
-	    # we first check if the entry exist
-	    my $mesg = $ldap_master->search (
-					     base => "$dn",
-					     scope => "base",
-					     filter => "objectclass=*"
-					     );
-	    $mesg->code;
-	    my $nb=$mesg->count;
-	    if ($nb == 1 ) {
-		print "entry $dn already exist. ";
-		if ($dn eq $config{sambaUnixIdPooldn}) {
-		    print "Updating it...\n";
-		    my @mods;
-		    foreach my $attr_tmp ($entry->attributes) {
-			push(@mods,$attr_tmp=>[$entry->get_value("$attr_tmp")]);
-		    }
-		    my $modify = $ldap_master->modify ( "$dn",
-							'replace' => { @mods },
-							);
-		    $modify->code && warn "failed to modify entry: ", $modify->error ;
-		} else {
-		    print "\n";
-		}
-	    } else {
-		print "adding new entry: $dn\n";
-		my $result=$ldap_master->add($entry);
-		$result->code && warn "failed to add entry: ", $result->error ;
-	    }
-	}
-    }
-    $ldap_master->unbind;
-    if (!defined $Options{'i'}) {
-	system "rm -f $tmp_ldif_file";
-    }
+# secure the admin account
+print "\nPlease provide a password for the domain $adminName: \n";
+system("$RealBin/smbldap-passwd $adminName");
 
-    # secure the admin account
-    print "\nPlease provide a password for the domain $adminName: \n";
-    system("$RealBin/smbldap-passwd $adminName");
-
-
-
-} else {
-    print "exported ldif file: $tmp_ldif_file\n";
-}
 exit(0);
 
 

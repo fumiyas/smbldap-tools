@@ -1,3 +1,6 @@
+2011-07-08 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-populate: Use Net::LDAP::Entry to populate entries
+
 2011-06-29 <fumiyas at OSS Technology, Inc., Japan>
 	* Use sambaNextRid attribute in sambaDomain entry for the next RID
 	  as same as Samba 3.0+ (only when sambaAlgorithmicRidBase attribute
