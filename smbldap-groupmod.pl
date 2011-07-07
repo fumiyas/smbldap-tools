@@ -175,8 +175,7 @@ if ($tmp= $Options{'s'}) {
 	    exit(7);
 	}
     } else {
-	# algorithmic mapping
-	$group_rid = 2*$gid+1001;
+	$group_rid = group_next_rid($gid);
     }
     $group_sid = $config{SID}.'-'.$group_rid;
 }

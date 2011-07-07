@@ -1,5 +1,5 @@
 %define version 0.9.6.svn
-%define release 1
+%define release 3
 %define name	smbldap-tools
 
 Summary:	User and Group administration tools for Samba/LDAP
@@ -22,10 +22,10 @@ smbldap-tools is a set of perl scripts designed to manage user and group
 accounts stored in an LDAP directory. They can be used both by users and
 administrators of Linux systems:
 
-  * administrators can perform users and groups management operations, in a
-    way similar to the standard useradd or groupmod commands
-  * users can change their LDAP password from the command line and get/change
-    personnal informations
+  * administrators can perform users and groups management operations,
+    in a way similar to the standard useradd or groupmod commands
+  * users can change their LDAP password from the command line and
+    get/change personnal informations
 
 This was first contributed by IDEALX (http://www.opentrust.com/)
 
@@ -51,10 +51,15 @@ cp -p *.8 %{buildroot}%{_mandir}/man8/
 %clean
 %{__rm} -rf %{buildroot}
 
+%triggerpostun -- %{name} < 0.9.6.svn
+if [ "$1" -eq "2" ]; then ## Upgrade
+    %{__perl} %{_docdir}/%{name}-%{version}/smbldap-upgrade-0.9.6.pl
+fi
+
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog CONTRIBUTORS COPYING FILES INFRA INSTALL README TODO
-%doc configure.pl *.conf doc/*.conf doc/migration_scripts/ doc/*.pdf
+%doc configure.pl *.conf doc/*.conf doc/migration_scripts/ doc/*.pdf doc/*.pl
 %dir %{_sysconfdir}/smbldap-tools/
 %config(noreplace) %{_sysconfdir}/smbldap-tools/smbldap.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/smbldap-tools/smbldap_bind.conf
@@ -87,7 +92,10 @@ cp -p *.8 %{buildroot}%{_mandir}/man8/
 %{_mandir}/man8/smbldap-usershow.8*
 
 %changelog
-* Wed Jun 22 2011 SATOH Fumiyasu <fumiyas at osstech> - 0.9.6.svn-2
+* Thu Jul  7 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-3
+- Run smbldap-upgrade-0.9.6.pl in %%triggerun %%{name} < 0.9.6.svn
+
+* Wed Jun 22 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-2
 - New upstream version
 
 * Fri Aug 10 2007 Jerome Tournier <jtournier@gmail.com> 0.9.4-1

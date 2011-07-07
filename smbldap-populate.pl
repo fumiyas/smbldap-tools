@@ -43,7 +43,7 @@ use vars qw(%oc);
 
 my %Options;
 
-my $ok = getopts('a:b:e:g:i:k:l:m:r:u:?', \%Options);
+my $ok = getopts('a:b:e:g:i:k:l:m:r:R:u:?', \%Options);
 if ( (!$ok) || ($Options{'?'}) ) {
     print_banner;
     print "Usage: $0 [-abegiklmru?] [ldif]\n";
@@ -56,6 +56,7 @@ if ( (!$ok) || ($Options{'?'}) ) {
     print "  -l uidNumber	guest's uidNumber (default: 999)\n";
     print "  -m gidNumber	administrator's gidNumber (default: 0)\n";
     print "  -r ridNumber	first sambaNextRid to allocate (default: 1000)\n";
+    print "  -R ridBase		sambaAlgorithmicRidBase (none)\n";
     print "  -u uidNumber	first uidNumber to allocate (default: 1000)\n";
     print "  -?		show this help message\n";
 
@@ -89,6 +90,8 @@ if (!defined($firstridNumber)) {
     $firstridNumber=1000;
 }
 
+my $algorithmicRidBase = $Options{'R'};
+
 my $tmp_ldif_file=$Options{'e'};
 if (!defined($tmp_ldif_file)) {
     $tmp_ldif_file="/tmp/$$.ldif";
@@ -105,17 +108,25 @@ if (!defined($guestName)) {
 }
 
 my $adminUidNumber=$Options{'k'};
-my $adminrid;
+my $adminRid = 500;
 if (!defined($adminUidNumber)) {
-    $adminUidNumber = "0";
-    $adminrid= "500";
+    $adminUidNumber = 0;
 } else {
-    $adminrid=(2*$adminUidNumber+ 1000)
+    if (defined($algorithmicRidBase)) {
+	## For backward compatibility with smbldap-tools 0.9.6 and older
+	$adminRid = 2 * $adminUidNumber + $algorithmicRidBase;
     }
+}
 
 my $guestUidNumber=$Options{'l'};
+my $guestRid = 501;
 if (!defined($guestUidNumber)) {
     $guestUidNumber = "999";
+} else {
+    if (defined($algorithmicRidBase)) {
+	## For backward compatibility with smbldap-tools 0.9.6 and older
+	$guestRid = 2 * $guestUidNumber + $algorithmicRidBase;
+    }
 }
 
 my $adminGidNumber=$Options{'m'};
@@ -240,7 +251,7 @@ sambaPwdMustChange: 2147483647\n";
 sambaLMPassword: XXX
 sambaNTPassword: XXX
 sambaAcctFlags: [U          ]
-sambaSID: $config{SID}-$adminrid
+sambaSID: $config{SID}-$adminRid
 loginShell: /bin/false
 gecos: Netbios Domain Administrator
 
@@ -284,7 +295,7 @@ sambaLMPassword: NO PASSWORDXXXXXXXXXXXXXXXXXXXXX
 sambaNTPassword: NO PASSWORDXXXXXXXXXXXXXXXXXXXXX
 # account disabled by default
 sambaAcctFlags: [NUD        ]
-sambaSID: $config{SID}-2998
+sambaSID: $config{SID}-$guestRid
 loginShell: /bin/false
 
 dn: cn=Domain Admins,$config{groupsdn}
@@ -442,7 +453,12 @@ sambaDomainName: $domain
 sambaSID: $config{SID}
 uidNumber: $firstuidNumber
 gidNumber: $firstgidNumber
-sambaNextRid: $firstridNumber";
+";
+	if (defined($algorithmicRidBase)) {
+	    $entries .= "sambaAlgorithmicRidBase: $algorithmicRidBase";
+	} else {
+	    $entries .= "sambaNextRid: $firstridNumber";
+	}
     } else {
 	$entries.="dn: $config{sambaUnixIdPooldn}
 objectClass: inetOrgPerson

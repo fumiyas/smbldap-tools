@@ -188,7 +188,7 @@ if ( defined( $tmp = $Options{'a'} ) ) {
     my $valacctflags     = "[UX]";
     my $user_entry       = read_user_entry($user);
     my $uidNumber        = $user_entry->get_value('uidNumber');
-    my $userRid          = 2 * $uidNumber + 1000;
+    my $userRid          = user_next_rid($uidNumber);
 
     # apply changes
     my $modify = $ldap_master->modify(
@@ -240,7 +240,6 @@ if ( defined( $tmp = $Options{'a'} ) ) {
 }
 
 # Process options
-my $changed_uid;
 my $_userUidNumber;
 my $_userRid;
 
@@ -255,10 +254,9 @@ if ( defined( $tmp = $Options{'u'} ) ) {
 
     push( @mods, 'uidNumber', $tmp );
     $_userUidNumber = $tmp;
-    if ($samba) {
-
-        # as rid we use 2 * uid + 1000
-        my $_userRid = 2 * $_userUidNumber + 1000;
+    if ($samba && my $rid_base = account_base_rid()) {
+	## For backward compatibility with smbldap-tools 0.9.6 and older
+	my $_userRid = 2 * $_userUidNumber + $rid_base;
         push( @mods, 'sambaSID', $config{SID} . '-' . $_userRid );
     }
     $changed_uid = 1;
