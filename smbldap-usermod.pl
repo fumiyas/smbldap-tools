@@ -259,9 +259,6 @@ if ( defined( $tmp = $Options{'u'} ) ) {
 
         # as rid we use 2 * uid + 1000
         my $_userRid = 2 * $_userUidNumber + 1000;
-        if ( defined( $Options{'x'} ) ) {
-            $_userRid = sprint( "%x", $_userRid );
-        }
         push( @mods, 'sambaSID', $config{SID} . '-' . $_userRid );
     }
     $changed_uid = 1;
@@ -993,9 +990,6 @@ on the  command  line.
 
 --sambaExpire <YYYY-MM-DD HH:MM:SS/n>
     Set the expiration date for the user account. This only affects the samba account. The date must be in the following format: YYYY-MM-DD HH:MM:SS. The n-days format of shadowExpire is also supported. This option uses the internal 'timelocal' command to set calculate the number of seconds from Junary 1 1970 to the specified date.
-
--x
-    Creates rid and primaryGroupID in hex instead of decimal (for Samba 2.2.2 unpatched only - higher versions always use decimal)
 
 -A, --sambaPwdCanChange
     can change password ? 0 if no, 1 if yes
