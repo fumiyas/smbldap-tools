@@ -162,10 +162,6 @@ Available options are :
 
 -a
    add an automatic Security ID for the group (SID).
-   The rid of the group is calculated from the gidNumber of the
-   group as rid=2*gidNumber+1001. Thus the resulted SID of the
-   group is $SID-$rid where $SID and $rid are the domain SID and
-   the group rid
 
 -b
    the group is also a AIX group
