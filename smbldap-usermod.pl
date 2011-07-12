@@ -161,10 +161,13 @@ my $ldap_master = connect_ldap_master();
 
 # Read user data
 my $user_entry = read_user_entry($user);
-if ( !defined($user_entry) ) {
-    print "$0: user $user doesn't exist\n";
+if (!defined($user_entry)) {
+    warn "User does not exist: $user\n";
     exit(1);
 }
+
+# Canonize user name
+$user = $user_entry->get_value('uid');
 
 my $samba = is_samba_user($user);
 

@@ -1,6 +1,8 @@
-2011-07-13 <fumiyas at OSS Technology, Inc., Japan>
+2011-07-12 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-usermod: New option: --ou NODE (move user entry to the
 	  specified organazional unit)
+	* Canonize user name to treat the memberUid as case-sensitive
+	  attribute (but the uid attribute is case-insensitive)
 
 2011-07-08 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-populate: Use Net::LDAP::Entry for populating entries

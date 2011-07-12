@@ -48,12 +48,15 @@ my $user = $ARGV[0];
 
 my $ldap_master=connect_ldap_master();
 
-my $dn;
 # user must not exist in LDAP
-if (!defined($dn=get_user_dn($user))) {
-    print "$0: user $user does not exist\n";
+my $user_entry = read_user_entry($user);
+if (!defined($user_entry)) {
+    warn "User does not exist: $user\n";
     exit (6);
 }
+
+# Canonize user name
+$user = $user_entry->get_value('uid');
 
 if ($< != 0) {
     print "You must be root to delete an user\n";

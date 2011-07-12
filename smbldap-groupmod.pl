@@ -95,63 +95,74 @@ if (defined(my $newname = $Options{'n'})) {
 				      );
     $modify->code && die "failed to modify entry: ", $modify->error ;
     $groupName = $newname;
-    $group_entry=read_group_entry($groupName);
+    $group_entry = read_group_entry($groupName)
 }
 
 # Add members
 if (defined($Options{'m'})) {
-    my $members = $Options{'m'};
-    my @members = split( /,/, $members );
-    my $member;
-    foreach $member ( @members ) {
-	$config{groupsdn}=$group_entry->dn;
-	if (is_unix_user($member) || is_nonldap_unix_user($member)) {
-	    if (is_group_member($config{groupsdn},$member)) {
-		print "User $member already in the group\n";
-	    } else {
-		print "adding user $member to group $groupName\n";
-		my $modify = $ldap_master->modify ($config{groupsdn},
-						   changes => [
-							       add => [memberUid => $member]
-							       ]
-						   );
-		$modify->code && warn "failed to add entry: ", $modify->error ;
-	    }
+    my @members = ();
+    foreach my $member (split(/,/, $Options{'m'})) {
+	if (my $user_entry = read_user_entry($member)) {
+	    # Canonize user name
+	    $member = $user_entry->get_value('uid');
+	} elsif (my @user_entry = getpwnam($member)) {
+	    # Canonize user name
+	    $member = $user_entry[0];
 	} else {
-	    print "User $member does not exist: create it first !\n";
+	    warn "User does not exist: $member\n";
+	    next;
 	}
+
+	if (is_group_member($group_entry->dn, $member)) {
+	    warn "User already in the group: $member\n";
+	    next;
+	}
+
+	push(@members, $member);
+    }
+
+    if (@members) {
+	my $modify = $ldap_master->modify($group_entry->dn,
+	    add => {memberUid => \@members},
+	);
+	$modify->code && warn "Failed to add memberUid: ", $modify->error;
     }
 }
 
 # Delete members
 if (defined($Options{'x'})) {
-    my $members = $Options{'x'};
-    my @members = split( /,/, $members );
-    my $member;
-    foreach $member ( @members ) {
-	my $user_entry=read_user_entry($member);
-	$config{groupsdn}=$group_entry->dn;
-	if (is_group_member("$config{groupsdn}",$member)) {
-	    my $delete=1;
-	    if (defined ($user_entry) && defined $group_entry->get_value('sambaSID')) {
-		if ($group_entry->get_value('sambaSID') eq $user_entry->get_value('sambaPrimaryGroupSID')) {
-		    $delete=0;
-		    print "Cannot delete user ($member) from his primary group ($groupName)\n";
-		}
+    my @members = ();
+    foreach my $member (split(/,/, $Options{'x'})) {
+	if (my $user_entry = read_user_entry($member)) {
+	    # Canonize user name
+	    $member = $user_entry->get_value('uid');
+
+	    my $user_pgroup_sid = $group_entry->get_value('sambaPrimaryGroupSID');
+	    my $group_sid = $group_entry->get_value('sambaSID');
+	    if (defined($user_pgroup_sid) && defined($group_sid) &&
+		$user_pgroup_sid eq $group_sid) {
+		warn "Cannot delete user from its primary group: $member\n";
+		next;
 	    }
-	    if ($delete eq 1) {
-		print "deleting user $member from group $groupName\n";
-		my $modify = $ldap_master->modify ($config{groupsdn},
-						   changes => [
-							       delete => [memberUid => $member]
-							       ]
-						   );
-		$modify->code && warn "failed to delete entry: ", $modify->error ;
-	    }
-	} else {
-	    print "User $member is not in the group $groupName!\n";
+	} elsif (my @user_entry = getpwnam($member)) {
+	    # Canonize user name
+	    $member = $user_entry[0];
 	}
+
+	if (!is_group_member($group_entry->dn, $member)) {
+	    warn "User is not in the group: $member\n";
+	    next;
+	}
+
+	push(@members, $member);
     }
+
+    if (@members) {
+	my $modify = $ldap_master->modify($group_entry->dn,
+	    delete => {memberUid => \@members},
+	);
+	$modify->code && warn "Failed to delete memberUid: ", $modify->error;
+    };
 }
 
 my $group_sid;
