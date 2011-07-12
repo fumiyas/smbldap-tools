@@ -59,8 +59,6 @@ if (! ($group_entry = read_group_entry($groupName))) {
     exit (6);
 }
 
-my $newname = $Options{'n'};
-
 nsc_invalidate("group");
 
 my $gid=$group_entry->get_value('gidNumber');
@@ -88,7 +86,7 @@ if (defined($tmp = $Options{'g'}) and $tmp =~ /\d+/) {
     }
 }
 
-if (defined($newname)) {
+if (defined(my $newname = $Options{'n'})) {
     my $modify = $ldap_master->moddn (
 				      "cn=$groupName,$config{groupsdn}",
 				      newrdn => "cn=$newname",
@@ -96,7 +94,8 @@ if (defined($newname)) {
 				      newsuperior => "$config{groupsdn}"
 				      );
     $modify->code && die "failed to modify entry: ", $modify->error ;
-    # take down session
+    $groupName = $newname;
+    $group_entry=read_group_entry($groupName);
 }
 
 # Add members
@@ -105,7 +104,6 @@ if (defined($Options{'m'})) {
     my @members = split( /,/, $members );
     my $member;
     foreach $member ( @members ) {
-	my $group_entry=read_group_entry($groupName);
 	$config{groupsdn}=$group_entry->dn;
 	if (is_unix_user($member) || is_nonldap_unix_user($member)) {
 	    if (is_group_member($config{groupsdn},$member)) {
@@ -132,7 +130,6 @@ if (defined($Options{'x'})) {
     my $member;
     foreach $member ( @members ) {
 	my $user_entry=read_user_entry($member);
-	my $group_entry=read_group_entry($groupName);
 	$config{groupsdn}=$group_entry->dn;
 	if (is_group_member("$config{groupsdn}",$member)) {
 	    my $delete=1;
