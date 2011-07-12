@@ -63,7 +63,7 @@ my $ok = GetOptions(
     "m"                      => \$Options{m},
     "n"                      => \$Options{n},
     "o|ou=s"                 => \$Options{ou},
-    "p=s"                    => \$Options{p},
+    "p"                      => \$Options{p},
     "s|shell=s"              => \$Options{s},
     "t=s"                    => \$Options{t},
     "u|uid=s"                => \$Options{u},
@@ -644,13 +644,23 @@ $ldap_master->unbind;    # take down session
 
 nsc_invalidate("passwd");
 
-if ( defined( $Options{'P'} ) ) {
-    if ( defined( $tmp = $Options{'B'} ) and $tmp != 0 ) {
-        exec "$RealBin/smbldap-passwd -B  \"$userName\"";
+if ($Options{'P'}) {
+    my @passwd_cmd = ("$RealBin/smbldap-passwd.cmd");
+
+    if ($Options{'B'}) {
+	## Must change Samba password at logon
+	push(@passwd_cmd, '-B');
     }
-    else {
-        exec "$RealBin/smbldap-passwd \"$userName\"";
+    if ($Options{'p'}) {
+	## Read password from STDIN
+	push(@passwd_cmd, '-p');
     }
+
+    ## Suppress Perl warning on exec() failed
+    local $SIG{__WARN__} = sub {};
+
+    exec {$passwd_cmd[0]} @passwd_cmd, $userName;
+    die "Failed to execute: $passwd_cmd[0]: $!";
 }
 
 exit 0;
@@ -738,6 +748,9 @@ Ex: 'ou=admin,ou=all'
 
 -P
    Ends by invoking smbldap-passwd.
+
+-p
+   Read password from STDIN without verification.
 
 -s shell
    The name of the user's login shell. The default is to leave this field blank, which causes the system to select the default login shell.

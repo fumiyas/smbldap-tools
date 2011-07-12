@@ -3,6 +3,8 @@
 	  specified organazional unit)
 	* Canonize user name to treat the memberUid as case-sensitive
 	  attribute (but the uid attribute is case-insensitive)
+	* smbldap-useradd: New option: -p (allow to set password from
+	  STDIN without verification, e.g. using a pipe)
 
 2011-07-08 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-populate: Use Net::LDAP::Entry for populating entries
