@@ -447,25 +447,21 @@ if ( defined( $tmp = $Options{'m'} ) ) {
     unless ( $userName =~ /\$$/ ) {
         if ( !( -d $userHomeDirectory ) ) {
             if ( $config{skeletonDir} ne "" ) {
-                system
-                  "cp -pRP $config{skeletonDir} $userHomeDirectory 2>/dev/null";
+		system("cp", "-pRP", $config{skeletonDir}, $userHomeDirectory);
+		system("chown", "-hR", "$userUidNumber:$userGidNumber", $userHomeDirectory);
             }
             else {
-                system "mkdir $userHomeDirectory 2>/dev/null";
+                mkdir($userHomeDirectory)
+		  || warn "Failed to create home directory: $userHomeDirectory: $!";
             }
-            system
-"chown -hR $userUidNumber:$userGidNumber $userHomeDirectory 2>/dev/null";
-            if ( defined $config{userHomeDirectoryMode} ) {
-                system
-"chmod $config{userHomeDirectoryMode} $userHomeDirectory 2>/dev/null";
-            }
-            else {
-                system "chmod 700 $userHomeDirectory 2>/dev/null";
-            }
+
+	    my $mode = defined($config{userHomeDirectoryMode})
+	      ? oct($config{userHomeDirectoryMode}) : 0700;
+	    chmod($mode, $userHomeDirectory)
+	      || warn "Failed to change mode of home directory: $userHomeDirectory: $!";
         }
         else {
-            print
-"Warning: homedirectory $userHomeDirectory already exist. Check manually\n";
+            warn "Warning: homedirectory $userHomeDirectory already exist. Check manually\n";
         }
     }
 }

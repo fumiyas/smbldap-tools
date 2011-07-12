@@ -185,25 +185,13 @@ if ( $samba and $update_samba_passwd ) {
 
     } else {
 	if ($< != 0) {
-	    my $FILE="|$config{smbpasswd} -s >/dev/null";
-	    open (FILE, $FILE) || die "$!\n";
-	    print FILE <<EOF;
-$pass_old
-$pass
-$pass
-EOF
-		;
-	    close FILE;
+	    open my $fh, "|-" or exec($config{smbpasswd}, "-s") || exit(1);
+	    print $fh "$pass_old\n$pass\n$pass\n";
+	    close($fh);
 	} else {
-	    open FILE,"|-" or
-		exec "$config{smbpasswd}","-s","$user";
-	    local $SIG{PIPE} = sub {die "buffer pipe terminated" };
-	    print FILE <<EOF;
-$pass
-$pass
-EOF
-		;
-	    close FILE;
+	    open my $fh, "|-" or exec($config{smbpasswd}, "-s", $user) || exit(1);
+	    print $fh "$pass\n$pass\n";
+	    close($fh);
 	}
     }
 }

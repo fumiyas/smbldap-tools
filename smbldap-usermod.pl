@@ -955,8 +955,10 @@ $ldap_master->unbind;
 nsc_invalidate("passwd");
 
 if ( defined( $Options{'P'} ) ) {
-    exec "$RealBin/smbldap-passwd $user";
+    exec("$RealBin/smbldap-passwd", $user);
 }
+
+exit(0);
 
 ############################################################
 

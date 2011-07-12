@@ -527,7 +527,7 @@ $ldap_master->unbind;
 
 # secure the admin account
 print "\nPlease provide a password for the domain $adminName: \n";
-system("$RealBin/smbldap-passwd $adminName");
+system("$RealBin/smbldap-passwd", $adminName);
 
 exit(0);
 
