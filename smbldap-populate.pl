@@ -560,8 +560,8 @@ import an ldif file (Options -a and -b will be ignored)
 
 =head1 FILES
 
-/etc/smbldap-tools/smbldap.conf : main configuration
-/etc/smbldap-tools/smbldap_bind.conf : credentials for binding to the directory
+@SYSCONFDIR@/smbldap.conf : main configuration
+@SYSCONFDIR@/smbldap_bind.conf : credentials for binding to the directory
 
 =head1 SEE ALSO
 

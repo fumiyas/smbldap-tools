@@ -674,7 +674,9 @@ smbldap-useradd [-abinwPW] [-c comment] [-d home_dir] [-g initial_group] [-m [-k
 =head1 DESCRIPTION
 
 Creating New Users
-The smbldap-useradd command creates a new user account using the values specified on the command line and the default values from the system and from the configuration files (in the /etc/smbldap-tools directory).
+The smbldap-useradd command creates a new user account using the values
+specified on the command line and the default values from the system and from
+the configuration files (in the @SYSCONFDIR@ directory).
 
 Without any option, the account created will be a Unix (Posix) account. The following options may be used to add information:
 
