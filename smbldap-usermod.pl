@@ -254,15 +254,13 @@ if ( defined( $tmp = $Options{'u'} ) ) {
 
     push( @mods, 'uidNumber', $tmp );
     $_userUidNumber = $tmp;
-    if ($samba && my $rid_base = account_base_rid()) {
+    if ($samba and my $rid_base = account_base_rid()) {
 	## For backward compatibility with smbldap-tools 0.9.6 and older
 	my $_userRid = 2 * $_userUidNumber + $rid_base;
         push( @mods, 'sambaSID', $config{SID} . '-' . $_userRid );
     }
-    $changed_uid = 1;
 }
 
-my $changed_gid;
 my $_userGidNumber;
 my $_userGroupSID;
 if ( defined( $tmp = $Options{'g'} ) ) {
@@ -284,7 +282,6 @@ if ( defined( $tmp = $Options{'g'} ) ) {
         }
         push( @mods, 'sambaPrimaryGroupSid', $_userGroupSID );
     }
-    $changed_gid = 1;
 }
 
 if ( defined( $tmp = $Options{'s'} ) ) {
