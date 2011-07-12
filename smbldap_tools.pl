@@ -52,6 +52,9 @@ my $samba_conf =
     $ENV{'SMBLDAP_SMB_CONF'} ||
     $ENV{'SMB_CONF_PATH'} ||
     '@SAMBA_SYSCONFDIR@/smb.conf';
+my $samba_bindir =
+    $ENV{'SMBLDAP_SAMBA_BINDIR'} ||
+    '@SAMBA_BINDIR@';
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Exporter;
@@ -239,9 +242,17 @@ sub read_smbconf {
 my %smbconf = read_smbconf();
 
 sub getLocalSID {
-    my $string =
-`LANG= PATH=/opt/IDEALX/bin:/usr/local/bin:/usr/bin:/bin net getlocalsid 2>/dev/null`;
-    my ( $domain, $sid ) = ( $string =~ m/^SID for domain (\S+) is: (\S+)$/ );
+    open my $fh, "-|" or exec("$samba_bindir/netx", "getlocalsid") || exit(1);
+
+    my $line = <$fh>;
+    if (!defined($line)) {
+	die "Failed to get SID from Samba net command";
+    }
+
+    my ($sid) = ($line =~ m/^SID for domain \S+ is: (\S+)$/);
+    if (!defined($sid)) {
+	die "Samba net command returns invalid output: $line";
+    }
 
     return $sid;
 }
