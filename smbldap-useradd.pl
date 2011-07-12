@@ -62,7 +62,7 @@ my $ok = GetOptions(
     "k=s"                    => \$Options{k},
     "m"                      => \$Options{m},
     "n"                      => \$Options{n},
-    "o|ou=s"                 => \$Options{o},
+    "o|ou=s"                 => \$Options{ou},
     "p=s"                    => \$Options{p},
     "s|shell=s"              => \$Options{s},
     "t=s"                    => \$Options{t},
@@ -160,7 +160,7 @@ elsif ( !$rc ) {
 
 # Read options
 # we create the user in the specified ou (relative to the users suffix)
-my $user_ou = $Options{'o'};
+my $user_ou = $Options{'ou'};
 my $node;
 if ( defined $user_ou ) {
 

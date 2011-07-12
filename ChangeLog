@@ -1,5 +1,9 @@
+2011-07-13 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-usermod: New option: --ou NODE (move user entry to the
+	  specified organazional unit)
+
 2011-07-08 <fumiyas at OSS Technology, Inc., Japan>
-	* smbldap-populate: Use Net::LDAP::Entry to populate entries
+	* smbldap-populate: Use Net::LDAP::Entry for populating entries
 
 2011-06-29 <fumiyas at OSS Technology, Inc., Japan>
 	* Use sambaNextRid attribute in sambaDomain entry for the next RID

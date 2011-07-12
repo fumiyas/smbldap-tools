@@ -62,6 +62,7 @@ my $ok = GetOptions(
     "g|gid=s"                => \$Options{g},
     "h|?|help"               => \$Options{h},
     "o|canBeNotUnique"       => \$Options{o},
+    "ou=s"                   => \$Options{ou},
     "r|rename=s"             => \$Options{r},
     "s|shell=s"              => \$Options{s},
     "shadowExpire=s"         => \$Options{shadowExpire},
@@ -788,8 +789,66 @@ if ( $nb_to_del != 0 ) {
     $modify->code && die "failed to modify entry: ", $modify->error;
 }
 
-# take down session
-$ldap_master->unbind;
+if (defined(my $ou_rdn_hier = $Options{'ou'})) {
+    my @ou_rdn_hier = split(/,/, $ou_rdn_hier);
+    ## "foo,bar" -> "ou=foo,ou=bar"
+    for my $ou_rdn (@ou_rdn_hier) {
+	$ou_rdn = "ou=$ou_rdn" if ($ou_rdn !~ /^\w+=/);
+    }
+
+    my $dn = utf8Decode($characterSet,$user_entry->dn);
+    my ($rdn, $superior) = split(",", $dn, 2);
+    my $suffix = ($rdn =~ /\$$/) ?  $config{computersdn} : $config{usersdn};
+
+    my $rdn_new = $rdn; ## FIXME: Merge --rename=newname option
+    my $dn_new = join(",", $rdn_new, @ou_rdn_hier, $suffix);
+
+    if (lc($dn_new) ne lc($dn)) { ## FIXME: Use Unicode::Normalize::NFC() instaed of lc()
+	my $superior_new= $suffix;
+	for my $ou_rdn (reverse(@ou_rdn_hier)) {
+	    my $superior_new_superior = $superior_new;
+	    $superior_new = "$ou_rdn,$superior_new";
+	    my $mesg = $ldap_master->search(
+		base   => utf8Encode($characterSet,$superior_new_superior),
+		scope  => "one",
+		filter => "(&(objectClass=organizationalUnit)(".utf8Encode($characterSet,$ou_rdn)."))",
+	    );
+	    $mesg->code && die "Faild to search: $ou_rdn: ", $mesg->error;
+	    next if ($mesg->count ne 0);
+
+	    print "$superior_new does not exist. Creating it (Y/[N]) ? ";
+	    chomp(my $answ = <STDIN>);
+	    unless ($answ eq "y" || $answ eq "Y") {
+		print "exiting.\n";
+		exit(1);
+	    }
+
+	    # add organizational unit
+	    my $ou = $ou_rdn;
+	    $ou =~ s/^.*=//;
+	    my $add = $ldap_master->add(
+		utf8Encode($characterSet,$superior_new),
+		attr => [
+		    'objectclass' => 'organizationalUnit',
+		    'ou'          => utf8Encode($characterSet,$ou),
+		]
+	    );
+	    $add->code && die "Failed to add entry: $superior_new: ", $add->error;
+	    print "$superior_new created\n";
+	}
+
+	my $modify = $ldap_master->moddn(
+	    utf8Encode($characterSet,$dn),
+	    newrdn       => $rdn_new,
+	    newsuperior  => utf8Encode($characterSet,$superior_new),
+	    deleteoldrdn => 1,
+	);
+	$modify->code && die "Failed to modify DN: $dn -> $dn_new: ", $modify->error;
+
+	# Re-read user entry
+	$user_entry = read_user_entry($user);
+    }
+}
 
 # asked to rename the account. only do that if new rdn doesn't equal old one
 if ( defined( my $new_user = $Options{'r'} ) and $Options{'r'} ne $user ) {
@@ -887,10 +946,9 @@ if ( defined( my $new_user = $Options{'r'} ) and $Options{'r'} ne $user ) {
               $modify->error;
         }
     }
-
-    $ldap_master->unbind;
 }
 
+$ldap_master->unbind;
 nsc_invalidate("passwd");
 
 if ( defined( $Options{'P'} ) ) {
@@ -982,6 +1040,10 @@ on the  command  line.
 
 -e, --expire <YYYY-MM-DD(HH:MM:SS)/n>
     Sets the expiration for both samba (--sambaExpire) and shadow (--shadowExpire).
+
+--ou node
+    The user's account will be moved to the specified organazional unit. It is relative to the user suffix dn ($usersdn) defined in the configuration file.
+    Ex: 'ou=admin,ou=all'
 
 --sambaExpire <YYYY-MM-DD HH:MM:SS/n>
     Set the expiration date for the user account. This only affects the samba account. The date must be in the following format: YYYY-MM-DD HH:MM:SS. The n-days format of shadowExpire is also supported. This option uses the internal 'timelocal' command to set calculate the number of seconds from Junary 1 1970 to the specified date.
