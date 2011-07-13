@@ -1,3 +1,7 @@
+2011-07-13 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-useradd: New option: --non-unique (Allow the creation of a
+	  user account with a duplicate (non-unique) UID)
+
 2011-07-12 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-usermod: New option: --ou NODE (move user entry to the
 	  specified organazional unit)

@@ -62,6 +62,7 @@ my $ok = GetOptions(
     "k=s"                    => \$Options{k},
     "m"                      => \$Options{m},
     "n"                      => \$Options{n},
+    "non-unique"             => \$Options{non_unique},
     "o|ou=s"                 => \$Options{ou},
     "p"                      => \$Options{p},
     "s|shell=s"              => \$Options{s},
@@ -72,7 +73,9 @@ my $ok = GetOptions(
 
 if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'h'} ) ) {
     print_banner;
-    print "Usage: $0 [-abcdgikmnostuwABCDEFGHMNOPSTWXZ?] username\n";
+    print "Usage: $0 [OPTIONS] USERNAME\n";
+    print "\n";
+    print "Options:\n";
     print "  -a	is a Windows User (otherwise, Posix stuff only)\n";
     print "  -b	is a AIX User\n";
     print "  -c	gecos\n";
@@ -81,6 +84,8 @@ if ( ( !$ok ) || ( @ARGV < 1 ) || ( $Options{'h'} ) ) {
     print "  -i	is a trust account (Windows Workstation)\n";
     print "  -k	skeleton dir (with -m)\n";
     print "  -m	creates home directory and copies /etc/skel\n";
+    print "  --non-unique\n";
+    print "	Allow the creation of a user account with a duplicate (non-unique) UID.\n";
     print "  -n	do not create a group\n";
     print
 "  -o	add the user in the organizational unit (relative to the user suffix. Ex: 'ou=admin,ou=all')\n";
@@ -210,7 +215,7 @@ my $userUidNumber = $Options{'u'};
 if ( !defined($userUidNumber) ) {
     $userUidNumber = user_next_uid();
 }
-elsif (my $user = user_by_uid($userUidNumber)) {
+elsif (!$Options{non_unique} and my $user = user_by_uid($userUidNumber)) {
     die "UID already owned by " . $user->dn . "\n";
 }
 
@@ -731,6 +736,9 @@ Without any option, the account created will be a Unix (Posix) account. The foll
 
 -M mail
    E-mail addresses (multiple addresses are separated by commas).
+
+--non-unique
+   Allow the creation of a user account with a duplicate (non-unique) UID.
 
 -n
    Do not print banner message.
