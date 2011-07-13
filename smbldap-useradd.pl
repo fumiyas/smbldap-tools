@@ -639,6 +639,7 @@ if ( defined( $Options{'b'} ) ) {
 $ldap_master->unbind;    # take down session
 
 nsc_invalidate("passwd");
+nsc_invalidate("group");
 
 if ($Options{'P'}) {
     my @passwd_cmd = ("$RealBin/smbldap-passwd.cmd");

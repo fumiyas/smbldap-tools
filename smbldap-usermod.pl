@@ -952,7 +952,9 @@ if ( defined( my $new_user = $Options{'r'} ) and $Options{'r'} ne $user ) {
 }
 
 $ldap_master->unbind;
+
 nsc_invalidate("passwd");
+nsc_invalidate("group");
 
 if ( defined( $Options{'P'} ) ) {
     exec("$RealBin/smbldap-passwd", $user);
