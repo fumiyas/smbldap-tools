@@ -1,0 +1,68 @@
+[global]
+	workgroup = DOMSMB
+	netbios name = PDC-SRV
+
+	deadtime = 10
+
+	log level = 1
+	log file = /var/log/samba/log.%m
+	max log size = 5000
+	debug pid = yes
+	debug uid = yes
+	syslog = 0
+	utmp = yes
+
+	security = user
+	domain logons = yes
+	os level = 64
+	logon path =
+	logon home =
+	logon drive =
+	logon script =
+
+	passdb backend = ldapsam:"ldap://ldap.example.com/"
+	ldap ssl = start tls
+	ldap admin dn = cn=Manager,dc=example,dc=com
+	ldap delete dn = no
+
+	## Sync UNIX password with Samba password
+	## Method 1:
+	ldap password sync = yes
+	## Method 2:
+	;ldap password sync = no
+	;unix password sync = yes
+	;passwd program = @SBINDIR@/smbldap-passwd -u '%u'
+	;passwd chat = "Changing *\nNew password*" %n\n "*Retype new password*" %n\n"
+
+	ldap suffix = dc=example,dc=com
+	ldap user suffix = ou=Users
+	ldap group suffix = ou=Groups
+	ldap machine suffix = ou=Computers
+	ldap idmap suffix = ou=Idmap
+
+	add user script = @SBINDIR@/smbldap-useradd -m '%u' -t 1
+	rename user script = @SBINDIR@/smbldap-usermod -r '%unew' '%uold'
+	delete user script = @SBINDIR@/smbldap-userdel '%u'
+	set primary group script = @SBINDIR@/smbldap-usermod -g '%g' '%u'
+	add group script = @SBINDIR@/smbldap-groupadd -p '%g'
+	delete group script = @SBINDIR@/smbldap-groupdel '%g'
+	add user to group script = @SBINDIR@/smbldap-groupmod -m '%u' '%g'
+	delete user from group script = @SBINDIR@/smbldap-groupmod -x '%u' '%g'
+	add machine script = @SBINDIR@/smbldap-useradd -w '%u' -t 1
+
+[NETLOGON]
+	path = /var/lib/samba/netlogon
+	browseable = no
+	share modes = no
+
+[PROFILES]
+	path = /var/lib/samba/profiles
+	browseable = no
+	writeable = yes
+	create mask = 0611
+	directory mask = 0700
+	profile acls = yes
+	csc policy = disable
+	map system = yes
+	map hidden = yes
+

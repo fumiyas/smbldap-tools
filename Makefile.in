@@ -18,7 +18,9 @@ BUILD_TARGETS= \
 	$(BUILD_PERL_MOD_TARGETS) \
 	$(BUILD_PERL_CMD_TARGETS) \
 	$(BUILD_PERL_MAN_TARGETS) \
+	smb.conf.example \
 	smb.smbldap.conf.example \
+	#
 
 INSTALL_DIR=		$(PERL_LIBDIR)
 INSTALL_FILES=		$(BUILD_PERL_MOD_TARGETS)
