@@ -2,8 +2,9 @@
 #
 ## How To Install SMBLDAP-TOOLS
 
-INSTALLATION on CentOS4:
+INSTALLATION on CentOS 4:
 -=-=-=-=-=-=-=-=-=-=-=-=
+
 . yum install perl-Digest-SHA1 perl-LDAP perl-IO-Socket-SSL
 . add Dag Wieers repository
   cat > /etc/yum.repos.d/DAG.repo << EOF
@@ -18,6 +19,7 @@ EOF
 
 INSTALLATION from the tar.gz archive
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 . Copy all those scripts in /usr/local/sbin/
 . Modify smbldap.conf and smbldap_bind.conf to match your configuration, and copy
   them in /etc/smbldap-tools/
@@ -42,6 +44,7 @@ INSTALLATION from the tar.gz archive
 
 INSTALLATION from RedHat RPM:
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 . install the package
   $ rpm -Uvh smbldap-tools-0.8.6-1.noarch.rpm
 . Modify /etc/opt/IDEALX/smbldap-tools/smbldap.conf and /etc/opt/IDEALX/smbldap-tools/smbldap_bind.conf
@@ -57,22 +60,25 @@ INSTALLATION from RedHat RPM:
 
 UPGRADE TO RELEASE 0.8.8 :
 -=-=-=-=-=-=-=-=-=-=-=-=-=
+
 you need to add the new parameter userHomeDirectoryMode in smbldap.conf. For example :
 => # Default mode used for user homeDirectory
 => userHomeDirectoryMode="700"
 
 UPGRADE TO RELEASE 0.8.7 :
 -=-=-=-=-=-=-=-=-=-=-=-=-=
+
 . configuration files are now stored in /etc/opt/IDEALX/smbldap-tools/
 . Next uidNumber and gidNumber available are _not_ stored anymore in cn=NextFreeUnixId
   by default, but you can still continue to use your entry.
   They are now store in the sambaDomain entry.
 . If your sambaDomain entry already exist, you can securely execute the smbldap-populate script to
   update it and add the uidNumber and gidNumber attribut.
-  
+
 
 UPGRADE TO RELEASE 0.8.5 :
 -=-=-=-=-=-=-=-=-=-=-=-=-=
+
 . Change the variable name userHomePrefix to userHome in /etc/smbldap-tools/smbldap.conf
 . Next uidNumber and gidNumber available are now stored in cn=NextFreeUnixId
   When upgrading, you need to create this object manually. You can use for example
@@ -120,6 +126,7 @@ UPGRADE TO RELEASE 0.8.5 :
 
 UPGRADE TO RELEASE 0.8.4 :
 -=-=-=-=-=-=-=-=-=-=-=-=-=
+
 . configuration is now set in two different files:
   - /etc/smbldap-tools/smbldap.conf for global parameters
   - /etc/smbldap-tools/smbldap_bind.conf for connection parameters
