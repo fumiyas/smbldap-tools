@@ -32,14 +32,11 @@ use Getopt::Std;
 use Net::LDAP::LDIF;
 use Net::LDAP::Entry;
 
-use vars qw(%oc);
-
-# objectclass of the suffix
-%oc = (
-       "ou" => "organizationalUnit",
-       "o" => "organization",
-       "dc" => "dcObject",
-       );
+my %oc_by_attr = (
+      "ou" =>	"organizationalUnit",
+      "o" =>	"organization",
+      "dc" =>	"dcObject",
+);
 
 my %Options;
 
@@ -142,73 +139,57 @@ if (my $file = $Options{'i'}) {
 } else {
     my @entries;
     my $entry;
-    my $attr;
-    my $val;
-    my $objcl;
 
     print "(using builtin directory structure)\n\n";
-    if ($config{suffix} =~ m/([^=]+)=([^,]+)/) {
-	$attr = $1;
-	$val = $2;
-	$objcl = $oc{$attr} if (exists $oc{$attr});
-	if (!defined($objcl)) {
-	    $objcl = "myhardcodedobjectclass";
-	}
-    } else {
-	die "can't extract first attr and value from suffix $config{suffix}";
-    }
 
-    my ($type,$ou_users,$ou_groups,$ou_computers,$ou_idmap,$cnsambaUnixIdPool);
-    ($type,$ou_users)=($config{usersdn}=~/(.*)=(.*),$config{suffix}/);
-    ($type,$ou_groups)=($config{groupsdn}=~/(.*)=(.*),$config{suffix}/);
-    ($type,$ou_computers)=($config{computersdn}=~/(.*)=(.*),$config{suffix}/);
-    if (defined $config{idmapdn}) {
-	($type,$ou_idmap)=($config{idmapdn}=~/(.*)=(.*),$config{suffix}/);
+    unless ($config{suffix} =~ /^([^=]+)=([^,]+)/) {
+	die "Cannot extract first attr and value from suffix: $config{suffix}";
     }
-    ($type,$cnsambaUnixIdPool)=($config{sambaUnixIdPooldn}=~/(.*)=(.*),$config{suffix}/);
-    my ($organisation,$ext);
-    if ($config{suffix} =~ m/dc=([^=]+),dc=(.*)$/) {
-	($organisation,$ext) = ($config{suffix} =~ m/dc=([^=]+),dc=(.*)$/);
-    } elsif ($config{suffix} =~ m/dc=(.*)$/) {
-	$organisation=$1;
+    my $suffix_attr = $1;
+    my $suffix_val = $2;
+    my $suffix_oc = $oc_by_attr{$suffix_attr};
+    if (!defined($suffix_oc)) {
+	die "Cannot determine object class for suffix entry: $config{suffix}";
     }
 
     $entry = Net::LDAP::Entry->new($config{suffix},
-	objectClass => $objcl,
-	$attr => $val,
+	objectClass => $suffix_oc,
+	$suffix_attr => $suffix_val,
     );
-    if ($organisation ne '') {
+    if ($config{suffix} =~ m/(?:^|,)dc=([^,]+)/) {
 	$entry->add(
 	    objectClass => "organization",
-	    o => $organisation,
+	    o => $1,
 	);
     }
     push(@entries, $entry);
 
-    $entry = Net::LDAP::Entry->new($config{usersdn},
-	objectClass => [qw(top organizationalUnit)],
-	ou => $ou_users,
-    );
-    push(@entries, $entry);
+    my %node_created = ();
+    for my $config_dn (qw(usersdn groupsdn computersdn idmapdn)) {
+	my $prefix = $config{$config_dn} || next;
+	$prefix =~ s/,\Q$config{suffix}\E$//i;
 
-    $entry = Net::LDAP::Entry->new($config{groupsdn},
-	objectClass => [qw(top organizationalUnit)],
-	ou => $ou_groups,
-    );
-    push(@entries, $entry);
+	my $dn = $config{suffix};
+	for my $node (reverse(split(/,/, $prefix))) {
+	    $dn = "$node,$dn";
+	    next if ($node_created{$dn});
 
-    $entry = Net::LDAP::Entry->new($config{computersdn},
-	objectClass => [qw(top organizationalUnit)],
-	ou => $ou_computers,
-    );
-    push(@entries, $entry);
-
-    if (defined $config{idmapdn}) {
-	$entry = Net::LDAP::Entry->new($config{idmapdn},
-	    objectClass => [qw(top organizationalUnit)],
-	    ou => $ou_idmap,
-	);
-	push(@entries, $entry);
+	    unless ($node =~ /^([^=]+)=([^,]*)$/) {
+		die "Cannot extract first attr and value for entry: $dn";
+	    }
+	    my $attr = $1;
+	    my $val = $2;
+	    my $oc = $oc_by_attr{$attr};
+	    if (!defined($oc)) {
+		die "Cannot determine object class for entry: $dn";
+	    }
+	    $entry = Net::LDAP::Entry->new($dn,
+		objectClass => $oc,
+		$attr => $val,
+	    );
+	    push(@entries, $entry);
+	    $node_created{$dn} = 1;
+	}
     }
 
     $entry = Net::LDAP::Entry->new("uid=$adminName,$config{usersdn}",
@@ -467,6 +448,8 @@ if (my $file = $Options{'i'}) {
 	push(@entries, $entry);
     } else {
 	push(@entries, $entry);
+
+	my ($cnsambaUnixIdPool)=($config{sambaUnixIdPooldn}=~/(?:.*)=(.*),\Q$config{suffix}\E/);
 
 	$entry = Net::LDAP::Entry->new($config{sambaUnixIdPooldn},
 	    objectClass => [qw(inetOrgPerson sambaUnixIdPool)],
