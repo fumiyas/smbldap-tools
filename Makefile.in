@@ -50,8 +50,6 @@ BUILD_PERL_MOD_TARGETS= $(PERL_MOD_SOURCES:.pl=.pm)
 BUILD_PERL_CMD_TARGETS= $(PERL_CMD_SOURCES:.pl=.cmd)
 BUILD_PERL_MAN_TARGETS= $(BUILD_PERL_CMD_TARGETS:.cmd=.$(PERL_MAN_SECTION))
 
-POD2MAN_TARGETS= $(INSTALL_CMDS:.cmd \
-
 ## ======================================================================
 
 include $(BUILD_COMMON)/Makefile
