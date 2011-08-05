@@ -142,8 +142,9 @@ AC_MSG_RESULT([using $SAMBA_BINDIR for Samba bin directory])
 
 AC_CONFIG_FILES(
     Makefile
-    build/Makefile
+    build/Makefile.common
     build/Makefile.package
+    build/Makefile.top
     build/subst.pl
 )
 

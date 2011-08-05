@@ -1,0 +1,18 @@
+## Makefile.top
+## ======================================================================
+
+CONFIG_HEADERS=		@CONFIG_HEADERS@
+
+clean::
+	$(RM) $(SOURCE_BUILD)/subst
+
+distclean:: clean
+	$(RM) $(CONFIG_HEADERS)
+	$(RM) Makefile config.log config.status config.cache autom4te.cache
+	$(RM) $(SUBST_SRC)
+	$(RM) $(SOURCE_BUILD)/Makefile.common $(SOURCE_BUILD)/Makefile.package $(SOURCE_BUILD)/Makefile.top
+	echo "include $(SOURCE_BUILD)/Makefile.maintainer" >Makefile
+
+dist dist-conf:
+	$(MAKE) -f $(SOURCE_BUILD)/Makefile.maintainer $@
+

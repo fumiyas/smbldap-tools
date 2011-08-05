@@ -1,4 +1,8 @@
+## Makefile.package
+## ======================================================================
+
 PERL_CMD=		@PERL_CMD@
+PERL_LIBDIR=		@PERL_LIBDIR@
 POD2MAN_CMD=		@POD2MAN_CMD@
 
 SAMBA_BINDIR=		@SAMBA_BINDIR@

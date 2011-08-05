@@ -8,7 +8,8 @@ Makefile
 *.example
 *.8
 smbldap_tools.pm
-build/Makefile
+build/Makefile.common
 build/Makefile.package
+build/Makefile.top
 build/subst
 build/subst.pl
