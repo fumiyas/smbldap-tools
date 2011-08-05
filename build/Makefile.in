@@ -1,4 +1,4 @@
-## Common Makefile
+## Makefile.common
 ## ======================================================================
 
 PACKAGE_NAME=		@PACKAGE_NAME@
@@ -17,39 +17,42 @@ exec_prefix=		@exec_prefix@
 bindir=			@bindir@
 sbindir=		@sbindir@
 libdir=			@libdir@
-libexecdir=		@libexecdir@${package_subdir}
-sysconfdir=		@sysconfdir@${package_subdir}
+libexecdir=		@libexecdir@$(package_subdir)
+sysconfdir=		@sysconfdir@$(package_subdir)
 localstatedir=		@localstatedir@
-datarootdir=		@datarootdir@
-datadir=		@datadir@${package_subdir}
+datadir=		@datadir@$(package_subdir)
+datarootdir=		@datarootdir@$(package_subdir)
 mandir=			@mandir@
 infodir=		@infodir@
 docdir=			@docdir@
 
-vardir=			${localstatedir}/lib${package_subdir}
-rundir=			${localstatedir}/run${package_subdir}
-logdir=			${localstatedir}/log${package_subdir}
-
-PERL_LIBDIR=		@PERL_LIBDIR@
+vardir=			$(localstatedir)/lib$(package_subdir)
+rundir=			$(localstatedir)/run$(package_subdir)
+logdir=			$(localstatedir)/log$(package_subdir)
 
 ## Commands, Flags and so on
 ## ----------------------------------------------------------------------
 
-SUBST=			$(BUILD_COMMON)/subst
+SUBST=			$(SOURCE_BUILD)/subst
+CC=			@CC@
+CPPFLAGS=		@CPPFLAGS@
+CFLAGS=			@CFLAGS@
+
 CP=			cp -p
 RM=			rm -rf
 LN_S=			ln -s
-INSTALL=		$(BUILD_COMMON)/install-sh -c
+INSTALL=		$(SOURCE_BUILD)/install-sh -c
 CHMOD_FILES=		chmod 0644
+CHMOD_EXES=		chmod 0755
 CHMOD_CMDS=		chmod 0755
 ## ----------------------------------------------------------------------
 
-BUILD_TARGETS_TOP=	$(BUILD_COMMON)/subst
+BUILD_TARGETS_TOP=	$(SUBST)
 
 ## Package local
 ## ----------------------------------------------------------------------
 
-include $(BUILD_COMMON)/Makefile.package
+include $(SOURCE_BUILD)/Makefile.package
 
 ## Suffix rules
 ## ======================================================================
@@ -59,21 +62,21 @@ include $(BUILD_COMMON)/Makefile.package
 .pl.cmd:
 	@echo "Building $@ from $< ..."
 	@$(RM) $@ $@.tmp
-	@$(BUILD_COMMON)/subst <$< >$@.tmp
+	@$(SUBST) <$< >$@.tmp
 	@$(CHMOD_CMDS) $@.tmp
 	@mv $@.tmp $@
 
 .pl.pm:
 	@echo "Building $@ from $< ..."
 	@$(RM) $@ $@.tmp
-	@$(BUILD_COMMON)/subst <$< >$@.tmp
+	@$(SUBST) <$< >$@.tmp
 	@$(CHMOD_FILES) $@.tmp
 	@mv $@.tmp $@
 
 .tmpl.example:
 	@echo "Building $@ from $< ..."
 	@$(RM) $@ $@.tmp
-	@$(BUILD_COMMON)/subst <$< >$@.tmp
+	@$(SUBST) <$< >$@.tmp
 	@$(CHMOD_FILES) $@.tmp
 	@mv $@.tmp $@
 
@@ -84,7 +87,7 @@ default:: build
 
 build:: $(BUILD_TARGETS)
 
-$(BUILD_TARGETS):: $(BUILD_COMMON)/subst
+$(BUILD_TARGETS):: $(SUBST)
 
 install:: $(INSTALL_TARGETS)
 
@@ -116,8 +119,8 @@ clean::
 distclean:: clean
 
 build install clean distclean::
-	@if [ -n "$(DIRS)" ]; then \
-	    set - $(DIRS); \
+	@if [ -n "$(MAKE_DIRS)" ]; then \
+	    set - $(MAKE_DIRS); \
 	    for subdir in "$$@"; do \
 		(cd $$subdir && $(MAKE) $@) || exit 1; \
 	    done \
@@ -125,9 +128,9 @@ build install clean distclean::
 
 build:: $(BUILD_TARGETS_POST)
 
-$(BUILD_COMMON)/subst: $(BUILD_COMMON)/subst.pl $(BUILD_COMMON)/Makefile $(BUILD_COMMON)/Makefile.package
+$(SUBST): $(SUBST).pl $(SOURCE_BUILD)/Makefile $(SOURCE_BUILD)/Makefile.package
 	cp $< $@.tmp
-	$(PERL_CMD) -ne 'print if s/^(\w+)\s*=\s*(.*?)\s$$/$$1=$$2\n/' $(BUILD_COMMON)/Makefile $(BUILD_COMMON)/Makefile.package >>$@.tmp
+	$(PERL_CMD) -ne 'print if s/^(\w+)\s*=\s*(.*?)\s$$/$$1=$$2\n/' $(SOURCE_BUILD)/Makefile $(SOURCE_BUILD)/Makefile.package >>$@.tmp
 	chmod 0755 $@.tmp
 	mv $@.tmp $@
 

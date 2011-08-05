@@ -1,9 +1,9 @@
 clean::
-	$(RM) $(BUILD_COMMON)/subst
+	$(RM) $(SOURCE_BUILD)/subst
 
 distclean::
 	$(RM) Makefile config.log config.status config.cache autom4te.cache
-	$(RM) $(BUILD_COMMON)/subst.??
-	$(RM) $(BUILD_COMMON)/Makefile $(BUILD_COMMON)/Makefile.package
+	$(RM) $(SOURCE_BUILD)/subst.??
+	$(RM) $(SOURCE_BUILD)/Makefile $(SOURCE_BUILD)/Makefile.package
 	echo "include Makefile.maintainer" >Makefile
 

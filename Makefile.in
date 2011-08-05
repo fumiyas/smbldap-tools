@@ -1,7 +1,7 @@
 # $Id$
 
-BUILD_TOP=		.
-BUILD_COMMON=		$(BUILD_TOP)/build
+SOURCE_DIR=		.
+SOURCE_BUILD=		$(SOURCE_DIR)/build
 
 ## ======================================================================
 
@@ -27,7 +27,7 @@ INSTALL_FILES=		$(BUILD_PERL_MOD_TARGETS)
 INSTALL_CMD_DIR=	$(sbindir)
 INSTALL_CMDS=		$(BUILD_PERL_CMD_TARGETS)
 
-PERL_MOD_SOURCES= smbldap_tools.pl
+PERL_MOD_SOURCES=	smbldap_tools.pl
 
 PERL_CMD_SOURCES= \
 	smbldap-groupadd.pl \
@@ -52,8 +52,8 @@ BUILD_PERL_MAN_TARGETS= $(BUILD_PERL_CMD_TARGETS:.cmd=.$(PERL_MAN_SECTION))
 
 ## ======================================================================
 
-include $(BUILD_COMMON)/Makefile
-include $(BUILD_COMMON)/Makefile.top
+include $(SOURCE_BUILD)/Makefile
+include $(SOURCE_BUILD)/Makefile.top
 
 ## ======================================================================
 
