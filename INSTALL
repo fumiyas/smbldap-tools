@@ -39,13 +39,6 @@ Basic configuration procedure
 Upgrade from previous release
 ======================================================================
 
-UPGRADE TO RELEASE 0.8.8
-----------------------------------------------------------------------
-
-You need to add the new parameter userHomeDirectoryMode in smbldap.conf. For example :
-=> # Default mode used for user homeDirectory
-=> userHomeDirectoryMode="700"
-
 UPGRADE TO RELEASE 0.8.7
 ----------------------------------------------------------------------
 
@@ -59,7 +52,6 @@ UPGRADE TO RELEASE 0.8.7
 UPGRADE TO RELEASE 0.8.5
 ----------------------------------------------------------------------
 
-. Change the variable name userHomePrefix to userHome in /etc/smbldap-tools/smbldap.conf
 . Next uidNumber and gidNumber available are now stored in cn=NextFreeUnixId
   When upgrading, you need to create this object manually. You can use for example
   an add.ldif life containing the following lines:

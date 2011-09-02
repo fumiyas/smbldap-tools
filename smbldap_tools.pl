@@ -269,8 +269,14 @@ sub getLocalSID {
     password_crypt_salt_format=>'%s',
     shadowAccount =>		true,
     nscd =>			"/usr/sbin/nscd",
+    userHomeDirectoryMode =>	"0700",
     read_conf(),
 );
+
+## Backward compatibility with 0.8.4 and older
+if (!exists($config{userHome}) && exists($config{userHomePrefix})) {
+    $config{userHome} = "$config{userHomePrefix}/%U";
+}
 
 sub get_parameter {
 
