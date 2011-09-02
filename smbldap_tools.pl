@@ -1185,9 +1185,8 @@ sub account_next_id
 	$oc = "sambaDomain";
 	$filter = "(&(objectClass=sambaDomain)(sambaDomainName=$domain))",
 	$scope = "sub";
-	## NOTE: sambaNextRid has "latest RID", not "next RID!
+	## NOTE: sambaNextRid has "latest RID", not "next RID"!
 	$id_bias = 1;
-    } else {
     }
 
     for (;;) {
