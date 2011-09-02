@@ -36,71 +36,19 @@ Basic configuration procedure
 
     # smbldap-populate
 
-Upgrade from previous release
+Upgrade to new release from previous release
 ======================================================================
 
-UPGRADE TO RELEASE 0.8.7
+Upgrade from release 0.9.6
 ----------------------------------------------------------------------
 
-. configuration files are now stored in /etc/opt/IDEALX/smbldap-tools/
-. Next uidNumber and gidNumber available are _not_ stored anymore in cn=NextFreeUnixId
-  by default, but you can still continue to use your entry.
-  They are now store in the sambaDomain entry.
-. If your sambaDomain entry already exist, you can securely execute the smbldap-populate script to
-  update it and add the uidNumber and gidNumber attribut.
+smbldap-tools 0.9.7 now support sambaNextRid attribute and its value
+in sambaDomain object for new RID allocation instead of obsolete RID
+algorithm by default. (It is for compatibility with Samba 3.0.23c and later.)
 
-UPGRADE TO RELEASE 0.8.5
-----------------------------------------------------------------------
+If you are upgrading from smbldap-tools 0.9.6 (or older) and/or you
+want to use legacy RID algorithm for new RID allocation, you must
+add "sambaAlgorithmicRidBase: 1000" to your sambaDomain object.
+You can do that by running `./smbldap-upgrade-0.9.6.cmd` in your
+smbldap-tools source tree.
 
-. Next uidNumber and gidNumber available are now stored in cn=NextFreeUnixId
-  When upgrading, you need to create this object manually. You can use for example
-  an add.ldif life containing the following lines:
-  > dn: cn=NextFreeUnixId,dc=idealx,dc=org
-  > objectClass: inetOrgPerson
-  > objectClass: sambaUnixIdPool
-  > uidNumber: 1000
-  > gidNumber: 1000
-  > cn: NextFreeUnixId
-  > sn: NextFreeUnixId
-  and then add the object with the ldapadd utility:
-  $ ldapadd -x -D "cn=Manager,dc=idealx,dc=org" -w secret -f add.ldif
-  note: . $firstuidNumber and $firstgidNumber are the first uidNumber and gidNumber
-          available (previously called UID_START and GID_START in the configuration file)
-        . here, 1000 is the first available value for uidNumber and gidNumber (of course, if
-          this value is already used by a user or a group, the first available after 1000 will
-          be used).
-. Next, you have to update the configuration file to defined the object where are sotred
-  the next uidNumber and gidNumber available. In our example, you have to add a new entry in
-  /etc/smbldap-tools/smbldap.conf containing :
-  > # Where to store next uidNumber and gidNumber available
-  > sambaUnixIdPooldn="cn=NextFreeUnixId,${suffix}"
-. Update, if necessary, the configuration file that defined users, groups and computers dn.
-  Those parameters must not be relative to the suffix parameter. A typical configuration look
-  like this :
-  > usersdn="ou=Users,${suffix}"
-  > computersdn="ou=Computers,${suffix}"
-  > groupsdn="ou=Groups,${suffix}"
-. the "Domain Computers" gidNumber should be set to 515 (see wellknown rid). Check if
-  you need to update the smbldap-tools configuration file /etc/smbldap-tools/smbldap.conf :
-  > defaultComputerGid="515"
-. the new version adds mail-forwarding and mail-alias capabilities to
-  the user's ldap-records. Those new attributes may be used for mail
-  delievry by MTAs like sendmail or postfix. Two new options "-M" and "-T"
-  allow specifying mail-aliases and mail-forward addresses in
-  smbldap-useradd and smbldap-usermod. If those options are used, the
-  objectclass "inetLocalMailRecipient" is used.
-  This objectclass is part of the misc.schema schema given with the OpenLDAP package
-  You then have to update the configuration file to set the domain name to append to mail.
-  For example, you can add a new entry in /etc/smbldap-tools/smbldap.conf containing :
-  > # Domain appended to the users "mail"-attribute
-  > # when smbldap-useradd -M is used
-  > mailDomain="idealx.com"
-
-UPGRADE TO RELEASE 0.8.4
-----------------------------------------------------------------------
-
-. configuration is now set in two different files:
-  - /etc/smbldap-tools/smbldap.conf for global parameters
-  - /etc/smbldap-tools/smbldap_bind.conf for connection parameters
-. scripts does not have any more the .pl extension. The call of the
-  scripts in the smb.conf file must then be updated.
