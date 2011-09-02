@@ -26,23 +26,23 @@ smbldap.conf        : global configuration
 smbldap_bind.conf   : LDAP binding configuration
 smbldap_tools.pm    : functions
 smbldap-useradd     : add a new LDAP user
-			(objectclass: posixAccount and/or sambaAccount)
+			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-userdel     : delete a LDAP user
-			(objectclass: posixAccount and/or sambaAccount)
+			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-userlist    : list LDAP users
-			(objectclass: posixAccount and/or sambaAccount)
+			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-usermod     : modify a LDAP user entry
-			(objectclass: posixAccount and/or sambaAccount)
+			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-usershow    : view a LDAP user entry
-			(objectclass: posixAccount and/or sambaAccount)
+			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-passwd      : set and sync LDAP passwdords (Unix and Samba)
 			(replacement for the system passwd utility)
 smbldap-populate    : add a builtin ldif to initialize your LDAP master for
 			smbldap use, or to add a specified ldif
-smbldap-tools.spec  : SPEC file for RedHat RPM package format
+smbldap-tools.spec  : SPEC file for Red Hat RPM package format
 
 Migration:
 =-=-=-=-=-
 smbldap-migrate-accounts     : add NT sam entries from pwdump to ldap
-smbldap-migrate-groups       : add any LDAP posixGroups from the output of the 
+smbldap-migrate-groups       : add any LDAP posixGroups from the output of the
 				'net group' NT command

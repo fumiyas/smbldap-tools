@@ -1,72 +1,53 @@
-# $Id$
-#
-## How To Install SMBLDAP-TOOLS
+How To Install SMBLDAP-TOOLS
+======================================================================
 
-INSTALLATION on CentOS 4:
--=-=-=-=-=-=-=-=-=-=-=-=
+Requirements
+======================================================================
 
-. yum install perl-Digest-SHA1 perl-LDAP perl-IO-Socket-SSL
-. add Dag Wieers repository
-  cat > /etc/yum.repos.d/DAG.repo << EOF
-[dag]
-name=DAG Repository
-baseurl = http://apt.sw.be/redhat/el\$releasever/en/\$basearch/dag
-gpgkey=http://dag.wieers.com/packages/RPM-GPG-KEY.dag.txt
-gpgcheck=1
-enabled=0
-EOF
-. yum --enablerepo=dag install perl-Crypt-SmbHash
+For build and installation:
+  * Perl 5.x
+  * make
 
-INSTALLATION from the tar.gz archive
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+For runtime:
+  * Perl 5.8.1 or later
+  * Perl Net::LDAP module
+  * Perl Crypt::SmbHash module
 
-. Copy all those scripts in /usr/local/sbin/
-. Modify smbldap.conf and smbldap_bind.conf to match your configuration, and copy
-  them in /etc/smbldap-tools/
-. set proper permissions on those files:
-  $ chmod 644 /etc/smbldap-tools/smbldap.conf
-  $ chmod 600 /etc/smbldap-tools/smbldap_bind.conf
-. update the 2 first declaration of /usr/local/sbin/smbldap_tools.pm to define the
-  PATH to the configuration file, for example
-  > my $smbldap_conf="/etc/smbldap-tools/smbldap.conf";
-  > my $smbldap_bind_conf="/etc/smbldap-tools/smbldap_bind.conf";
-. if upgrading, add these lines in smbldap.conf configuration file:
-  > # Allows not tu use slappasswd (if with_slappasswd="0" in smbldap.conf)
-  > # but prefer Crypt:: libraries
-  > with_slappasswd="0"
-  > slappasswd="/usr/sbin/slappasswd"
-  If 'with_slappasswd' is set to 0, password will be hashed with appropriate perl module
-  (to not use anymore external programm)
-. initialize the ldap directory
-  $ smbldap-populate
-. If not already done : "smbpasswd -w secret" to set up
-  the ldap admin password in secrets.tdb
+Basic install procedure
+======================================================================
 
-INSTALLATION from RedHat RPM:
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  $ ./configure
+  ...
+  $ make
+  ...
+  # su -
+  Password: xxxxxxxx
+  # make install
+  ...
 
-. install the package
-  $ rpm -Uvh smbldap-tools-0.8.6-1.noarch.rpm
-. Modify /etc/opt/IDEALX/smbldap-tools/smbldap.conf and /etc/opt/IDEALX/smbldap-tools/smbldap_bind.conf
-  to match you configuration.
-. initialize the ldap directory
-  $ smbldap-populate
-. If not already done : "smbpasswd -w secret" to set up
-  the ldap admin password in secrets.tdb
+Basic configuration procedure
+======================================================================
 
+  * Edit smbldap.conf and smbldap_bind.conf file in
+    /usr/local/etc/smbldap-tools directory (by default) to match
+    your environment.
 
+  * Initialize the LDAP DIT
 
+    # smbldap-populate
 
+Upgrade from previous release
+======================================================================
 
-UPGRADE TO RELEASE 0.8.8 :
--=-=-=-=-=-=-=-=-=-=-=-=-=
+UPGRADE TO RELEASE 0.8.8
+----------------------------------------------------------------------
 
-you need to add the new parameter userHomeDirectoryMode in smbldap.conf. For example :
+You need to add the new parameter userHomeDirectoryMode in smbldap.conf. For example :
 => # Default mode used for user homeDirectory
 => userHomeDirectoryMode="700"
 
-UPGRADE TO RELEASE 0.8.7 :
--=-=-=-=-=-=-=-=-=-=-=-=-=
+UPGRADE TO RELEASE 0.8.7
+----------------------------------------------------------------------
 
 . configuration files are now stored in /etc/opt/IDEALX/smbldap-tools/
 . Next uidNumber and gidNumber available are _not_ stored anymore in cn=NextFreeUnixId
@@ -75,9 +56,8 @@ UPGRADE TO RELEASE 0.8.7 :
 . If your sambaDomain entry already exist, you can securely execute the smbldap-populate script to
   update it and add the uidNumber and gidNumber attribut.
 
-
-UPGRADE TO RELEASE 0.8.5 :
--=-=-=-=-=-=-=-=-=-=-=-=-=
+UPGRADE TO RELEASE 0.8.5
+----------------------------------------------------------------------
 
 . Change the variable name userHomePrefix to userHome in /etc/smbldap-tools/smbldap.conf
 . Next uidNumber and gidNumber available are now stored in cn=NextFreeUnixId
@@ -124,8 +104,8 @@ UPGRADE TO RELEASE 0.8.5 :
   > # when smbldap-useradd -M is used
   > mailDomain="idealx.com"
 
-UPGRADE TO RELEASE 0.8.4 :
--=-=-=-=-=-=-=-=-=-=-=-=-=
+UPGRADE TO RELEASE 0.8.4
+----------------------------------------------------------------------
 
 . configuration is now set in two different files:
   - /etc/smbldap-tools/smbldap.conf for global parameters
