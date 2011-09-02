@@ -20,8 +20,8 @@ BUILD_TARGETS= \
 	$(BUILD_PERL_MAN_TARGETS) \
 	smbldap-config.cmd \
 	smbldap-upgrade-0.9.6.cmd \
-	smb.conf.example \
-	smb.smbldap.conf.example \
+	doc/smb.conf.example \
+	doc/smb.smbldap.conf.example \
 	#
 
 INSTALL_DIR=		$(PERL_LIBDIR)
