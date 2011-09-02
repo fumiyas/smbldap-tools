@@ -70,8 +70,6 @@ if (! defined $domain) {
     die;
 }
 
-#$config{sambaUnixIdPooldn}="sambaDomainName=$domain,$config{suffix}";
-
 my $firstuidNumber=$Options{'u'};
 if (!defined($firstuidNumber)) {
     $firstuidNumber=1000;
@@ -449,15 +447,16 @@ if (my $file = $Options{'i'}) {
     } else {
 	push(@entries, $entry);
 
-	my ($cnsambaUnixIdPool)=($config{sambaUnixIdPooldn}=~/(?:.*)=(.*),\Q$config{suffix}\E/);
+	my ($pool_attr, $pool_val)=($config{sambaUnixIdPooldn}=~/([^=]+)=([^,]+),\Q$config{suffix}\E/);
+	my $pool_oc = $oc_by_attr{$pool_attr} || 'inetOrgPerson';
 
 	$entry = Net::LDAP::Entry->new($config{sambaUnixIdPooldn},
-	    objectClass => [qw(inetOrgPerson sambaUnixIdPool)],
-	    cn => $cnsambaUnixIdPool,
-	    sn => $cnsambaUnixIdPool,
+	    objectClass => [$pool_oc, qw(sambaUnixIdPool)],
+	    $pool_attr => $pool_val,
 	    uidNumber => $firstuidNumber,
 	    gidNumber => $firstgidNumber,
 	);
+	$entry->add(sn => $pool_val) if ($pool_oc eq 'inetOrgPerson');
 	push(@entries, $entry);
     }
 
