@@ -5,7 +5,7 @@
 <HEAD><TITLE>Smbldap-tools User Manual 
 (Release: 0.9.3 )</TITLE>
 
-<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <META name="GENERATOR" content="hevea 1.07">
 
 <link rel="stylesheet" href="IDXDOC.css">
@@ -31,7 +31,7 @@
 <H1 ALIGN=center>Smbldap-tools User Manual<BR>
 (<I>Release</I>: 0.9.3 )</H1>
 
-<H3 ALIGN=center>Jérôme Tournier</H3>
+<H3 ALIGN=center>JÃ©rÃ´me Tournier</H3>
 
 <H3 ALIGN=center><I>Revision</I>: 1.7 , generated April 22, 2008<BR>
 </H3>
@@ -360,16 +360,16 @@ Let's have a look at all available parameters.
  </UL>
 <LI><TT>clientcert</TT>&nbsp;: the file that contains the client certificate
  <UL><LI>
- Example: <TT>clientcert="/etc/opt/IDEALX/smbldap-tools/smbldap-tools.iallanis.com.pem"</TT>
+ Example: <TT>clientcert="/etc/opt/IDEALX/smbldap-tools/smbldap-tools.example.com.pem"</TT>
  </UL>
 <LI><TT>clientkey</TT>&nbsp;: the file that contains the private key that
  matches the certificate stored in the clientcert file
  <UL><LI>
- Example: <TT>clientkey="/etc/opt/IDEALX/smbldap-tools/smbldap-tools.iallanis.com.key"</TT>
+ Example: <TT>clientkey="/etc/opt/IDEALX/smbldap-tools/smbldap-tools.example.com.key"</TT>
  </UL>
 <LI><TT>suffix</TT>&nbsp;: The distinguished name of the search base
  <UL><LI>
- Example: <TT>suffix="dc=idealx,dc=com"</TT>
+ Example: <TT>suffix="dc=example,dc=com"</TT>
  </UL>
 <LI><TT>usersdn</TT>&nbsp;: branch in which users account can be found or
  must be added
@@ -510,7 +510,7 @@ Let's have a look at all available parameters.
 <UL><LI>
 <TT>slaveDN</TT>&nbsp;: distinguished name used to bind to the slave server 
  <UL><LI>
- Example 1: <TT>slaveDN="cn=Manager,dc=idealx,dc=com"</TT> 
+ Example 1: <TT>slaveDN="cn=Manager,dc=example,dc=com"</TT> 
  <LI>Example 2: <TT>slaveDN=""</TT>
  <LI>Remark: this can be the manager account of the directory or
  any LDAP account that has sufficient permissions to read the full
@@ -527,7 +527,7 @@ Let's have a look at all available parameters.
  </UL>
 <LI><TT>masterDN</TT>&nbsp;: the distinguished name used to bind to the master server
  <UL><LI>
- Example: <TT>masterDN="cn=Manager,dc=idealx,dc=com"</TT>
+ Example: <TT>masterDN="cn=Manager,dc=example,dc=com"</TT>
  <LI>Remark: this can be the manager account of the directory or
  any LDAP account that has enough permissions to modify the content
  of the directory. Anonymous access does not make any sense here.
@@ -567,7 +567,7 @@ directory configuration. On RedHat system, this file is
 </TR></TABLE></TD>
 <TD><TABLE BORDER=0 CELLPADDING="1" CELLSPACING=0>
 <TR><TD><PRE>
-  rootdn          "cn=Manager,dc=idealx,dc=com"
+  rootdn          "cn=Manager,dc=example,dc=com"
   rootpw          secret
 </PRE></TD>
 </TR></TABLE></TD>
@@ -597,7 +597,7 @@ the parameters to connect to the master LDAP server match the previous ones:
 </TR></TABLE></TD>
 <TD><TABLE BORDER=0 CELLPADDING="1" CELLSPACING=0>
 <TR><TD><PRE>
-  masterDN="cn=Manager,dc=idealx,dc=com"
+  masterDN="cn=Manager,dc=example,dc=com"
   masterPw="secret"
 </PRE></TD>
 </TR></TABLE></TD>
@@ -656,27 +656,27 @@ following command:
 <PRE>
 [root@etoile root]# smbldap-populate 
 Using builtin directory structure
-adding new entry: dc=idealx,dc=com
-adding new entry: ou=Users,dc=idealx,dc=com
-adding new entry: ou=Groups,dc=idealx,dc=com
-adding new entry: ou=Computers,dc=idealx,dc=com
-adding new entry: ou=Idmap,dc=idealx,dc=org
-adding new entry: cn=NextFreeUnixId,dc=idealx,dc=org
-adding new entry: uid=Administrator,ou=Users,dc=idealx,dc=com
-adding new entry: uid=nobody,ou=Users,dc=idealx,dc=com
-adding new entry: cn=Domain Admins,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Domain Users,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Domain Guests,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Print Operators,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Backup Operators,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Replicator,ou=Groups,dc=idealx,dc=com
-adding new entry: cn=Domain Computers,ou=Groups,dc=idealx,dc=com
+adding new entry: dc=example,dc=com
+adding new entry: ou=Users,dc=example,dc=com
+adding new entry: ou=Groups,dc=example,dc=com
+adding new entry: ou=Computers,dc=example,dc=com
+adding new entry: ou=Idmap,dc=example,dc=org
+adding new entry: cn=NextFreeUnixId,dc=example,dc=org
+adding new entry: uid=Administrator,ou=Users,dc=example,dc=com
+adding new entry: uid=nobody,ou=Users,dc=example,dc=com
+adding new entry: cn=Domain Admins,ou=Groups,dc=example,dc=com
+adding new entry: cn=Domain Users,ou=Groups,dc=example,dc=com
+adding new entry: cn=Domain Guests,ou=Groups,dc=example,dc=com
+adding new entry: cn=Print Operators,ou=Groups,dc=example,dc=com
+adding new entry: cn=Backup Operators,ou=Groups,dc=example,dc=com
+adding new entry: cn=Replicator,ou=Groups,dc=example,dc=com
+adding new entry: cn=Domain Computers,ou=Groups,dc=example,dc=com
 </PRE>
-After this step, if you don't want to use the <TT>cn=Manager,dc=idealx,dc=com</TT>
+After this step, if you don't want to use the <TT>cn=Manager,dc=example,dc=com</TT>
 account anymore, you can create a dedicated account for Samba and the
 smbldap-tools. See section <A HREF="#change::manager">8.2</A> for more details.<BR>
 <BR>
-The <TT>cn=NextFreeUnixId,dc=idealx,dc=org</TT> entry is only used to
+The <TT>cn=NextFreeUnixId,dc=example,dc=org</TT> entry is only used to
 defined the next uidNumber and gidNumber available for creating new
 users and groups. The default values for those numbers are 1000. You
 can change it with the <TT>-u</TT> and <TT>-g</TT> option. For
@@ -1242,7 +1242,7 @@ The migration process is outlined in the chapter 30 of the samba howto
 
 There are two way to do this :
 <UL><LI>
-modify the <TT>cn=NextFreeUnixId,dc=idealx,dc=org</TT> and
+modify the <TT>cn=NextFreeUnixId,dc=example,dc=org</TT> and
  change the <TT>uidNumber</TT> and/or <TT>gidNumber</TT> value. This
  must be done manually. For example, if you want to use all available
  uidNumber and gidNumber higher then 1500, you need to create a
@@ -1260,7 +1260,7 @@ modify the <TT>cn=NextFreeUnixId,dc=idealx,dc=org</TT> and
  </TD>
 </TR></TABLE></TD>
 <TD><TABLE BORDER=0 CELLPADDING="1" CELLSPACING=0>
-<TR><TD><PRE>dn: cn=NextFreeUnixId,dc=idealx,dc=org
+<TR><TD><PRE>dn: cn=NextFreeUnixId,dc=example,dc=org
 changetype: modify
 uidNumber: 1500
 gidNumber: 1500
@@ -1279,7 +1279,7 @@ gidNumber: 1500
 </TR></TABLE>
 and then update the directory :
 <PRE>
-ldapmodify -x -D "cn=Manager,dc=idealx,dc=org" -w secret -f update-NextFreeUnixId.ldif
+ldapmodify -x -D "cn=Manager,dc=example,dc=org" -w secret -f update-NextFreeUnixId.ldif
 </PRE><LI>use the <TT>-u</TT> or <TT>-g</TT> option to the script you need to set the value you
  want to use
 </UL>
@@ -1299,7 +1299,7 @@ script, I get
 <PRE>
 [root@slave sbin]# smbldap-populate.pl
   Using builtin directory structure
-  adding new entry: dc=IDEALX,dc=COM
+  adding new entry: dc=example,dc=org
   Can't call method "code" without a package or object reference at
   /usr/local/sbin/smbldap-populate.pl line 270, &lt;GEN1&gt; line 2.
 </PRE>Answer: check the TLS configuration
@@ -1451,7 +1451,7 @@ Could not find base dn, to get next uidNumber at /usr/local/sbin//smbldap_tools.
 	You have updated the smbldap-tools to version 0.8.5 or newer.
 	You have to do this manually. Create an file called <TT>add.ldif</TT> and containing
 <PRE>
-dn: cn=NextFreeUnixId,dc=idealx,dc=org
+dn: cn=NextFreeUnixId,dc=example,dc=org
 objectClass: inetOrgPerson
 objectClass: sambaUnixIdPool
 uidNumber: 1000
@@ -1460,7 +1460,7 @@ cn: NextFreeUnixId
 sn: NextFreeUnixId
 </PRE>	and then add the object with the ldapadd utility:
 <PRE>
-$ ldapadd -x -D "cn=Manager,dc=idealx,dc=org" -w secret -f add.ldif
+$ ldapadd -x -D "cn=Manager,dc=example,dc=org" -w secret -f add.ldif
 </PRE>	Here, 1000 is the first available value for uidNumber and gidNumber (of course, if this value is
 	already used by a user or a group, the first available after 1000 will be used).
 	</UL><BR>
@@ -1531,7 +1531,7 @@ services:   ldap [NOTFOUND=return] files
 <A NAME="thanks"></A>
 People who have worked on this document are
 <UL><LI>
-Jérôme Tournier &lt;jerome.tournier@IDEALX.com&gt;
+JÃ©rÃ´me Tournier &lt;jerome.tournier@IDEALX.com&gt;
 <LI>David Barth &lt;david.barth@IDEALX.com&gt;
 <LI>Nat Makarevitch &lt;nat@IDEALX.com&gt;
 </UL>
@@ -1543,7 +1543,7 @@ suggestions :
 <UL><LI>
 IDEALX team :
  <UL><LI>
- Roméo Adekambi &lt;romeo.adekambi@IDEALX.com&gt;
+ RomÃ©o Adekambi &lt;romeo.adekambi@IDEALX.com&gt;
  <LI>Aurelien Degremont &lt;adegremont@IDEALX.com&gt;
  <LI>Renaud Renard &lt;rrenard@IDEALX.com&gt;
  </UL>
@@ -1634,7 +1634,7 @@ sambaDomain="DOMSMB"
 # Slave LDAP server
 # Ex: slaveLDAP=127.0.0.1
 # If not defined, parameter is set to "127.0.0.1"
-slaveLDAP="ldap.iallanis.info"
+slaveLDAP="ldap.example.info"
 
 # Slave LDAP port
 # If not defined, parameter is set to "389"
@@ -1643,7 +1643,7 @@ slavePort="389"
 # Master LDAP server: needed for write operations
 # Ex: masterLDAP=127.0.0.1
 # If not defined, parameter is set to "127.0.0.1"
-masterLDAP="ldap.iallanis.info"
+masterLDAP="ldap.example.info"
 
 # Master LDAP port
 # If not defined, parameter is set to "389"
@@ -1672,15 +1672,15 @@ cafile="/etc/smbldap-tools/ca.pem"
 
 # certificate to use to connect to the ldap server
 # see "man Net::LDAP" in start_tls section for more details
-clientcert="/etc/smbldap-tools/smbldap-tools.iallanis.info.pem"
+clientcert="/etc/smbldap-tools/smbldap-tools.example.info.pem"
 
 # key certificate to use to connect to the ldap server
 # see "man Net::LDAP" in start_tls section for more details
-clientkey="/etc/smbldap-tools/smbldap-tools.iallanis.info.key"
+clientkey="/etc/smbldap-tools/smbldap-tools.example.info.key"
 
 # LDAP Suffix
 # Ex: suffix=dc=IDEALX,dc=ORG
-suffix="dc=iallanis,dc=info"
+suffix="dc=example,dc=info"
 
 # Where are stored Users
 # Ex: usersdn="ou=Users,dc=IDEALX,dc=ORG"
@@ -1786,7 +1786,7 @@ userScript="logon.bat"
 # Domain appended to the users "mail"-attribute
 # when smbldap-useradd -M is used
 # Ex: mailDomain="idealx.com"
-mailDomain="iallanis.info"
+mailDomain="example.info"
 
 ##############################################################################
 #
@@ -1844,9 +1844,9 @@ slappasswd="/usr/sbin/slappasswd"
 # master ldap for writing access and a slave ldap server for reading access
 # By default, we will use the same DN (so it will work for standard Samba
 # release)
-slaveDN="cn=Manager,dc=iallanis,dc=info"
+slaveDN="cn=Manager,dc=example,dc=info"
 slavePw="secret"
-masterDN="cn=Manager,dc=iallanis,dc=info"
+masterDN="cn=Manager,dc=example,dc=info"
 masterPw="secret"
 </PRE></TD>
 </TR></TABLE></TD>
@@ -2190,7 +2190,7 @@ access to *
 <H3><A NAME="htoc47">8.2</A>&nbsp;&nbsp;Changing the administrative account (<TT>ldap admin
  dn</TT> in <TT>smb.conf</TT> file)</H3><!--SEC END -->
 <A NAME="change::manager"></A>
-If you don't want to use the <TT>cn=Manager,dc=idealx,dc=com</TT>
+If you don't want to use the <TT>cn=Manager,dc=example,dc=com</TT>
 account anymore, you can create a dedicated account for Samba and the
 smbldap-tools scripts. To do
 this, create an account named <I>samba</I> as follows (see
@@ -2216,9 +2216,9 @@ file <TT>/etc/opt/IDEALX/smbldap-tools/smbldap_bind.conf</TT>
 </TR></TABLE></TD>
 <TD><TABLE BORDER=0 CELLPADDING="1" CELLSPACING=0>
 <TR><TD><PRE>
-    slaveDN="uid=samba,ou=Users,dc=idealx,dc=com"
+    slaveDN="uid=samba,ou=Users,dc=example,dc=com"
     slavePw="samba"
-    masterDN="uid=samba,ou=Users,dc=idealx,dc=com"
+    masterDN="uid=samba,ou=Users,dc=example,dc=com"
     masterPw="samba"
   </PRE></TD>
 </TR></TABLE></TD>
@@ -2247,7 +2247,7 @@ file <TT>/etc/opt/IDEALX/smbldap-tools/smbldap_bind.conf</TT>
 </TR></TABLE></TD>
 <TD><TABLE BORDER=0 CELLPADDING="1" CELLSPACING=0>
 <TR><TD><PRE>
-    ldap admin dn = uid=samba,ou=Users,dc=idealx,dc=com
+    ldap admin dn = uid=samba,ou=Users,dc=example,dc=com
   </PRE></TD>
 </TR></TABLE></TD>
 <TD BGCOLOR=black COLSPAN="1"><TABLE CELLSPACING="1" CELLPADDING=0 BORDER=0>
@@ -2284,17 +2284,17 @@ smbpasswd -w samba
 <TR><TD><PRE>
 # users can authenticate and change their password
 access to attrs=userPassword,sambaNTPassword,sambaLMPassword,sambaPwdLastSet,sambaPwdMustChange
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by self write
       by anonymous auth
       by * none
 # some attributes need to be readable anonymously so that 'id user' can answer correctly
 access to attrs=objectClass,entry,gecos,homeDirectory,uid,uidNumber,gidNumber,cn,memberUid
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by * read
 # somme attributes can be writable by users themselves
 access to attrs=description,telephoneNumber
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by self write
       by * read
 # some attributes need to be writable for samba
@@ -2302,24 +2302,24 @@ access to attrs=cn,sambaLMPassword,sambaNTPassword,sambaPwdLastSet,sambaLogonTim
  sambaPwdCanChange,sambaPwdMustChange,sambaAcctFlags,displayName,sambaHomePath,sambaHomeDrive,sambaLogonScript,
  sambaProfilePath,description,sambaUserWorkstations,sambaPrimaryGroupSID,sambaDomainName,sambaSID,sambaGroupType,
  sambaNextRid,sambaNextGroupRid,sambaNextUserRid,sambaAlgorithmicRidBase
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by self read
       by * none
 # samba need to be able to create the samba domain account
-access to dn.base="dc=idealx,dc=com"
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+access to dn.base="dc=example,dc=com"
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by * none
 # samba need to be able to create new users account
-access to dn="ou=Users,dc=idealx,dc=com"
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+access to dn="ou=Users,dc=example,dc=com"
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by * none
 # samba need to be able to create new groups account
-access to dn="ou=Groups,dc=idealx,dc=com"
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+access to dn="ou=Groups,dc=example,dc=com"
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by * none
 # samba need to be able to create new computers account
-access to dn="ou=Computers,dc=idealx,dc=com"
-      by dn="uid=samba,ou=Users,dc=idealx,dc=com" write
+access to dn="ou=Computers,dc=example,dc=com"
+      by dn="uid=samba,ou=Users,dc=example,dc=com" write
       by * none
 # this can be omitted but we leave it: there could be other branch
 # in the directory
@@ -2359,7 +2359,7 @@ Option <I>-B</I> (user must change password) of
 
 <DIV class="piedpage">
 <HR>
-<P>Documents&nbsp;: Copyright © 2002 IDEALX S.A.S..
+<P>Documents&nbsp;: Copyright &copy; 2002 IDEALX S.A.S..
 'IDEALX' is the property of IDEALX.
 'Samba' is the property of Samba Team. All other trademarks belong to their respective owners.
 </DIV>
