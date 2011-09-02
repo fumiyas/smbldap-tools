@@ -37,8 +37,10 @@ This was first contributed by IDEALX (http://www.opentrust.com/)
 
 make
 
-cp -p smbldap-tools-upgrade-0.9.6.cmd doc/smbldap-tools-upgrade-0.9.6.pl
-chmod -x doc/smbldap-tools-upgrade-0.9.6.pl
+for f in smbldap-config smbldap-upgrade-0.9.6; do
+    cp -p $f.cmd doc/$f.pl
+    chmod -x doc/$f.pl
+done
 
 %install
 %{__rm} -rf %{buildroot}
