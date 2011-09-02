@@ -8,7 +8,7 @@ FILES			: this file listing
 README			: introduction and usage
 TODO			: feature request and bug report list
 ChangeLog		: changelog
-configure.pl		: script to configure the smbldap_conf.pl
+smbldap-config		: script to configure the smbldap.conf
 
 Core:
 =-=-=

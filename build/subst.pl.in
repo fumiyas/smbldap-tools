@@ -44,9 +44,26 @@ foreach my $arg (@ARGV) {
   }
 }
 
+sub subst
+{
+  my $str = shift;
+
+  $str =~ s/$tag1/exists($text{lc($1)}) ? subst2($text{lc($1)}) : "XXX Unknown: $1 XXX"/ge;
+
+  return $str;
+}
+
+sub subst2
+{
+  my $str = shift;
+
+  while ($str =~ s/$tag2/exists($text{lc($1)}) ? $text{lc($1)} : "XXX Unknown: $1 XXX"/ge) {};
+
+  return $str;
+}
+
 while (defined(my $line = $fh_in->getline())) {
-  $line =~ s/$tag1/exists($text{lc($1)}) ? $text{lc($1)} : "XXX Unknown: $1 XXX"/ge;
-  while ($line =~ s/$tag2/exists($text{lc($1)}) ? $text{lc($1)} : "XXX Unknown: $1 XXX"/ge) {};
+  $line = subst($line);
   $fh_out->print($line);
 }
 

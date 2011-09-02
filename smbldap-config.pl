@@ -27,7 +27,6 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 #  USA.
 
-
 use strict;
 use warnings;
 use File::Basename;
@@ -54,26 +53,14 @@ chomp($test_smb);
 die "\nSamba needs to be started first !\n" if ($test_smb eq "" || not defined $test_smb);
 
 print "Looking for configuration files...\n\n";
-my $smb_conf="";
-if (-e "/etc/samba/smb.conf") {
-  $smb_conf="/etc/samba/smb.conf";
-} elsif (-e "/usr/local/samba/lib/smb.conf") {
-  $smb_conf="/usr/local/samba/lib/smb.conf";
-}
+my $smb_conf="@SAMBA_SMB_CONF@";
 print "Samba Configuration File Path [$smb_conf] > ";
 chomp(my $config_smb=<STDIN>);
 if ($config_smb ne "") {
   $smb_conf=$config_smb;
 }
 
-my $conf_dir;
-if (-d "/etc/opt/IDEALX/smbldap-tools") {
-	$conf_dir="/etc/opt/IDEALX/smbldap-tools";
-} elsif (-d "/etc/smbldap-tools") {
-	$conf_dir="/etc/smbldap-tools";
-} else {
-	$conf_dir="/etc/opt/IDEALX/smbldap-tools";
-}
+my $conf_dir = "@sysconfdir@";
 
 print "\nThe default directory in which the smbldap configuration files are stored is shown.\n";
 print "If you need to change this, enter the full directory path, then press enter to continue.\n";
@@ -569,6 +556,4 @@ close(SMBLDAP_BIND);
 print "  $smbldap_bind_conf done.\n";
 $mode=0600;
 chmod $mode,"$smbldap_bind_conf","$smbldap_bind_conf.old";
-
-
 
