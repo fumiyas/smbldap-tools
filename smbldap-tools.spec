@@ -64,7 +64,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc ChangeLog CONTRIBUTORS COPYING FILES INFRA INSTALL README TODO
-%doc configure.pl *.conf doc/*.conf doc/migration_scripts/ doc/*.pdf doc/*.pl
+%doc *.conf doc/*.conf doc/migration_scripts/ doc/*.pdf doc/*.pl
 %dir %{_sysconfdir}/smbldap-tools/
 %config(noreplace) %{_sysconfdir}/smbldap-tools/smbldap.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/smbldap-tools/smbldap_bind.conf
