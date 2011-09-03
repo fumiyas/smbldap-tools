@@ -1,16 +1,17 @@
-%define version 0.9.6.svn
-%define release 3
-%define name	smbldap-tools
+%define name		smbldap-tools
+%define version		0.9.7
+%define pre_version	rc1
+%define release		1
 
 Summary:	User and Group administration tools for Samba/LDAP
 Name: 		%{name}
 version: 	%{version}
-Release: 	%{release}
+Release: 	%{?pre_version:0.%{pre_version}}.%{release}
 Group: 		System Environment/Base
 License: 	GPLv2+
 URL:		https://gna.org/projects/smbldap-tools/
 Packager:	Jerome Tournier <jtournier@gmail.com>
-Source0: 	smbldap-tools-%{version}.tgz
+Source0: 	smbldap-tools-%{version}%{?pre_version}.tgz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	perl
 BuildArch:	noarch
@@ -30,7 +31,7 @@ administrators of Linux systems:
 This was first contributed by IDEALX (http://www.opentrust.com/)
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?pre_version}
 
 %build
 %configure
@@ -97,6 +98,9 @@ fi
 %{_mandir}/man8/smbldap-usershow.8*
 
 %changelog
+* Sat Sep  3 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.7.0.rc1.1
+- New upstream pre version
+
 * Thu Jul  7 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-3
 - Run smbldap-upgrade-0.9.6.pl in %%triggerun %%{name} < 0.9.6.svn
 
