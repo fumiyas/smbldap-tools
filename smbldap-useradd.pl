@@ -772,7 +772,7 @@ Ex: 'ou=admin,ou=all'
    Forward address (multiple addresses are separated by commas).
 
 -u uid
-   The numerical value of the user's ID. This value must be unique, unless the -o option is used. The value must be non-negative. The default is to use the smallest ID value greater than 1000 and greater than every other user.
+   The numerical value of the user's ID. This value must be unique, unless the --non-unique option is used. The value must be non-negative. The default is to use the smallest ID value greater than 1000 and greater than every other user.
 
 -w/-W
    Creates an account for a Samba machine (Workstation), so that it can join a sambaDomainName. Normally -w is used for adding machines through Samba but -W can be used for manual addition of samba attributes.
