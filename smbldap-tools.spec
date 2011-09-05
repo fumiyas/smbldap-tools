@@ -11,7 +11,7 @@ Group: 		System Environment/Base
 License: 	GPLv2+
 URL:		https://gna.org/projects/smbldap-tools/
 Packager:	Jerome Tournier <jtournier@gmail.com>
-Source0: 	smbldap-tools-%{version}%{?pre_version}.tgz
+Source0: 	http://download.gna.org/smbldap-tools/sources/%{version}%{?pre_version}/smbldap-tools-%{version}%{?pre_version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	perl
 BuildArch:	noarch
