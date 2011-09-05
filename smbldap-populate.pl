@@ -29,6 +29,7 @@ use warnings;
 use FindBin qw($RealBin);
 use smbldap_tools;
 use Getopt::Std;
+use Net::LDAP qw(LDAP_NO_SUCH_OBJECT);
 use Net::LDAP::LDIF;
 use Net::LDAP::Entry;
 
@@ -483,7 +484,9 @@ while (my $entry = $entries_iter->()) {
 	scope => "base",
 	filter => "objectclass=*"
     );
-    $mesg->code && die "failed to search entry: ", $mesg->error;
+    if ($mesg->code && $mesg->code != LDAP_NO_SUCH_OBJECT) {
+	die "failed to search entry: ", $mesg->error;
+    }
     if ($mesg->count == 1) {
 	print "entry $dn already exist. ";
 	if ($dn eq $config{sambaUnixIdPooldn}) {
