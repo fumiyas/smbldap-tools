@@ -15,6 +15,8 @@ TAR=			tar
 GZIP=			gzip -9
 GPG_cmd=		type gpg >/dev/null 2>&1 && echo gpg || echo :
 GPG=			$(shell $(GPG_cmd))$(GPG_CMD:sh)
+RPMBUILD_cmd=		type gpg >/dev/null 2>&1 && echo rpmbuild --sign || echo rpmbuild
+RPMBUILD=		$(shell $(RPMBUILD_cmd))$(RPMBUILD_CMD:sh)
 
 ## ----------------------------------------------------------------------
 
@@ -23,7 +25,7 @@ default:
 
 ## ----------------------------------------------------------------------
 
-dist: dist-conf dist-archive
+dist: dist-conf dist-archive dist-rpm
 
 dist-conf:
 	[ -f Makefile ] && $(MAKE) distclean || :
@@ -41,6 +43,9 @@ dist-archive:
 	$(GPG) --sign --detach-sign $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 	ls -l $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 	ls -l $(ARCHIVE_DIR)/$(ARCHIVE_NAME).sig 2>/dev/null || :
+
+dist-rpm:
+	$(RPMBUILD) -ta $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 
 configure: configure.in
 	autoconf
