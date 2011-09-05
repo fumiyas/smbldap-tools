@@ -25,7 +25,7 @@ dist-archive:
 	find .dist.tmp -type d -name .svn -exec rm -rf {} \; -prune
 	rm -rf .dist.tmp/vendor/rails .dist.tmp/tags
 	mv .dist.tmp $(PACKAGE_DIST)
-	tar cf - $(PACKAGE_DIST) |bzip2 > ../$(PACKAGE_DIST).tar.bz2
+	tar cf - $(PACKAGE_DIST) |gzip -9 > ../$(PACKAGE_DIST).tgz
 	rm -rf $(PACKAGE_DIST)
 
 configure: configure.in
