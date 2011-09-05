@@ -15,7 +15,6 @@ Source0: 	http://download.gna.org/smbldap-tools/sources/%{version}%{?pre_version
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	perl
 BuildArch:	noarch
-Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:	perl >= 5.8.1
 
 %description
