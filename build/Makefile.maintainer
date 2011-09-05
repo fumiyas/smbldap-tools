@@ -1,9 +1,20 @@
 ## Makefile.maintainer
 ## ======================================================================
 
-PACKAGE_NAME=	`grep '^AC_INIT' configure.in |sed 's/.*(//;s/,.*//'`
-PACKAGE_VERSION=`grep '^AC_INIT' configure.in |sed 's/.*, *//;s/)$$//'`
-PACKAGE_DIST=	$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+PACKAGE_NAME_cmd=	grep '^AC_INIT' configure.in |sed 's/.*(//;s/,.*//'
+PACKAGE_NAME=		$(shell $(PACKAGE_NAME_cmd))$(PACKAGE_NAME_cmd:sh)
+PACKAGE_VERSION_cmd=	grep '^AC_INIT' configure.in |sed 's/.*, *//;s/)$$//'
+PACKAGE_VERSION=	$(shell $(PACKAGE_VERSION_cmd))$(PACKAGE_VERSION_cmd:sh)
+PACKAGE_DIST=		$(PACKAGE_NAME)-$(PACKAGE_VERSION)
+
+ARCHIVE_DIR=		..
+ARCHIVE_NAME=		$(PACKAGE_DIST).tgz
+ARCHIVE_COMPRESS=	$(GZIP)
+
+TAR=			tar
+GZIP=			gzip -9
+GPG_cmd=		type gpg >/dev/null 2>&1 && echo gpg || echo :
+GPG=			$(shell $(GPG_cmd))$(GPG_CMD:sh)
 
 ## ----------------------------------------------------------------------
 
@@ -25,10 +36,14 @@ dist-archive:
 	find .dist.tmp -type d -name .svn -exec rm -rf {} \; -prune
 	rm -rf .dist.tmp/vendor/rails .dist.tmp/tags
 	mv .dist.tmp $(PACKAGE_DIST)
-	tar cf - $(PACKAGE_DIST) |gzip -9 > ../$(PACKAGE_DIST).tgz
+	$(TAR) cf - $(PACKAGE_DIST) |$(ARCHIVE_COMPRESS) >$(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 	rm -rf $(PACKAGE_DIST)
+	$(GPG) --sign --detach-sign $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
+	ls -l $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
+	ls -l $(ARCHIVE_DIR)/$(ARCHIVE_NAME).sig 2>/dev/null || :
 
 configure: configure.in
 	autoconf
 
 distclean:
+
