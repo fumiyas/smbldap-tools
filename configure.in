@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.50)
 
-AC_INIT(smbldap-tools, 0.9.7rc1)
+AC_INIT(smbldap-tools, 0.9.7rc2)
 
 AC_PREFIX_DEFAULT(/usr/local)
 

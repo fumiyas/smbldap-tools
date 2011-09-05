@@ -1,6 +1,6 @@
 %define name		smbldap-tools
 %define version		0.9.7
-%define pre_version	rc1
+%define pre_version	rc2
 %define release		1
 
 Summary:	User and Group administration tools for Samba/LDAP
