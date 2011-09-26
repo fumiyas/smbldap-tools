@@ -1,10 +1,14 @@
+2011-09-06 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-populate: Create parent entry for $config{sambaUnixIdPooldn}
+	  if it does not exist
+
 2011-09-02 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-config: Rename from configure.pl
 
 2011-07-23 <fumiyas at OSS Technology, Inc., Japan>
-	* smbldap-populate: Create all node entries if $config{usersdn}
-	  (and/or others) has multiple nodes under $config{suffix}
-	  (e.g. usersdn="ou=Users,ou=foo,ou=bar,${suffix}" in smbldap.conf)
+	* smbldap-populate: Create parent entry for $config{usersdn}
+	  (and others) if it does not exist
+	  (e.g. usersdn="ou=Users,ou=parent,${suffix}" in smbldap.conf)
 
 2011-07-13 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-useradd: New option: --non-unique (Allow the creation of a

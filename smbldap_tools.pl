@@ -323,11 +323,9 @@ if ( defined $config{idmapdn} ) {
     }
 }
 
-# next uidNumber and gidNumber available are stored in sambaDomainName object
-if ( !defined $config{sambaUnixIdPooldn} ) {
-    $config{sambaUnixIdPooldn} =
-      "sambaDomainName=$config{sambaDomain},$config{suffix}";
-}
+$config{sambaDomaindn} = "sambaDomainName=$config{sambaDomain},$config{suffix}";
+$config{sambaUnixIdPooldn} ||= $config{sambaDomaindn};
+
 if ( $config{ldapSSL} == 1 and $config{ldapTLS} == 1 ) {
     die "Both options ldapSSL and ldapTLS could not be activated\n";
 }

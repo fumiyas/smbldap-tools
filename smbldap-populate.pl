@@ -34,9 +34,11 @@ use Net::LDAP::LDIF;
 use Net::LDAP::Entry;
 
 my %oc_by_attr = (
-      "ou" =>	"organizationalUnit",
-      "o" =>	"organization",
-      "dc" =>	"dcObject",
+      "dc" =>			"dcObject",
+      "o" =>			"organization",
+      "ou" =>			"organizationalUnit",
+      "cn" =>			"organizationalRole",
+      "sambaDomainName" =>	"sambaDomain",
 );
 
 my %Options;
@@ -163,15 +165,19 @@ if (my $file = $Options{'i'}) {
     }
     push(@entries, $entry);
 
-    my %node_created = ();
-    for my $config_dn (qw(usersdn groupsdn computersdn idmapdn)) {
-	my $prefix = $config{$config_dn} || next;
+    my @config_dn = @config{
+	qw(usersdn groupsdn computersdn idmapdn sambaDomaindn sambaUnixIdPooldn)
+    };
+    my %entry_by_dn = ();
+
+    for my $config_dn (@config_dn) {
+	my $prefix = $config_dn;
 	$prefix =~ s/,\Q$config{suffix}\E$//i;
 
 	my $dn = $config{suffix};
 	for my $node (reverse(split(/,/, $prefix))) {
 	    $dn = "$node,$dn";
-	    next if ($node_created{$dn});
+	    next if ($entry_by_dn{$dn});
 
 	    unless ($node =~ /^([^=]+)=([^,]*)$/) {
 		die "Cannot extract first attr and value for entry: $dn";
@@ -182,14 +188,33 @@ if (my $file = $Options{'i'}) {
 	    if (!defined($oc)) {
 		die "Cannot determine object class for entry: $dn";
 	    }
+
 	    $entry = Net::LDAP::Entry->new($dn,
 		objectClass => $oc,
 		$attr => $val,
 	    );
+
+	    ## Add attribute required by object class
+	    $entry->add(sambaSID => $config{SID}) if ($oc eq 'sambaDomain');
+	    $entry->add(sn => $val) if ($oc eq 'inetOrgPerson');
+
 	    push(@entries, $entry);
-	    $node_created{$dn} = 1;
+	    $entry_by_dn{$dn} = $entry;
 	}
     }
+
+    $entry = $entry_by_dn{$config{sambaDomaindn}};
+    if (defined($algorithmicRidBase)) {
+	$entry->add(sambaAlgorithmicRidBase => $algorithmicRidBase);
+    } else {
+	$entry->add(sambaNextRid => $firstridNumber);
+    }
+
+    $entry_by_dn{$config{sambaUnixIdPooldn}}->add(
+	objectClass =>	"sambaUnixIdPool",
+	uidNumber =>	$firstuidNumber,
+	gidNumber =>	$firstgidNumber,
+    );
 
     $entry = Net::LDAP::Entry->new("uid=$adminName,$config{usersdn}",
 	objectClass =>	[qw(top person organizationalPerson inetOrgPerson sambaSAMAccount posixAccount)],
@@ -427,39 +452,6 @@ if (my $file = $Options{'i'}) {
 	displayName =>	"Replicators",
     );
     push(@entries, $entry);
-
-    $entry = Net::LDAP::Entry->new("sambaDomainName=$domain,$config{suffix}",
-	objectClass =>	[qw(top sambaDomain)],
-	sambaDomainName =>	$domain,
-	sambaSID =>		$config{SID},
-    );
-    if (defined($algorithmicRidBase)) {
-	$entry->add(sambaAlgorithmicRidBase => $algorithmicRidBase);
-    } else {
-	$entry->add(sambaNextRid => $firstridNumber);
-    }
-    if ("sambaDomainName=$domain,$config{suffix}" eq $config{sambaUnixIdPooldn}) {
-	$entry->add(
-	    objectClass =>	"sambaUnixIdPool",
-	    uidNumber =>	$firstuidNumber,
-	    gidNumber =>	$firstgidNumber,
-	);
-	push(@entries, $entry);
-    } else {
-	push(@entries, $entry);
-
-	my ($pool_attr, $pool_val)=($config{sambaUnixIdPooldn}=~/([^=]+)=([^,]+),\Q$config{suffix}\E/);
-	my $pool_oc = $oc_by_attr{$pool_attr} || 'inetOrgPerson';
-
-	$entry = Net::LDAP::Entry->new($config{sambaUnixIdPooldn},
-	    objectClass => [$pool_oc, qw(sambaUnixIdPool)],
-	    $pool_attr => $pool_val,
-	    uidNumber => $firstuidNumber,
-	    gidNumber => $firstgidNumber,
-	);
-	$entry->add(sn => $pool_val) if ($pool_oc eq 'inetOrgPerson');
-	push(@entries, $entry);
-    }
 
     $entries_iter = sub {
 	return shift(@entries);
