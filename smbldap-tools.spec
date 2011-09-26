@@ -1,6 +1,6 @@
 %define name		smbldap-tools
 %define version		0.9.7
-%define pre_version	rc2
+%define pre_version	rc3
 %define release		1
 
 Summary:	User and Group administration tools for Samba/LDAP
@@ -10,7 +10,7 @@ Release: 	%{?pre_version:0.%{pre_version}}.%{release}
 Group: 		System Environment/Base
 License: 	GPLv2+
 URL:		https://gna.org/projects/smbldap-tools/
-Packager:	Jerome Tournier <jtournier@gmail.com>
+Packager:	SATOH Fumiyasu
 Source0: 	http://download.gna.org/smbldap-tools/sources/%{version}%{?pre_version}/smbldap-tools-%{version}%{?pre_version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	perl
@@ -56,7 +56,7 @@ cp -p *.8 %{buildroot}%{_mandir}/man8/
 %clean
 %{__rm} -rf %{buildroot}
 
-%triggerpostun -- %{name} < 0.9.6.svn
+%triggerpostun -- %{name} < 0.9.7
 if [ "$1" -eq "2" ]; then ## Upgrade
     %{__perl} %{_docdir}/%{name}-%{version}/smbldap-upgrade-0.9.6.pl
 fi
@@ -97,8 +97,8 @@ fi
 %{_mandir}/man8/smbldap-usershow.8*
 
 %changelog
-* Sat Sep  3 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.7.0.rc1.1
-- New upstream pre version
+* Tue Sep  6 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.7.0.rc3.1
+- New upstream rc version
 
 * Thu Jul  7 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-3
 - Run smbldap-upgrade-0.9.6.pl in %%triggerun %%{name} < 0.9.6.svn
