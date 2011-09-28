@@ -258,7 +258,7 @@ foreach my $entry ($mesg->all_entries) {
 
 =head1 NAME
 
-smbldap-userlist list users or machines with some info
+smbldap-userlist - list users or machines with some info
 
 =head1 SYNOPSIS
 

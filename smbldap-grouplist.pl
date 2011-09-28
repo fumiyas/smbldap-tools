@@ -166,7 +166,7 @@ foreach my $entry ($mesg->all_entries) {
 
 =head1 NAME
 
-smbldap-grouplist list groups
+smbldap-grouplist - list groups
 
 =head1 SYNOPSIS
 
