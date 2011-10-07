@@ -1,4 +1,4 @@
-#!@PERL_CMD@
+#!@PERL_COMMAND@
 
 # $Id$
 

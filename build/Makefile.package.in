@@ -1,9 +1,9 @@
 ## Makefile.package
 ## ======================================================================
 
-PERL_CMD=		@PERL_CMD@
+PERL_COMMAND=		@PERL_COMMAND@
 PERL_LIBDIR=		@PERL_LIBDIR@
-POD2MAN_CMD=		@POD2MAN_CMD@
+POD2MAN_COMMAND=	@POD2MAN_COMMAND@
 
 SAMBA_BINDIR=		@SAMBA_BINDIR@
 SAMBA_SYSCONFDIR=	@SAMBA_SYSCONFDIR@

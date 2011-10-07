@@ -33,8 +33,10 @@ logdir=			$(localstatedir)/log$(package_subdir)
 ## Commands, Flags and so on
 ## ----------------------------------------------------------------------
 
-SUBST=			$(SOURCE_BUILD)/subst
-SUBST_SRC=		$(SUBST).pl
+SUBST_SRC=		$(SOURCE_BUILD)/subst.pl
+SUBST_VARS=		$(SOURCE_BUILD)/subst.vars
+SUBST_COMMAND=		$(SOURCE_BUILD)/subst
+SUBST=			@PERL_COMMAND@ $(SUBST_COMMAND) $(SUBST_ARGS)
 
 CC=			@CC@
 CPPFLAGS=		@CPPFLAGS@
@@ -47,9 +49,6 @@ INSTALL=		$(SOURCE_BUILD)/install-sh -c
 CHMOD_FILES=		chmod 0644
 CHMOD_EXES=		chmod 0755
 CHMOD_CMDS=		chmod 0755
-## ----------------------------------------------------------------------
-
-BUILD_TARGETS_TOP=	$(SUBST)
 
 ## Package local
 ## ----------------------------------------------------------------------
@@ -114,7 +113,7 @@ install-cmds: install-cmd-dir
 	done
 
 clean::
-	$(RM) $(BUILD_TARGETS) $(BUILD_TARGETS_POST) *.tmp
+	$(RM) $(BUILD_TARGETS) $(BUILD_TARGETS_POST) $(CLEAN_TARGETS) *.tmp
 
 distclean:: clean
 
@@ -128,10 +127,11 @@ build install clean distclean::
 
 build:: $(BUILD_TARGETS_POST)
 
-$(BUILD_TARGETS):: $(SUBST)
+$(BUILD_TARGETS):: $(SUBST_COMMAND)
 
-$(SUBST): $(SUBST_SRC) $(SOURCE_BUILD)/Makefile.common $(SOURCE_BUILD)/Makefile.package
+$(SUBST_COMMAND): $(SUBST_SRC) $(SUBST_VARS) $(SOURCE_BUILD)/Makefile.common $(SOURCE_BUILD)/Makefile.package
 	cp $< $@.tmp
+	cat $(SUBST_VARS) >>$@.tmp
 	sed -n 's/^\([A-Za-z_][A-Za-z_0-9]*\)[ 	]*=[ 	]*\(.*\)/\1=\2/p' \
 	  $(SOURCE_BUILD)/Makefile.common \
 	  $(SOURCE_BUILD)/Makefile.package \

@@ -1,4 +1,4 @@
-#!@PERL_CMD@
+#!@PERL_COMMAND@
 ##
 ## Substitute for @TAG@ in STDIN stream and output to STDOUT
 ## Copyright (c) 2000-2011 SATOH Fumiyasu, All rights reserved.

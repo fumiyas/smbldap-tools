@@ -11,8 +11,7 @@ DESTARCH=		smbldap-tools-$(PACKAGE_VERSION)
 # where to build the rpm
 TOPDIR=			$$HOME/redhat
 GPG_PATH=		$$HOME/.gnupg
-#RPMBUILD_CMD=		rpmbuild -ba
-RPMBUILD_CMD=		rpmbuild -ba --sign
+RPMBUILD_COMMAND=	rpmbuild -ba --sign
 
 BUILD_TARGETS= \
 	$(BUILD_PERL_MOD_TARGETS) \
@@ -63,7 +62,7 @@ include $(SOURCE_BUILD)/Makefile.top
 
 .cmd.$(PERL_MAN_SECTION):
 	@echo "Building $@ from $< ..."
-	@$(POD2MAN_CMD) --section=$(PERL_MAN_SECTION) $< >$@.tmp
+	@$(POD2MAN_COMMAND) --section=$(PERL_MAN_SECTION) $< >$@.tmp
 	@mv $@.tmp $@
 
 ## ======================================================================
@@ -92,7 +91,7 @@ rpm: dist build_dir
 	@perl -i -pe's@^\%define version(.*)@\%define version $(VERSION)@' $(TOPDIR)/SPECS/smbldap-tools.spec
 	@perl -i -pe's@^\%define release(.*)@\%define release $(RELEASE)@' $(TOPDIR)/SPECS/smbldap-tools.spec
 	@perl -i -pe's@^Source0(.*)@Source0: smbldap-tools-$(VERSION).tgz@' $(TOPDIR)/SPECS/smbldap-tools.spec
-	@cd $(TOPDIR)/SPECS/ && $(RPMBUILD_CMD) smbldap-tools.spec
+	@cd $(TOPDIR)/SPECS/ && $(RPMBUILD_COMMAND) smbldap-tools.spec
 	@echo "Signing packages smbldap-tools-$(VERSION)-$(RELEASE).noarch.rpm"
 	@cd $(TOPDIR)/RPMS/noarch &&  gpg --detach smbldap-tools-$(VERSION)-$(RELEASE).noarch.rpm
 	@echo "Signing packages smbldap-tools-$(VERSION)-$(RELEASE).src.rpm"

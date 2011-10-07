@@ -14,6 +14,15 @@ PERL_VERSION=5.008001
 SAMBA_SYSCONFDIR="/etc/samba"
 SAMBA_BINDIR="/usr/bin"
 
+AC_CONFIG_FILES(
+    Makefile
+    build/Makefile.common
+    build/Makefile.package
+    build/Makefile.top
+    build/subst.pl
+    build/subst.vars
+)
+
 ## Installation directories
 ## ======================================================================
 
@@ -39,29 +48,29 @@ esac
 ## Perl
 ## ======================================================================
 
-AC_SUBST(PERL_CMD)
+AC_SUBST(PERL_COMMAND)
 
 AC_ARG_WITH(
     perl,
     [AC_HELP_STRING(--with-perl=PATH, [Use specific perl command])],
-    [PERL_CMD="$withval"],
+    [PERL_COMMAND="$withval"],
 )
 
-case "$PERL_CMD" in
+case "$PERL_COMMAND" in
 /*)
     ;;
 *)
-    AC_PATH_PROG(PERL_CMD, perl)
+    AC_PATH_PROG(PERL_COMMAND, perl)
     ;;
 esac
 
-AC_MSG_RESULT([using $PERL_CMD for perl command])
+AC_MSG_RESULT([using $PERL_COMMAND for perl command])
 
 ## ----------------------------------------------------------------------
 
 AC_MSG_CHECKING(for Perl version)
 
-if test x`"$PERL_CMD" -e "use $PERL_VERSION; print 'ok'"` = x"ok"; then
+if test x`"$PERL_COMMAND" -e "use $PERL_VERSION; print 'ok'"` = x"ok"; then
     AC_MSG_RESULT($PERL_VERSION or later)
 else
     AC_MSG_ERROR(Perl $PERL_VERSION or later required.)
@@ -81,10 +90,10 @@ case "$PERL_LIBDIR" in
 /*)
     ;;
 sitelib)
-    PERL_LIBDIR=`$PERL_CMD -MConfig -e 'print $Config{installsitelib}'`
+    PERL_LIBDIR=`$PERL_COMMAND -MConfig -e 'print $Config{installsitelib}'`
     ;;
 *)
-    PERL_LIBDIR=`$PERL_CMD -MConfig -e 'print $Config{installvendorlib}'`
+    PERL_LIBDIR=`$PERL_COMMAND -MConfig -e 'print $Config{installvendorlib}'`
     ;;
 esac
 
@@ -92,23 +101,23 @@ AC_MSG_RESULT([using $PERL_LIBDIR for *.pm install directory])
 
 ## ----------------------------------------------------------------------
 
-AC_SUBST(POD2MAN_CMD)
+AC_SUBST(POD2MAN_COMMAND)
 
 AC_ARG_WITH(
     pod2man,
     [AC_HELP_STRING(--with-pod2man=PATH, [Use specific pod2man command])],
-    [POD2MAN_CMD="$withval"],
+    [POD2MAN_COMMAND="$withval"],
 )
 
-case "$POD2MAN_CMD" in
+case "$POD2MAN_COMMAND" in
 /*)
     ;;
 *)
-    AC_PATH_PROG(POD2MAN_CMD, pod2man)
+    AC_PATH_PROG(POD2MAN_COMMAND, pod2man)
     ;;
 esac
 
-AC_MSG_RESULT([using $POD2MAN_CMD for pod2man command])
+AC_MSG_RESULT([using $POD2MAN_COMMAND for pod2man command])
 
 ## Samba
 ## ======================================================================
@@ -139,14 +148,6 @@ AC_MSG_RESULT([using $SAMBA_BINDIR for Samba bin directory])
 
 ## Output
 ## ======================================================================
-
-AC_CONFIG_FILES(
-    Makefile
-    build/Makefile.common
-    build/Makefile.package
-    build/Makefile.top
-    build/subst.pl
-)
 
 AC_OUTPUT
 

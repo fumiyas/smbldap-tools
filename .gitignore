@@ -1,3 +1,4 @@
+.*
 configure
 autom4te.cache
 config.log
@@ -8,8 +9,10 @@ Makefile
 *.example
 *.8
 smbldap_tools.pm
-build/Makefile.common
-build/Makefile.package
-build/Makefile.top
-build/subst
-build/subst.pl
+/build/Makefile.common
+/build/Makefile.package
+/build/Makefile.top
+/build/subst
+/build/subst.pl
+/build/subst.vars
+/build/subst.vars.in
