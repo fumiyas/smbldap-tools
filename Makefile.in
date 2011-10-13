@@ -67,6 +67,8 @@ include $(SOURCE_BUILD)/Makefile.top
 
 ## ======================================================================
 
+all: build
+
 build::
 
 install:: install-files install-cmds
