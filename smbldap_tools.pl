@@ -1420,7 +1420,7 @@ sub password_read
 	my $sig_sent = {};
 	my $sig_hander = sub { $sig_sent->{shift(@_)} = 1; die; };
 
-	for my $sig_name qw(ALRM INT HUP QUIT TERM TSTP TTIN TTOU) {
+	for my $sig_name (qw(ALRM INT HUP QUIT TERM TSTP TTIN TTOU)) {
 	    $sig_handlers_orig->{$sig_name} = $SIG{$sig_name};
 	    $SIG{$sig_name} = $sig_hander;
 	}
