@@ -514,6 +514,9 @@ if (@adds) {
     $modify->code && die "failed to add entry: ", $modify->error;
 }
 
+# Reset adds
+@adds = ();
+
 # Add Samba user infos
 if ( defined( $Options{'a'} ) ) {
     if ( !$config{with_smbpasswd} ) {
@@ -597,8 +600,6 @@ EOF
 
     $tmp = defined( $Options{'F'} ) ? $Options{'F'} : $config{userProfile};
     my $valprofilepath = &subst_user( $tmp, $userName );
-
-    my @adds = ();
 
     if ($valhomedrive) {
         push( @adds, 'sambaHomeDrive' => $valhomedrive );
