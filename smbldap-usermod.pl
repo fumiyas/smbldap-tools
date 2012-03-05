@@ -456,7 +456,7 @@ if ( defined $Options{'U'} ) {
     push( @mods, 'userPassword' => $tmp );
 }
 
-if ( $tmp = $Options{'M'} ) {    
+if (defined($tmp = $Options{'M'})) {
 
     # action si + or - for adding or deleting an entry
     my $action = '';
@@ -485,7 +485,7 @@ if ( $tmp = $Options{'M'} ) {
 }
 
 my $mailobj = 0;
-if ( $tmp = $Options{'O'} ) {    
+if (defined($tmp = $Options{'O'})) {
 
     # action si + or - for adding or deleting an entry
     my $action = '';
@@ -507,7 +507,7 @@ if ( $tmp = $Options{'O'} ) {
     $mailobj = 1;
 }
 
-if ( $tmp = $Options{'T'} ) {
+if (defined($tmp = $Options{'T'})) {
     my $action = '';
     my @old;
 
