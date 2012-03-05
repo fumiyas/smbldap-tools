@@ -29,10 +29,10 @@ dist: dist-conf dist-archive dist-rpm
 
 dist-conf:
 	[ -f Makefile ] && $(MAKE) distclean || :
-	autoconf
-	rm -rf autom4te.cache .dist.tmp $(PACKAGE_DIST)
+	build/autogen.sh
 
 dist-archive:
+	rm -rf .dist.tmp $(PACKAGE_DIST)
 	mkdir .dist.tmp
 	cp -rp * .dist.tmp
 	find .dist.tmp -type d -name .svn -exec rm -rf {} \; -prune
