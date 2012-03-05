@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.50)
 
-AC_INIT(smbldap-tools, 0.9.7.next)
+AC_INIT(smbldap-tools, 0.9.8alpha1)
 
 AC_PREFIX_DEFAULT(/usr/local)
 
@@ -75,6 +75,19 @@ if test x`"$PERL_COMMAND" -e "use $PERL_VERSION; print 'ok'"` = x"ok"; then
 else
     AC_MSG_ERROR(Perl $PERL_VERSION or later required.)
 fi
+
+## ----------------------------------------------------------------------
+
+AC_MSG_CHECKING(for Perl Digest::SHA1 or Digest::SHA)
+AC_SUBST(PERL_DIGEST_SHA)
+
+if test x`"$PERL_COMMAND" -e "use 5.010000; print 'ok'" 2>/dev/null` = x"ok"; then
+    PERL_DIGEST_SHA="Digest::SHA"
+else
+    PERL_DIGEST_SHA="Digest::SHA1"
+fi
+
+AC_MSG_RESULT([$PERL_DIGEST_SHA])
 
 ## ----------------------------------------------------------------------
 

@@ -1,3 +1,6 @@
+2012-03-05 <fumiyas at OSS Technology, Inc., Japan>
+	* Use Digest::SHA instead of Digest::SHA1 if Perl version > 5.10.0
+
 2011-09-26 <fumiyas at OSS Technology, Inc., Japan>
 	* new tag 0.9.7
 

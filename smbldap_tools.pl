@@ -31,7 +31,7 @@ use Net::LDAP;
 use Net::LDAP::Extension::SetPassword;
 use Crypt::SmbHash;
 use Digest::MD5 qw(md5);
-use Digest::SHA1 qw(sha1);
+use @PERL_DIGEST_SHA@ qw(sha1);
 use MIME::Base64 qw(encode_base64);
 
 use constant true => 1;
