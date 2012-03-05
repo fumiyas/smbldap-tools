@@ -5,10 +5,14 @@
 %endif
 %define release		1
 
+%if 0%{!?dist:1}
+%define dist %(sed -n 's/^.* \\([1-9]*[0-9]\\)\\..*$/.el\\1/p' /etc/redhat-release 2>/dev/null)
+%endif
+
 Summary:	User and Group administration tools for Samba/LDAP
 Name: 		%{name}
 version: 	%{version}
-Release: 	%{?pre_version:0.%{pre_version}.}%{release}
+Release: 	%{?pre_version:0.%{pre_version}.}%{release}%{?dist}
 Group: 		System Environment/Base
 License: 	GPLv2+
 URL:		https://gna.org/projects/smbldap-tools/
