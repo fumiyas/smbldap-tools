@@ -464,11 +464,12 @@ if ( $tmp = $Options{'M'} ) {
         $action = $1;
     }
     my @mail = &split_arg_comma($tmp);
-    foreach my $m (@mail) {
-        my $domain = $config{mailDomain};
-        if ( $m !~ /^(.+)@/ ) {
-            $m = $m . ( $domain ? '@' . $domain : '' );
-        }
+    if (my $domain = $config{mailDomain}) {
+      for my $m (@mail) {
+	  if ( $m !~ /@/ ) {
+	      $m .= '@' . $domain;
+	  }
+      }
     }
     if ($action) {
         my @old_mail;
