@@ -122,24 +122,23 @@ sub print_group {
     print "|\n";
 }
 
-my $attrs="['gid','cn'";
+my @attrs = qw(gidNumber cn);
 my $banner="gid  |cn                   ";
 if ($Options{'d'})
 {
     $banner .=  "|displayName         ";
-    $attrs  .=  ",'displayName'";
+    push(@attrs, qw(displayName));
 }
 if ($Options{'t'})
 {
     $banner .=  "|sambaGroupType";
-    $attrs  .=  ",'sambaGroupType'";
+    push(@attrs, qw(sambaGroupType));
 }
 if ($Options{'S'})
 {
     $banner .=  "|sambaSID                                       ";
-    $attrs  .=  ",'sambaSID'";
+    push(@attrs, qw(sambaSID));
 }
-$attrs.="]";
 $banner.="|";
 print "$banner\n\n";
 my $filter;
@@ -155,7 +154,7 @@ $filter.=")";
 my  $mesg = $ldap_master->search ( base   => $base,
                                    scope => $config{scope},
                                    filter => $filter,
-				   attrs => "$attrs"
+				   attrs => \@attrs
 				   );
 $mesg->code && warn $mesg->error;
 

@@ -1,3 +1,8 @@
+2012-07-16 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-userlist, smbldap-grouplist: Specify Net::LDAP
+	  search attributes as an array ref, not a string
+	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=681350
+
 2012-03-05 <fumiyas at OSS Technology, Inc., Japan>
 	* Use Digest::SHA instead of Digest::SHA1 if Perl version > 5.10.0
 	* smbldap-usermod: -M, -O, -T option: Remove associated attribute
