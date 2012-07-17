@@ -1,3 +1,6 @@
+2012-07-17 <fumiyas at OSS Technology, Inc., Japan>
+	* smbldap-useradd: Fix smbldap-passwd name
+
 2012-07-16 <fumiyas at OSS Technology, Inc., Japan>
 	* smbldap-userlist, smbldap-grouplist: Specify Net::LDAP
 	  search attributes as an array ref, not a string

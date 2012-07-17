@@ -648,7 +648,7 @@ nsc_invalidate("passwd");
 nsc_invalidate("group");
 
 if ($Options{'P'}) {
-    my @passwd_cmd = ("$RealBin/smbldap-passwd.cmd");
+    my @passwd_cmd = ("$RealBin/smbldap-passwd");
 
     if ($Options{'B'}) {
 	## Must change Samba password at logon
