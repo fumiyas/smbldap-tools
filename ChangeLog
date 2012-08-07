@@ -5,6 +5,7 @@
 	  smbldap-userinfo, smbldap-userlist and smbldap-grouplist with
 	  SSL-enabled LDAP server
 	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=647860
+	* new tag 0.9.9
 
 2012-07-17 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd: Fix smbldap-passwd name
