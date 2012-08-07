@@ -9,6 +9,7 @@
 
 2012-07-17 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd: Fix smbldap-passwd name
+	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=679935
 
 2012-07-16 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-userlist, smbldap-grouplist: Specify Net::LDAP
