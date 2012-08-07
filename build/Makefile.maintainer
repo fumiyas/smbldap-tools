@@ -45,7 +45,7 @@ dist-archive:
 	ls -l $(ARCHIVE_DIR)/$(ARCHIVE_NAME).sig 2>/dev/null || :
 
 dist-rpm:
-	$(RPMBUILD) -ta $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
+	$(RPMBUILD) -ta $(RPMBUILD_OPTS) $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 
 configure: configure.in
 	autoconf
