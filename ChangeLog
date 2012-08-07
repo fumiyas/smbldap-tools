@@ -1,6 +1,10 @@
 2012-08-07 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: $config{masterLDAP} and $config{slaveLDAP}
 	  can take a LDAP URI
+	* smbldap_tools.pm: Non-root user cannot run smbldap-passwd,
+	  smbldap-userinfo, smbldap-userlist and smbldap-grouplist with
+	  SSL-enabled LDAP server
+	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=647860
 
 2012-07-17 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd: Fix smbldap-passwd name

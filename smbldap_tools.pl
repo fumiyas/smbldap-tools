@@ -551,54 +551,22 @@ sub does_sid_exist {
 
 # try to bind with user dn and password to validate current password
 sub is_user_valid {
-    my ( $user, $dn, $pass ) = @_;
-    my $userLdap = Net::LDAP->new(
-        "$config{slaveLDAP}",
-        port    => "$config{slavePort}",
-        version => 3,
-        timeout => 60
-      )
-      or warn
-"erreur LDAP: Can't contact slave ldap server ($@)\n=>trying to contact the master server\n";
-    if ( !$userLdap ) {
+    my ($user, $dn, $pass) = @_;
 
-        # connection to the slave failed: trying to contact the master ...
-        $userLdap = Net::LDAP->new(
-            "$config{masterLDAP}",
-            port    => "$config{masterPort}",
-            version => 3,
-            timeout => 60
-        ) or die "erreur LDAP: Can't contact master ldap server ($@)\n";
+    my $ldap = connect_ldap(
+	$config{slaveLDAP},
+	$config{slavePort},
+	$config{ldapTLS},
+    );
+
+    my $mesg = $ldap->bind(dn => $dn, password => $pass);
+    $ldap->disconnect;
+
+    if ($mesg->code) {
+	return 0;
     }
-    if ($userLdap) {
-        if ( $config{ldapTLS} == 1 ) {
-            $userLdap->start_tls(
-                verify     => "$config{verify}",
-                clientcert => "$config{clientcert}",
-                clientkey  => "$config{clientkey}",
-                cafile     => "$config{cafile}"
-            );
-        }
-        my $mesg = $userLdap->bind( dn => $dn, password => $pass );
-        if ( $mesg->code eq 0 ) {
-            $userLdap->unbind;
-            return 1;
-        }
-        else {
-            if ( $userLdap->bind() ) {
-                $userLdap->unbind;
-                return 0;
-            }
-            else {
-                print(
-"The LDAP directory is not available.\n Check the server, cables ..."
-                );
-                $userLdap->unbind;
-                return 0;
-            }
-            die "Problem : contact your administrator";
-        }
-    }
+
+    return 1;
 }
 
 # dn = get_dn_from_line ($dn_line)
