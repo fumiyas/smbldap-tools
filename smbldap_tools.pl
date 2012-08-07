@@ -260,10 +260,8 @@ sub getLocalSID {
 
 # let's read the configurations file...
 %config = (
-    masterLDAP =>		'127.0.0.1',
-    masterPort =>		389,
-    slaveLDAP =>		'127.0.0.1',
-    slavePort =>		389,
+    masterLDAP =>		'ldap://127.0.0.1/',
+    slaveLDAP =>		'ldap://127.0.0.1/',
     ldapTLS =>			false,
     ldapSSL =>			false,
     password_hash =>		'SSHA',
@@ -331,93 +329,95 @@ if ( $config{ldapSSL} == 1 and $config{ldapTLS} == 1 ) {
     die "Both options ldapSSL and ldapTLS could not be activated\n";
 }
 
-sub connect_ldap_master {
-    my $mesg;
+sub connect_ldap {
+    my ($server, $port, $tls) = @_;
 
-    # bind to a directory with dn and password
-    my $ldap_master;
-    if ( $config{ldapSSL} ) {
-        $ldap_master = Net::LDAP->new(
-            "ldaps://$config{masterLDAP}:$config{masterPort}",
-            verify => "$config{verify}",
-            cafile => "$config{cafile}"
-        ) or die "LDAP error: Can't contact master ldap server with SSL ($@)";
-    }
-    else {
-        $ldap_master = Net::LDAP->new(
-            "$config{masterLDAP}",
-            port    => "$config{masterPort}",
-            version => 3,
-            timeout => 60,
+    my @params = (
+	version => 3,
+	timeout => 60,
+    );
 
-            # debug => 0xffff,
-          )
-          or die
-          "erreur LDAP: Can't contact master ldap server for writing ($@)";
+    my $uri;
+    if ($server =~ m#^\w+://#) {
+	$uri = $server;
+    } else {
+	if ($config{ldapSSL}) {
+	    $uri = "ldaps://$server";
+	    push(@params,
+		verify => $config{verify},
+		cafile => $config{cafile},
+	    );
+	} else {
+	    $uri = "ldap://$server";
+	}
+	$uri .= ":$port" if ($port);
     }
-    if ( $config{ldapTLS} == 1 ) {
-        $mesg = $ldap_master->start_tls(
-            verify     => "$config{verify}",
-            clientcert => "$config{clientcert}",
-            clientkey  => "$config{clientkey}",
-            cafile     => "$config{cafile}"
+
+    my $ldap = Net::LDAP->new($uri, @params);
+    unless ($ldap) {
+        die "Cannot connect to LDAP server: $uri: $@\n";
+    }
+
+    if ($tls) {
+        my $mesg = $ldap->start_tls(
+            verify     => $config{verify},
+            clientcert => $config{clientcert},
+            clientkey  => $config{clientkey},
+            cafile     => $config{cafile},
         );
-        if ( $mesg->code ) {
-            die( "Could not start_tls: " . $mesg->error );
+        if ($mesg->code) {
+	    $ldap->disconnect;
+	    die( "Cannot start TLS on LDAP connection: $uri: " . $mesg->error . "\n");
         }
     }
-    $mesg = $ldap_master->bind( "$config{masterDN}",
-        password => "$config{masterPw}" );
+
+    return $ldap;
+}
+
+sub connect_ldap_master {
+    my $bind_dn = defined($_[0]) ? shift : $config{masterDN};
+    my $bind_pw = defined($_[0]) ? shift : $config{masterPw};
+
+    my $ldap_master = connect_ldap(
+        $config{masterLDAP},
+        $config{masterPort},
+	$config{ldapTLS},
+    );
+
+    $ldap_master->bind($bind_dn, password => $bind_pw);
+
     $ldap = $ldap_master;
-    return ($ldap_master);
+
+    return $ldap_master;
 }
 
 sub connect_ldap_slave {
-    my $mesg;
-    my $conf_cert;
+    my $bind_dn = defined($_[0]) ? shift : $config{slaveDN};
+    my $bind_pw = defined($_[0]) ? shift : $config{slavePw};
     my $ldap_slave;
-    if ( $config{ldapSSL} == 1 ) {
-        $ldap_slave = Net::LDAP->new(
-            "ldaps://$config{slaveLDAP}:$config{slavePort}",
-            verify => "$config{verify}",
-            cafile => "$config{cafile}"
-          )
-          or warn
-"LDAP error: Can't contact slave ldap server with SSL ($@)\n=>trying to contact the master server\n";
-    }
-    else {
-        $ldap_slave = Net::LDAP->new(
-            "$config{slaveLDAP}",
-            port    => "$config{slavePort}",
-            version => 3,
-            timeout => 60,
 
-            # debug => 0xffff,
-          )
-          or warn
-"erreur LDAP: Can't contact slave ldap server ($@)\n=>trying to contact the master server\n";
-    }
-    if ( !$ldap_slave ) {
+    eval {
+	$ldap_slave = connect_ldap(
+	    $config{slaveLDAP},
+	    $config{slavePort},
+	    $config{ldapTLS},
+	);
 
-        # connection to the slave failed: trying to contact the master ...
-        $ldap_slave      = connect_ldap_master();
-        $config{slaveDN} = $config{masterDN};
-        $config{slavePw} = $config{masterPw};
+	$ldap_slave->bind($bind_dn, password => $bind_pw);
+    };
+
+    if ($@) {
+	if ($config{masterLDAP} eq $config{slaveLDAP}) {
+	    die "$@";
+	}
+	warn "$@";
+	warn "Trying to contact the LDAP master server...\n";
+	$ldap_slave = connect_ldap_master($bind_dn, $bind_pw);
     }
-    elsif ( $config{ldapTLS} == 1 ) {
-        $mesg = $ldap_slave->start_tls(
-            verify     => "$config{verify}",
-            clientcert => "$config{clientcert}",
-            clientkey  => "$config{clientkey}",
-            cafile     => "$config{cafile}"
-        );
-        if ( $mesg->code ) {
-            die( "Could not start_tls: " . $mesg->error );
-        }
-    }
-    $ldap_slave->bind( "$config{slaveDN}", password => "$config{slavePw}" );
+
     $ldap = $ldap_slave;
-    return ($ldap_slave);
+
+    return $ldap_slave;
 }
 
 sub get_user_dn {

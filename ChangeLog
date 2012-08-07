@@ -1,36 +1,40 @@
-2012-07-17 <fumiyas at OSS Technology, Inc., Japan>
+2012-08-07 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap_tools.pm: $config{masterLDAP} and $config{slaveLDAP}
+	  can take a LDAP URI
+
+2012-07-17 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd: Fix smbldap-passwd name
 
-2012-07-16 <fumiyas at OSS Technology, Inc., Japan>
+2012-07-16 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-userlist, smbldap-grouplist: Specify Net::LDAP
 	  search attributes as an array ref, not a string
 	  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=681350
 
-2012-03-05 <fumiyas at OSS Technology, Inc., Japan>
+2012-03-05 <fumiyas at OSS Technology Corp., Japan>
 	* Use Digest::SHA instead of Digest::SHA1 if Perl version > 5.10.0
 	* smbldap-usermod: -M, -O, -T option: Remove associated attribute
 	  when the null value is specified
 
-2011-09-26 <fumiyas at OSS Technology, Inc., Japan>
+2011-09-26 <fumiyas at OSS Technology Corp., Japan>
 	* new tag 0.9.7
 
-2011-09-06 <fumiyas at OSS Technology, Inc., Japan>
+2011-09-06 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-populate: Create parent entry for $config{sambaUnixIdPooldn}
 	  if it does not exist
 
-2011-09-02 <fumiyas at OSS Technology, Inc., Japan>
+2011-09-02 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-config: Rename from configure.pl
 
-2011-07-23 <fumiyas at OSS Technology, Inc., Japan>
+2011-07-23 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-populate: Create parent entry for $config{usersdn}
 	  (and others) if it does not exist
 	  (e.g. usersdn="ou=Users,ou=parent,${suffix}" in smbldap.conf)
 
-2011-07-13 <fumiyas at OSS Technology, Inc., Japan>
+2011-07-13 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd: New option: --non-unique (Allow the creation of a
 	  user account with a duplicate (non-unique) UID)
 
-2011-07-12 <fumiyas at OSS Technology, Inc., Japan>
+2011-07-12 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-usermod: New option: --ou NODE (move user entry to the
 	  specified organazional unit)
 	* Canonize user name to treat the memberUid as case-sensitive
@@ -38,44 +42,44 @@
 	* smbldap-useradd: New option: -p (allow to set password from
 	  STDIN without verification, e.g. using a pipe)
 
-2011-07-08 <fumiyas at OSS Technology, Inc., Japan>
+2011-07-08 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-populate: Use Net::LDAP::Entry for populating entries
 
-2011-06-29 <fumiyas at OSS Technology, Inc., Japan>
+2011-06-29 <fumiyas at OSS Technology Corp., Japan>
 	* Use sambaNextRid attribute in sambaDomain entry for the next RID
 	  as same as Samba 3.0+ (only when sambaAlgorithmicRidBase attribute
 	  does NOT exists in sambaDomain entry for backward compatibility)
 
-2011-06-24 <fumiyas at OSS Technology, Inc., Japan>
+2011-06-24 <fumiyas at OSS Technology Corp., Japan>
 	* Rename smbldap.conf parameters:
 	  - hash_encrypt -> password_hash
 	  - crypt_salt_format -> password_crypt_salt_format
 	* LDAPv3 Password Modify (RFC 3062) extended operation
 	  support when password_hash="exop" in smbldap.conf
 
-2011-06-23 <fumiyas at OSS Technology, Inc., Japan>
+2011-06-23 <fumiyas at OSS Technology Corp., Japan>
 	* Add shadowAccount parameter in smbldap.conf to control whether
 	  to treat shadowAccount objectclass and attributes or not
 
-2011-06-22 <fumiyas at OSS Technology, Inc., Japan>
+2011-06-22 <fumiyas at OSS Technology Corp., Japan>
 	* Introduce autoconf (configure.in, Makefile.in and so on)
 
-2011-06-14 <fumiyas at OSS Technology, Inc., Japan>
+2011-06-14 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-passwd: Do not use permuted -s option for the smbpasswd(1)
 	  command-line because the plain-old getopt(3) does not support it
 
-2011-05-28 <fumiyas at OSS Technology, Inc., Japan>
+2011-05-28 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: Add read_password() to avoid `stty -echo` hacks
 	* Use /usr/sbin/nscd -i instead of /etc/init.d/nscd
 
-2011-05-24 <fumiyas at OSS Technology, Inc., Japan>
+2011-05-24 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-populate, smbldap_tools.pm: Use /nonexistent instead
 	  of /dev/null for guest's and computer's homeDirectory
 
-2011-03-09 <fumiyas at OSS Technology, Inc., Japan>
+2011-03-09 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: Use Encode instead of Unicode::MapUTF8
 
-2011-02-23 <fumiyas at OSS Technology, Inc., Japan>
+2011-02-23 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm:
 	  - get_next_id: Use getgrgid() for GID number
 	  - read_parameter: Use lexically-scoped variable $line
