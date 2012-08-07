@@ -1,6 +1,6 @@
 2012-08-07 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: $config{masterLDAP} and $config{slaveLDAP}
-	  can take a LDAP URI
+	  can take an LDAP URI
 	* smbldap_tools.pm: Non-root user cannot run smbldap-passwd,
 	  smbldap-userinfo, smbldap-userlist and smbldap-grouplist with
 	  SSL-enabled LDAP server
@@ -254,9 +254,9 @@
 	account, just set the 'top', 'account' and 'posixAccount' objectclass
 
 	* smbldap_tools.pm (parse_group): same as below: replace getgrgid() by
-	a ldap querie
+	an ldap querie
 
-	* smbldap-groupmod: replace the call of getgrnam() with a ldap search
+	* smbldap-groupmod: replace the call of getgrnam() with an ldap search
 	because getgrnam() can't return the group gidNumber in case the script
 	is executed from a server where ldap auth is not set
 	(tnx to Konstantin Munning)

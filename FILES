@@ -14,26 +14,26 @@ Core:
 =-=-=
 smbldap-groupadd    : add a new LDAP group entry
 			(objectclass: posixGroup)
-smbldap-groupdel    : delete a LDAP group entry
+smbldap-groupdel    : delete an LDAP group entry
 			(objectclass: posixGroup)
 smbldap-grouplist   : list LDAP group entries
 			(objectclass: posixGroup)
-smbldap-groupmod    : modify a LDAP group entry (or its members)
+smbldap-groupmod    : modify an LDAP group entry (or its members)
 			(objectclass: posixGroup)
-smbldap-groupshow   : view a LDAP group entry
+smbldap-groupshow   : view an LDAP group entry
 			(objectclass: posixGroup)
 smbldap.conf        : global configuration
 smbldap_bind.conf   : LDAP binding configuration
 smbldap_tools.pm    : functions
 smbldap-useradd     : add a new LDAP user
 			(objectclass: posixAccount and/or sambaSamAccount)
-smbldap-userdel     : delete a LDAP user
+smbldap-userdel     : delete an LDAP user
 			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-userlist    : list LDAP users
 			(objectclass: posixAccount and/or sambaSamAccount)
-smbldap-usermod     : modify a LDAP user entry
+smbldap-usermod     : modify an LDAP user entry
 			(objectclass: posixAccount and/or sambaSamAccount)
-smbldap-usershow    : view a LDAP user entry
+smbldap-usershow    : view an LDAP user entry
 			(objectclass: posixAccount and/or sambaSamAccount)
 smbldap-passwd      : set and sync LDAP passwdords (Unix and Samba)
 			(replacement for the system passwd utility)
