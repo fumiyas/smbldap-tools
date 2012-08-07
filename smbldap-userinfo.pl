@@ -54,8 +54,8 @@ if ( $< != 0 ) {
     }
 } else {
     if ( $ARGV[0] ) {
-    $user = $ARGV[0];
-}
+	$user = $ARGV[0];
+    }
     $pass = 1;
 }
 
@@ -159,26 +159,26 @@ if ($< != 0) {
     if (!defined($pass)) {
 	$pass = password_read("UNIX password: ");
 
-# now make a connection with the user's dn and password
-$config{masterDN}="$dn";
-$config{masterPw}="$pass";
-$ldap_master=connect_ldap_master();
-$dn=$config{masterDN};
-if (!is_user_valid($user, $dn, $pass)) {
-    print "Authentication failure\n";
-    exit (10);
-}
-}
+	# now make a connection with the user's dn and password
+	$config{masterDN}="$dn";
+	$config{masterPw}="$pass";
+	$ldap_master=connect_ldap_master();
+	$dn=$config{masterDN};
+	if (!is_user_valid($user, $dn, $pass)) {
+	    print "Authentication failure\n";
+	    exit (10);
+	}
+    }
 } else {
     # root user
     $ldap_master=connect_ldap_master();
-# test existence of user in LDAP
-my $dn_line;
-if (!defined($dn_line = get_user_dn($user))) {
-    print "$0: user $user doesn't exist\n";
-exit (10);
-}
-$dn = get_dn_from_line($dn_line);
+    # test existence of user in LDAP
+    my $dn_line;
+    if (!defined($dn_line = get_user_dn($user))) {
+	print "$0: user $user doesn't exist\n";
+	exit (10);
+    }
+    $dn = get_dn_from_line($dn_line);
 }
 
 # obtain old values

@@ -43,7 +43,6 @@ if ( (!$ok) || ($Options{'?'}) || $Options{'h'} ) {
 }
 
 my $binduser;
-my $pass;
 
 if (!defined($binduser)) {
     $binduser = getpwuid($<);
@@ -65,25 +64,21 @@ my ($dn,$ldap_master);
 # First, connecting to the directory
 if ($< != 0) {
     # non-root user
-    if (!defined($pass)) {
-	$pass = password_read("UNIX password: ");
+    my $pass = password_read("UNIX password: ");
 
-# JTO: search real basedn: may be different in case ou=bla1,ou=bla2 !
-# JTO: faire afficher egalement lock, expire et lastChange
-$config{masterDN}="uid=$binduser,$config{usersdn}";
-$config{masterPw}="$pass";
-$ldap_master=connect_ldap_master();
-$dn=$config{masterDN};
-if (!is_user_valid($binduser, $dn, $pass)) {
-    print "Authentication failure\n";
-    exit (10);
-}
-}
+    # JTO: search real basedn: may be different in case ou=bla1,ou=bla2 !
+    # JTO: faire afficher egalement lock, expire et lastChange
+    $config{masterDN}="uid=$binduser,$config{usersdn}";
+    $config{masterPw}="$pass";
+    $ldap_master=connect_ldap_master();
+    $dn=$config{masterDN};
+    if (!is_user_valid($binduser, $dn, $pass)) {
+	print "Authentication failure\n";
+	exit (10);
+    }
 } else {
     # root user
     $ldap_master=connect_ldap_master();
-# test existence of user in LDAP
-my $dn_line;
 }
 
 sub print_group {
@@ -141,8 +136,7 @@ if ($Options{'S'})
 }
 $banner.="|";
 print "$banner\n\n";
-my $filter;
-$filter = "(&(objectclass=posixGroup)";
+my $filter = "(&(objectclass=posixGroup)";
 my $base = $config{groupsdn};
 
 if ($search) {
