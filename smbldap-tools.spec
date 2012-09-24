@@ -103,19 +103,19 @@ fi
 %{_mandir}/man8/smbldap-usershow.8*
 
 %changelog
-* Tue Aug  7 2012 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.9-1
+* Tue Aug  7 2012 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.9-1
 - New upstream version
 
-* Mon Mar  5 2012 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.8-1
+* Mon Mar  5 2012 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.8-1
 - New upstream version
 
-* Mon Sep 26 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.7-1
+* Mon Sep 26 2011 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.7-1
 - New upstream version
 
-* Thu Jul  7 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-3
+* Thu Jul  7 2011 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.6.svn-3
 - Run smbldap-upgrade-0.9.6.pl in %%triggerun %%{name} < 0.9.6.svn
 
-* Wed Jun 22 2011 SATOH Fumiyasu <fumiyas at OSS Technology, Inc.> - 0.9.6.svn-2
+* Wed Jun 22 2011 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.6.svn-2
 - New upstream version
 
 * Fri Aug 10 2007 Jerome Tournier <jtournier@gmail.com> 0.9.4-1

@@ -32,7 +32,7 @@ Many thanks for bug reports and patches:
 	originaly useradd.pl
  . Alain Richard <alain.richard@equation.fr>
 	bug report and Perl tips
- . Roland Schulz <mail@r2s2.de> 
+ . Roland Schulz <mail@r2s2.de>
 	bug report for smbldap-passwd
  . Xavier Boschian <Xavier.Boschian@rtlgroup.net>
 	bug report for smbldap-populate
