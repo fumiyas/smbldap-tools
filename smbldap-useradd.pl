@@ -490,7 +490,11 @@ if (@userMailLocal) {
     push( @adds, 'mailLocalAddress' => [@userMailLocal] );
 }
 if (@userMailTo) {
-    push( @adds, 'mailRoutingAddress' => [@userMailTo] );
+    if (is_attr_single_value('mailRoutingAddress')) {
+        push(@adds, 'mailRoutingAddress' => join(',', @userMailTo));
+    } else {
+        push(@adds, 'mailRoutingAddress' => \@userMailTo);
+    }
 }
 
 # Custom modification - MPK

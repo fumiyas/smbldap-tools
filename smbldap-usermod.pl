@@ -517,7 +517,9 @@ if (defined($tmp = $Options{'T'})) {
     }
     my @userMailTo = &split_arg_comma($tmp);
     if ($action) {
-        @old = $user_entry->get_value('mailRoutingAddress');
+        @old = map {
+            split_arg_comma($_);
+        } $user_entry->get_value('mailRoutingAddress');
     }
     if ( $action eq '+' ) {
         @userMailTo = &list_union( \@old, \@userMailTo );
@@ -525,7 +527,11 @@ if (defined($tmp = $Options{'T'})) {
     elsif ( $action eq '-' ) {
         @userMailTo = &list_minus( \@old, \@userMailTo );
     }
-    push( @mods, 'mailRoutingAddress', [@userMailTo] );
+    if (is_attr_single_value('mailRoutingAddress')) {
+        push(@mods, 'mailRoutingAddress' => join(',', @userMailTo));
+    } else {
+        push(@mods, 'mailRoutingAddress' => \@userMailTo);
+    }
     $mailobj = 1;
 }
 if ($mailobj) {
