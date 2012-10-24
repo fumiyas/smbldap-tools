@@ -1,3 +1,7 @@
+2012-10-19 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap_tools.pm: read_user_human_readable: Protect attribute
+	  values from Encode::decode_utf8() with Encode::FB_CROAK
+
 2012-08-07 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: $config{masterLDAP} and $config{slaveLDAP}
 	  can take an LDAP URI

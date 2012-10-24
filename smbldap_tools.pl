@@ -808,7 +808,10 @@ sub read_user {
         foreach my $attr ( $entry->attributes ) {
             my @vals = $entry->get_value($attr);
 #	    my $val_utf8 = eval {
-#		Encode::decode_utf8($val, Encode::FB_CROAK);
+#               ## Use $tmp because Encode::FB_CROAK may change the input
+#               ## string. See Encode::FB_QUIET description in
+#               ## `perldoc Encode` for details.
+#		Encode::decode_utf8(my $tmp=$val, Encode::FB_CROAK);
 #	    };
 #	    $val = "**UNPRINTABLE**" if ($@ || $val_utf8 =~ /\P{IsPrint}/);
             $lines .= $attr . ": " . join( ',', @vals ) . "\n";
@@ -838,7 +841,10 @@ sub read_user_human_readable {
             my @vals = $entry->get_value($attr);
             foreach my $val (@vals) {
 		my $val_utf8 = eval {
-		    Encode::decode_utf8($val, Encode::FB_CROAK);
+                    ## Use $tmp because Encode::FB_CROAK may change the input
+                    ## string. See Encode::FB_QUIET description in
+                    ## `perldoc Encode` for details.
+		    Encode::decode_utf8(my $tmp=$val, Encode::FB_CROAK);
 		};
 		$val = "**UNPRINTABLE**" if ($@ || $val_utf8 =~ /\P{IsPrint}/);
             }
