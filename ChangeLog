@@ -1,3 +1,7 @@
+2012-10-24 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap_tools.pm: Add is_attr_single_value() to check if
+	  a specified attribute is defined as single-value in the LDAP schema
+
 2012-10-19 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: read_user_human_readable: Protect attribute
 	  values from Encode::decode_utf8() with Encode::FB_CROAK

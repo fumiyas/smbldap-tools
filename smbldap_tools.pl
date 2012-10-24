@@ -71,6 +71,7 @@ use vars qw(%config $ldap);
   is_unix_user
   is_nonldap_unix_user
   is_user_valid
+  is_attr_single_value
   does_sid_exist
   get_dn_from_line
   add_posix_machine
@@ -567,6 +568,18 @@ sub is_user_valid {
     }
 
     return 1;
+}
+
+sub is_attr_single_value {
+    my $attr = shift;
+    my $schema_attr = $ldap->schema->attribute($attr);
+
+    unless ($schema_attr) {
+        warn "Attribute not found in LDAP schema: $attr";
+        return true;
+    }
+
+    return $schema_attr->{'single-value'};
 }
 
 # dn = get_dn_from_line ($dn_line)
