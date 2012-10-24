@@ -527,10 +527,15 @@ if (defined($tmp = $Options{'T'})) {
     elsif ( $action eq '-' ) {
         @userMailTo = &list_minus( \@old, \@userMailTo );
     }
-    if (is_attr_single_value('mailRoutingAddress')) {
-        push(@mods, 'mailRoutingAddress' => join(',', @userMailTo));
-    } else {
-        push(@mods, 'mailRoutingAddress' => \@userMailTo);
+
+    if (@userMailTo) {
+        if (is_attr_single_value('mailRoutingAddress')) {
+            push(@mods, 'mailRoutingAddress' => join(',', @userMailTo));
+        } else {
+            push(@mods, 'mailRoutingAddress' => \@userMailTo);
+        }
+    } elsif (@old) {
+        push(@dels, 'mailRoutingAddress' => []);
     }
     $mailobj = 1;
 }
@@ -791,9 +796,8 @@ my $modify = $ldap_master->modify( "$dn", 'replace' => {@mods} );
 $modify->code && warn "failed to modify entry: ", $modify->error;
 
 # we can delete only if @dels is not empty: we check the number of elements
-my $nb_to_del = scalar(@dels);
-if ( $nb_to_del != 0 ) {
-    $modify = $ldap_master->modify( "$dn", 'delete' => {@dels} );
+if (@dels) {
+    $modify = $ldap_master->modify($dn, 'delete' => {@dels});
 
     # don't proceed on error
     $modify->code && die "failed to modify entry: ", $modify->error;
