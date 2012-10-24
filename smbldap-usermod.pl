@@ -481,7 +481,11 @@ if (defined($tmp = $Options{'M'})) {
             @mail          = &list_minus( \@old_mail,      \@mail );
         }
     }
-    push( @mods, 'mail' => [@mail] );
+    if (@mail) {
+        push(@mods, 'mail' => \@mail);
+    } elsif (@old_mail) {
+        push(@dels, 'mail' => []);
+    }
 }
 
 my $mailobj = 0;
@@ -503,7 +507,11 @@ if (defined($tmp = $Options{'O'})) {
             @userMailLocal = &list_minus( \@old_MailLocal, \@userMailLocal );
         }
     }
-    push( @mods, 'mailLocalAddress', [@userMailLocal] );
+    if (@userMailLocal) {
+        push(@mods, 'mailLocalAddress' => \@userMailLocal);
+    } elsif (@old_MailLocal) {
+        push(@dels, 'mailLocalAddress' => []);
+    }
     $mailobj = 1;
 }
 
