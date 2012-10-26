@@ -40,3 +40,5 @@ Many thanks for bug reports and patches:
 	Net::LDAP support in smbldap_tools.pm
  . Paul Howarth <paul@city-fan.org>
 	various style, spelling and other bugfixes
+ . Marco Gaiarin <gaio@linux.it>
+	bug report and proposal
