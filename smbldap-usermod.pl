@@ -471,8 +471,8 @@ if (defined($tmp = $Options{'M'})) {
 	  }
       }
     }
+    my @old_mail;
     if ($action) {
-        my @old_mail;
         @old_mail      = $user_entry->get_value('mail');
         if ( $action eq '+' ) {
             @mail          = &list_union( \@old_mail,      \@mail );
@@ -497,8 +497,8 @@ if (defined($tmp = $Options{'O'})) {
         $action = $1;
     }
     my @userMailLocal = &split_arg_comma($tmp);
+    my @old_MailLocal;
     if ($action) {
-        my @old_MailLocal;
         @old_MailLocal = $user_entry->get_value('mailLocalAddress');
         if ( $action eq '+' ) {
             @userMailLocal = &list_union( \@old_MailLocal, \@userMailLocal );
