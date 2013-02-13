@@ -17,7 +17,6 @@ BUILD_TARGETS= \
 	$(BUILD_PERL_MOD_TARGETS) \
 	$(BUILD_PERL_CMD_TARGETS) \
 	$(BUILD_PERL_MAN_TARGETS) \
-	smbldap-config.cmd \
 	smbldap-upgrade-0.9.6.cmd \
 	doc/smb.conf.example \
 	doc/smb.smbldap.conf.example \
@@ -43,7 +42,9 @@ PERL_CMD_SOURCES= \
 	smbldap-userinfo.pl \
 	smbldap-userlist.pl \
 	smbldap-usermod.pl \
-	smbldap-usershow.pl
+	smbldap-usershow.pl \
+	smbldap-config.pl \
+	#
 
 PERL_MAN_SECTION=	8
 
