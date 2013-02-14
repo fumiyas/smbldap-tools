@@ -87,6 +87,7 @@ fi
 %{_sbindir}/smbldap-usermod
 %{_sbindir}/smbldap-userinfo
 %{_sbindir}/smbldap-usershow
+%{_sbindir}/smbldap-config
 %{perl_vendorlib}/smbldap_tools.pm
 %{_mandir}/man8/smbldap-groupadd.8*
 %{_mandir}/man8/smbldap-groupdel.8*
@@ -101,6 +102,7 @@ fi
 %{_mandir}/man8/smbldap-userlist.8*
 %{_mandir}/man8/smbldap-usermod.8*
 %{_mandir}/man8/smbldap-usershow.8*
+%{_mandir}/man8/smbldap-config.8*
 
 %changelog
 * Thu Feb 14 2013 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.10-1
