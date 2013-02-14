@@ -1,5 +1,5 @@
 %define name		smbldap-tools
-%define version		0.9.9
+%define version		0.9.10
 %if 0
 %define pre_version	rc3
 %endif
@@ -103,6 +103,9 @@ fi
 %{_mandir}/man8/smbldap-usershow.8*
 
 %changelog
+* Thu Feb 14 2013 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.10-1
+- New upstream version
+
 * Tue Aug  7 2012 SATOH Fumiyasu <fumiyas at OSS Technology Corp., Japan> - 0.9.9-1
 - New upstream version
 

@@ -1,3 +1,6 @@
+2013-02-14 <fumiyas at OSS Technology Corp., Japan>
+	* new tag 0.9.10
+
 2012-10-24 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap_tools.pm: Add is_attr_single_value() to check if
 	  a specified attribute is defined as single-value in the LDAP schema
