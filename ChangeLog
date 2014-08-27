@@ -1,3 +1,7 @@
+2014-08-27 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap.conf: New parameter: lanmanPassword
+	* smbldap_tools.pm: Export account_base_rid() for smbldap-usermod
+
 2013-02-14 <fumiyas at OSS Technology Corp., Japan>
 	* new tag 0.9.10
 
