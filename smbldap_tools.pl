@@ -120,6 +120,7 @@ use vars qw(%config $ldap);
   utf8Decode
   password_read
   password_set
+  password_hash_samba
   shadow_update
   nsc_invalidate
   %config
@@ -269,6 +270,7 @@ sub getLocalSID {
     password_hash =>		'SSHA',
     password_crypt_salt_format=>'%s',
     shadowAccount =>		true,
+    lanmanPassword =>		true,
     nscd =>			"/usr/sbin/nscd",
     userHomeDirectoryMode =>	"0700",
     read_conf(),
@@ -636,7 +638,7 @@ sub add_samba_machine {
     my $name     = $user;
     $name =~ s/.$//s;
 
-    my ( $lmpassword, $ntpassword ) = ntlmgen $name;
+    my ($lmpassword, $ntpassword) = password_hash_samba($name);
     my $modify = $ldap->modify(
         "uid=$user,$config{computersdn}",
         changes => [
@@ -1581,6 +1583,16 @@ sub password_salt
 
     my @seeds = ('.', '/', 0..9, 'A'..'Z', 'a'..'z');
     return join "", @seeds[map {rand scalar(@seeds)} (1..$length)];
+}
+
+sub password_hash_samba
+{
+    my ($pass) = @_;
+
+    my ($lmpass, $ntpass) = ntlmgen($pass);
+    $lmpass = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" unless ($config{lanmanPassword});
+
+    return ($lmpass, $ntpass);
 }
 
 sub shadow_update

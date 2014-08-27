@@ -27,8 +27,6 @@ use warnings;
 
 use FindBin qw($RealBin);
 use smbldap_tools;
-use Crypt::SmbHash;
-#####################
 
 use Getopt::Long;
 my %Options;
@@ -350,7 +348,7 @@ if (   defined( $Options{'w'} )
             print "New passwords don't match!\n";
             exit(10);
         }
-        my ( $lmpassword, $ntpassword ) = ntlmgen $pass;
+        my ($lmpassword, $ntpassword) = password_hash_samba($pass);
         my $date   = time;
         my $modify = $ldap_master->modify(
             "uid=$userName,$config{computersdn}",

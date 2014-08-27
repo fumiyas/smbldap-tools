@@ -28,8 +28,6 @@ use strict;
 use warnings;
 use smbldap_tools;
 
-use Crypt::SmbHash;
-
 my $user= undef;
 my $pass_old = undef;
 
@@ -153,7 +151,7 @@ if ($< != 0) {
 if ( $samba and $update_samba_passwd ) {
     if (!$config{with_smbpasswd}) {
 	# generate LanManager and NT clear text passwords
-	my ($sambaLMPassword,$sambaNTPassword) = ntlmgen $pass;
+	my ($sambaLMPassword,$sambaNTPassword) = password_hash_samba($pass);
 	# the sambaPwdLastSet must be updating
 	my $date=time;
 	my @mods;
