@@ -106,6 +106,7 @@ use vars qw(%config $ldap);
   split_arg_comma
   list_union
   list_minus
+  account_base_rid
   account_by_sid
   user_by_uid
   user_next_uid
