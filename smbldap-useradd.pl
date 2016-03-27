@@ -213,8 +213,13 @@ my $userUidNumber = $Options{'u'};
 if ( !defined($userUidNumber) ) {
     $userUidNumber = user_next_uid();
 }
-elsif (!$Options{non_unique} and my $user = user_by_uid($userUidNumber)) {
-    die "UID already owned by " . $user->dn . "\n";
+elsif (!$Options{non_unique}) {
+    if (my $user = user_by_uid($userUidNumber)) {
+	die "UID already owned by " . $user->dn . "\n";
+    }
+    if (my @pwent = getpwuid($userUidNumber)) {
+	die "UID already owned by $pwent[0]\n";
+    }
 }
 
 my $createGroup   = 0;
