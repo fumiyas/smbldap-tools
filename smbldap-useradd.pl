@@ -427,7 +427,7 @@ unless ($Options{'b'}) {
 }
 
 my $add = $ldap_master->add("uid=$userName,$config{usersdn}", attr => \@attr);
-$add->code && warn "failed to add entry: ", $add->error;
+$add->code && die "failed to add entry: ", $add->error;
 
 #if ($createGroup) {
 #    group_add($userName, $userGidNumber);
