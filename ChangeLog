@@ -1,3 +1,8 @@
+2013-03-27 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap-useradd:
+	  - Do not add dummy userPassword attribute
+	  - Die on adding a user entry fails
+
 2014-08-27 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap.conf: New parameter: lanmanPassword
 	* smbldap_tools.pm: Export account_base_rid() for smbldap-usermod
