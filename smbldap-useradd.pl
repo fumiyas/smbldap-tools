@@ -574,12 +574,11 @@ if ( defined( $Options{'a'} ) ) {
 
     }
     else {
+	my $pass;
+	$pass .= chr(rand(0x7F-0x20)+0x20) for (1..32);
         my $FILE = "|$config{smbpasswd} -s -a $userName >/dev/null";
         open( FILE, $FILE ) || die "$!\n";
-        print FILE <<EOF;
-x
-x
-EOF
+	print FILE "$pass\n$pass\n";
         close FILE;
         if ($?) {
             print "$0: error adding samba account\n";

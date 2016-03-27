@@ -2,6 +2,7 @@
 	* smbldap-useradd:
 	  - Do not add dummy userPassword attribute
 	  - Die on adding a user entry fails
+	  - Set random password instead of insecure one on `smbpasswd -a`
 
 2014-08-27 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap.conf: New parameter: lanmanPassword
