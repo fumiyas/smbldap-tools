@@ -416,7 +416,6 @@ my @attr = (
     'homeDirectory' => $userHomeDirectory,
     'loginShell'    => $config{userLoginShell},
     'gecos'         => $config{userGecos},
-    'userPassword'  => "{crypt}x"
 );
 
 push(@objectclass, 'shadowAccount') if ($config{shadowAccount});
