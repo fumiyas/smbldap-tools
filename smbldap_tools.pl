@@ -111,7 +111,7 @@ use vars qw(%config $ldap);
   user_by_uid
   user_next_uid
   user_next_rid
-  group_next_uid
+  group_next_gid
   group_next_rid
   print_banner
   getDomainName
