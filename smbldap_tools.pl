@@ -246,7 +246,9 @@ sub read_smbconf {
 my %smbconf = read_smbconf();
 
 sub getLocalSID {
-    open my $fh, "-|" or exec("$samba_bindir/net", "getlocalsid") || exit(1);
+    open my $fh, "-|"
+	or exec("$samba_bindir/net", "getlocalsid")
+	|| die "Failed to execute net: $!";
 
     my $line = <$fh>;
     if (!defined($line)) {

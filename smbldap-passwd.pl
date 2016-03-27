@@ -183,11 +183,15 @@ if ( $samba and $update_samba_passwd ) {
 
     } else {
 	if ($< != 0) {
-	    open my $fh, "|-" or exec($config{smbpasswd}, "-s") || exit(1);
+	    open my $fh, "|-"
+		or exec($config{smbpasswd}, "-s")
+		|| die "Failed to execute smbpasswd: $!";
 	    print $fh "$pass_old\n$pass\n$pass\n";
 	    close($fh);
 	} else {
-	    open my $fh, "|-" or exec($config{smbpasswd}, "-s", $user) || exit(1);
+	    open my $fh, "|-"
+		or exec($config{smbpasswd}, "-s", $user)
+		|| die "Failed to execute smbpasswd: $!";
 	    print $fh "$pass\n$pass\n";
 	    close($fh);
 	}
