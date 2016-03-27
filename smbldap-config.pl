@@ -204,7 +204,7 @@ my $userHomeDirectoryMode=read_entry(". default users' homeDirectory mode","","7
 
 my $userScript=read_entry(". default user netlogon script (use %U as username)","logonscript","",0);
 
-my $defaultMaxPasswordAge=read_entry("  default password validation time (time in days)","","45",0);
+my $defaultMaxPasswordAge=read_entry(". default password validation time (time in days)","","45",0);
 
 #############################
 # ldap directory parameters #
@@ -276,14 +276,15 @@ chomp $sid_tmp;
 print ". SID for domain $config{workgroup}: SID of the domain (can be obtained with 'net getlocalsid $netbios_name')\n";
 my $sid=read_entry("  SID for domain $config{workgroup}","","$sid_tmp",0);
 
-print ". unix password encryption: encryption used for unix passwords\n";
-my $cryp_algo=read_entry("  unix password encryption (CRYPT, MD5, SMD5, SSHA, SHA)","","SSHA",0);
-my $crypt_salt_format="";
-if ( $cryp_algo eq "CRYPT" ) {
-  print ". crypt salt format: If hash_encrypt is set to CRYPT, you may set \n";
+print ". unix password hash: hash used for unix passwords\n";
+print "  If set to \"exop\", use LDAPv3 Password Modify (RFC 3062) extended operation.\n";
+my $password_hash=read_entry("  unix password hash (CRYPT, MD5, SMD5, SSHA, SHA, CLEARTEXT)","","SSHA",0);
+my $password_crypt_salt_format="";
+if ( $password_hash eq "CRYPT" ) {
+  print ". password crypt salt format: If password_hash is set to CRYPT, you may set \n";
   print "  a salt format. The default is \"\%s\", but many systems will generate\n";
   print "  MD5 hashed passwords if you use \"\$1\$\%\.8s\"\n";
-  $crypt_salt_format=read_entry("  crypt salt format","","\%s",0);
+  $password_crypt_salt_format=read_entry("  password crypt salt format","","\%s",0);
 }
 
 my $default_user_gidnumber=read_entry(". default user gidNumber","","513",0);
@@ -295,6 +296,8 @@ my $userLoginShell=read_entry(". default login shell","","/bin/bash",0);
 my $skeletonDir=read_entry(". default skeleton directory","","/etc/skel",0);
 
 my $mailDomain=read_entry(". default domain name to append to mail address", "","",0);
+
+my $shadowAccount=read_entry(". treat shadowAccount object or not (1/0)","","1",0);
 
 print "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
 my $template_smbldap="
@@ -425,13 +428,14 @@ sambaUnixIdPooldn=\"$sambaUnixIdPooldn,\${suffix}\"
 # Default scope Used
 scope=\"sub\"
 
-# Unix password encryption (CRYPT, MD5, SMD5, SSHA, SHA, CLEARTEXT)
-hash_encrypt=\"$cryp_algo\"
+# Unix password hash scheme (CRYPT, MD5, SMD5, SSHA, SHA, CLEARTEXT)
+# If set to \"exop\", use LDAPv3 Password Modify (RFC 3062) extended operation.
+password_hash=\"$password_hash\"
 
-# if hash_encrypt is set to CRYPT, you may set a salt format.
+# if password_hash is set to CRYPT, you may set a salt format.
 # default is \"\%s\", but many systems will generate MD5 hashed
 # passwords if you use \"\$1\$\%\.8s\". This parameter is optional!
-crypt_salt_format=\"$crypt_salt_format\"
+password_crypt_salt_format=\"$password_crypt_salt_format\"
 
 ##############################################################################
 # 
@@ -462,6 +466,9 @@ defaultComputerGid=\"$default_computer_gidnumber\"
 
 # Skel dir
 skeletonDir=\"$skeletonDir\"
+
+# Treat shadowAccount object or not
+shadowAccount=\"$shadowAccount\"
 
 # Default password validation time (time in days) Comment the next line if
 # you don't want password to be enable for defaultMaxPasswordAge days (be
