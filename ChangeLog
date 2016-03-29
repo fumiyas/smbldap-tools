@@ -1,8 +1,8 @@
-2013-03-28 <fumiyas at OSS Technology Corp., Japan>
+2016-03-28 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-config: Add support renamed and new parameters
 	  (Thanks to Gervasio Susterman <gerv>, bug #2914)
 
-2013-03-27 <fumiyas at OSS Technology Corp., Japan>
+2016-03-27 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-useradd:
 	  - Do not add dummy userPassword attribute
 	  - Die on adding a user entry fails
