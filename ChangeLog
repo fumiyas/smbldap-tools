@@ -1,6 +1,9 @@
 2016-03-29 <fumiyas at OSS Technology Corp., Japan>
-	* smbldap-config: Add POD text
-	  (Thanks to Paul Howarth <pghmcfc>, bug #3013)
+	* smbldap-config:
+	  - Add POD text
+	    (Thanks to Paul Howarth <pghmcfc>, bug #3013)
+	  - Do NOT assume "ou=..."-style value for "ldap users suffix",
+	    "ldap groups suffix" and "ldap machine suffix" in smb.conf
 
 2016-03-28 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-config: Add support renamed and new parameters

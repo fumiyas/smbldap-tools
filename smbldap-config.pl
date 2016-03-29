@@ -210,11 +210,8 @@ my $defaultMaxPasswordAge=read_entry(". default password validation time (time i
 #############################
 my $ldap_suffix=read_entry(". ldap suffix","ldapsuffix","",0);
 my $ldap_group_suffix=read_entry(". ldap group suffix","ldapgroupsuffix","",0);
-$ldap_group_suffix=~s/ou=//;
 my $ldap_user_suffix=read_entry(". ldap user suffix","ldapusersuffix","",0);
-$ldap_user_suffix=~s/ou=//;
 my $ldap_machine_suffix=read_entry(". ldap machine suffix","ldapmachinesuffix","",0);
-$ldap_machine_suffix=~s/ou=//;
 my $ldap_idmap_suffix=read_entry(". Idmap suffix","ldapidmapsuffix","ou=Idmap",0);
 print ". sambaUnixIdPooldn: object where you want to store the next uidNumber\n";
 print "  and gidNumber available for new users and groups\n";
@@ -401,17 +398,17 @@ suffix=\"$ldap_suffix\"
 # Where are stored Users
 # Ex: usersdn=\"ou=Users,dc=IDEALX,dc=ORG\"
 # Warning: if 'suffix' is not set here, you must set the full dn for usersdn
-usersdn=\"ou=$ldap_user_suffix,\${suffix}\"
+usersdn=\"$ldap_user_suffix,\${suffix}\"
 
 # Where are stored Computers
 # Ex: computersdn=\"ou=Computers,dc=IDEALX,dc=ORG\"
 # Warning: if 'suffix' is not set here, you must set the full dn for computersdn
-computersdn=\"ou=$ldap_machine_suffix,\${suffix}\"
+computersdn=\"$ldap_machine_suffix,\${suffix}\"
 
 # Where are stored Groups
 # Ex: groupsdn=\"ou=Groups,dc=IDEALX,dc=ORG\"
 # Warning: if 'suffix' is not set here, you must set the full dn for groupsdn
-groupsdn=\"ou=$ldap_group_suffix,\${suffix}\"
+groupsdn=\"$ldap_group_suffix,\${suffix}\"
 
 # Where are stored Idmap entries (used if samba is a domain member server)
 # Ex: groupsdn=\"ou=Idmap,dc=IDEALX,dc=ORG\"
