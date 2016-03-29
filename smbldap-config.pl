@@ -564,3 +564,20 @@ print "  $smbldap_bind_conf done.\n";
 $mode=0600;
 chmod $mode,"$smbldap_bind_conf","$smbldap_bind_conf.old";
 
+__END__
+
+=head1 NAME
+
+smbldap-config - Configure the smbldap-tools
+
+=head1 SYNOPSIS
+
+smbldap-config
+
+=head1 DESCRIPTION
+
+An interactive script to configure the smbldap-tools to work with your
+existing LDAP server(s). Before running it, you should ensure that your
+samba controller is up and running, and that the domain SID is defined
+
+=cut

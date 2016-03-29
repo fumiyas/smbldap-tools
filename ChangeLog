@@ -1,3 +1,7 @@
+2016-03-29 <fumiyas at OSS Technology Corp., Japan>
+	* smbldap-config: Add POD text
+	  (Thanks to Paul Howarth <pghmcfc>, bug #3013)
+
 2016-03-28 <fumiyas at OSS Technology Corp., Japan>
 	* smbldap-config: Add support renamed and new parameters
 	  (Thanks to Gervasio Susterman <gerv>, bug #2914)
