@@ -272,7 +272,7 @@ sub getLocalSID {
     password_hash =>		'SSHA',
     password_crypt_salt_format=>'%s',
     shadowAccount =>		true,
-    lanmanPassword =>		true,
+    lanmanPassword =>		false,
     nscd =>			"/usr/sbin/nscd",
     userHomeDirectoryMode =>	"0700",
     read_conf(),
