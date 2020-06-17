@@ -15,9 +15,10 @@ version: 	%{version}
 Release: 	%{?pre_version:0.%{pre_version}.}%{release}%{?dist}
 Group: 		System Environment/Base
 License: 	GPLv2+
-URL:		https://gna.org/projects/smbldap-tools/
+URL:		https://github.com/fumiyas/smbldap-tools
 Packager:	SATOH Fumiyasu
-Source0: 	http://download.gna.org/smbldap-tools/sources/%{version}%{?pre_version}/smbldap-tools-%{version}%{?pre_version}.tar.gz
+# https://github.com/fumiyas/smbldap-tools/archive/v%{version}%{?pre_version}.tar.gz
+Source0: 	smbldap-tools-%{version}%{?pre_version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	perl
 BuildArch:	noarch

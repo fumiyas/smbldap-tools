@@ -1,9 +1,9 @@
 # $Id$
 
-Latest version may be found at https://gna.org/projects/smbldap-tools/
+Latest version may be found at https://github.com/fumiyas/smbldap-tools
 
 Bug Report:
-  * Upstream: https://gna.org/bugs/?group=smbldap-tools
+  * Upstream: https://github.com/fumiyas/smbldap-tools
   * Ubuntu:   https://bugs.launchpad.net/ubuntu/+source/smbldap-tools/
   * Debian:   http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=smbldap-tools
 
